@@ -1,0 +1,238 @@
+E:\AllProjects\20251113_扬州大学演示DEMO\扬州大学演示DEMO\Example_Demo.exe
+E:\AllProjects\20251113_扬州大学演示DEMO\扬州大学演示DEMO\Example_Demo.pdb
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.csproj.AssemblyReference.cache
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\MainWindow.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CANView.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OtherView.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\BridgeView.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\IOView.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CounterTachoView.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\PtTypeView.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\RealTimeChartView.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ShowDataView.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OutDataView.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\StrainView.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\ThermocoupleView.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\VoltageView.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\DeviceSampleFreqWindow.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\OutDataSetWindow.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\App.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\GeneratedInternalTypeHelper.g.cs
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo_MarkupCompile.cache
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo_MarkupCompile.lref
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\MainWindow.baml
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CANView.baml
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OtherView.baml
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\BridgeView.baml
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\IOView.baml
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CounterTachoView.baml
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\PtTypeView.baml
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\RealTimeChartView.baml
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ShowDataView.baml
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OutDataView.baml
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\StrainView.baml
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\ThermocoupleView.baml
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\VoltageView.baml
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\DeviceSampleFreqWindow.baml
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\OutDataSetWindow.baml
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.g.resources
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.Properties.Resources.resources
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.csproj.GenerateResource.cache
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.csproj.CoreCompileInputs.cache
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_.28533534.Up2Date
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.exe
+E:\Code\dhtest\CustomSoftWare\InterfaceDemo\Demo_c#\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.pdb
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.csproj.AssemblyReference.cache
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\MainWindow.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CANView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OtherView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\BridgeView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\IOView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CounterTachoView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\PtTypeView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\RealTimeChartView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ShowDataView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OutDataView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\StrainView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\ThermocoupleView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\VoltageView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\DeviceSampleFreqWindow.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\OutDataSetWindow.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\App.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\GeneratedInternalTypeHelper.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo_MarkupCompile.cache
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo_MarkupCompile.lref
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\MainWindow.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CANView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OtherView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\BridgeView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\IOView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CounterTachoView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\PtTypeView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\RealTimeChartView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ShowDataView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OutDataView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\StrainView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\ThermocoupleView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\VoltageView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\DeviceSampleFreqWindow.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\OutDataSetWindow.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.g.resources
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.Properties.Resources.resources
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.csproj.GenerateResource.cache
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.csproj.CoreCompileInputs.cache
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_.28533534.Up2Date
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.exe
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.pdb
+C:\Users\Administrator\Desktop\扬州大学演示DEMO(yzcaijie@126.com)\Example_Demo.exe
+C:\Users\Administrator\Desktop\扬州大学演示DEMO(yzcaijie@126.com)\Example_Demo.pdb
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\Example_Demo.exe
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\Example_Demo.pdb
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\DHHandle.dll
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\LiveCharts.dll
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\LiveCharts.Wpf.dll
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\DHHandle.pdb
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\LiveCharts.pdb
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\LiveCharts.xml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\LiveCharts.Wpf.pdb
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\Example_Demo\LiveCharts.Wpf.xml
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\bin\Example_Demo.exe
+E:\AllProjects\20251113_扬州大学演示DEMO\Demo_C#(模拟回调)\bin\Example_Demo.pdb
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\bin\Example_Demo.exe
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\bin\Example_Demo.pdb
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.csproj.AssemblyReference.cache
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\MainWindow.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CANView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OtherView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\BridgeView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\IOView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CounterTachoView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\PtTypeView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\RealTimeChartView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ShowDataView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OutDataView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\StrainView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\ThermocoupleView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\VoltageView.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\DeviceSampleFreqWindow.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\OutDataSetWindow.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\App.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\GeneratedInternalTypeHelper.g.cs
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo_MarkupCompile.cache
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo_MarkupCompile.lref
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\MainWindow.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CANView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OtherView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\BridgeView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\IOView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CounterTachoView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\PtTypeView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\RealTimeChartView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ShowDataView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OutDataView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\StrainView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\ThermocoupleView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\ChnView\VoltageView.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\DeviceSampleFreqWindow.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Source\View\OutDataSetWindow.baml
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.g.resources
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.Properties.Resources.resources
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.csproj.GenerateResource.cache
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.csproj.CoreCompileInputs.cache
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_.28533534.Up2Date
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.exe
+E:\AllProjects\20251113_扬州大学演示DEMO\发扬州大学\Demo_C#(模拟回调)\Example_Demo\obj\x64\Debug\Example_Demo.pdb
+D:\DHDAS\Example_Demo.exe.config
+D:\DHDAS\Example_Demo.exe
+D:\DHDAS\Example_Demo.pdb
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo.csproj.AssemblyReference.cache
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\MainWindow.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CANView.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OtherView.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\BridgeView.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\IOView.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CounterTachoView.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\PtTypeView.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\RealTimeChartView.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ShowDataView.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OutDataView.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\StrainView.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\ThermocoupleView.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\VoltageView.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\DeviceSampleFreqWindow.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\OutDataSetWindow.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\App.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\GeneratedInternalTypeHelper.g.cs
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo_MarkupCompile.cache
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo_MarkupCompile.lref
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\MainWindow.baml
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CANView.baml
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OtherView.baml
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\BridgeView.baml
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\IOView.baml
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CounterTachoView.baml
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\PtTypeView.baml
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\RealTimeChartView.baml
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ShowDataView.baml
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OutDataView.baml
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\StrainView.baml
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\ThermocoupleView.baml
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\VoltageView.baml
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\DeviceSampleFreqWindow.baml
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\OutDataSetWindow.baml
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo.g.resources
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo.Properties.Resources.resources
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo.csproj.GenerateResource.cache
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo.csproj.CoreCompileInputs.cache
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_.28533534.Up2Date
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo.exe
+D:\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo.pdb
+C:\DASH Project\新建 RAR 压缩文件\DHDAS\Example_Demo.exe.config
+C:\DASH Project\新建 RAR 压缩文件\DHDAS\Example_Demo.exe
+C:\DASH Project\新建 RAR 压缩文件\DHDAS\Example_Demo.pdb
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo.csproj.AssemblyReference.cache
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\MainWindow.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CANView.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OtherView.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\BridgeView.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\IOView.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CounterTachoView.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\PtTypeView.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\RealTimeChartView.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ShowDataView.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OutDataView.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\StrainView.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\ThermocoupleView.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\VoltageView.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\DeviceSampleFreqWindow.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\OutDataSetWindow.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\App.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\GeneratedInternalTypeHelper.g.cs
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo_MarkupCompile.cache
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo_MarkupCompile.lref
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\MainWindow.baml
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CANView.baml
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OtherView.baml
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\BridgeView.baml
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\IOView.baml
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\CounterTachoView.baml
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\PtTypeView.baml
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\RealTimeChartView.baml
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ShowDataView.baml
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\OutDataView.baml
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\StrainView.baml
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\ThermocoupleView.baml
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\ChnView\VoltageView.baml
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\DeviceSampleFreqWindow.baml
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Source\View\OutDataSetWindow.baml
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo.g.resources
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo.Properties.Resources.resources
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo.csproj.GenerateResource.cache
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo.csproj.CoreCompileInputs.cache
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_.28533534.Up2Date
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo.exe
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo.pdb
+C:\DASH Project\DASH\Example_Demo.exe.config
+C:\DASH Project\DASH\Example_Demo.exe
+C:\DASH Project\DASH\Example_Demo.pdb
+C:\DASH Project\新建 RAR 压缩文件\DH_c\扬州大学数据回调示例及说明文档\Demo_C#(模拟回调源码)\Example_Demo\obj\x64\Debug\Example_Demo.exe.config

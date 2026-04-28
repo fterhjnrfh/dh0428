@@ -1,0 +1,15 @@
+E:\NEW-DH\src\DashCapture.Core\bin\Debug\net6.0\win-x64\DashCapture.Core.deps.json
+E:\NEW-DH\src\DashCapture.Core\bin\Debug\net6.0\win-x64\DashCapture.Core.dll
+E:\NEW-DH\src\DashCapture.Core\bin\Debug\net6.0\win-x64\DashCapture.Core.pdb
+E:\NEW-DH\src\DashCapture.Core\bin\Debug\net6.0\win-x64\DashCapture.Native.dll
+E:\NEW-DH\src\DashCapture.Core\bin\Debug\net6.0\win-x64\DashCapture.Native.pdb
+E:\NEW-DH\src\DashCapture.Core\obj\Debug\net6.0\win-x64\DashCapture.Core.csproj.AssemblyReference.cache
+E:\NEW-DH\src\DashCapture.Core\obj\Debug\net6.0\win-x64\DashCapture.Core.GeneratedMSBuildEditorConfig.editorconfig
+E:\NEW-DH\src\DashCapture.Core\obj\Debug\net6.0\win-x64\DashCapture.Core.AssemblyInfoInputs.cache
+E:\NEW-DH\src\DashCapture.Core\obj\Debug\net6.0\win-x64\DashCapture.Core.AssemblyInfo.cs
+E:\NEW-DH\src\DashCapture.Core\obj\Debug\net6.0\win-x64\DashCapture.Core.csproj.CoreCompileInputs.cache
+E:\NEW-DH\src\DashCapture.Core\obj\Debug\net6.0\win-x64\DashCapt.C3441F8B.Up2Date
+E:\NEW-DH\src\DashCapture.Core\obj\Debug\net6.0\win-x64\DashCapture.Core.dll
+E:\NEW-DH\src\DashCapture.Core\obj\Debug\net6.0\win-x64\refint\DashCapture.Core.dll
+E:\NEW-DH\src\DashCapture.Core\obj\Debug\net6.0\win-x64\DashCapture.Core.pdb
+E:\NEW-DH\src\DashCapture.Core\obj\Debug\net6.0\win-x64\ref\DashCapture.Core.dll

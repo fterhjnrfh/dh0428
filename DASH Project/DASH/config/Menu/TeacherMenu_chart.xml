@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DHTest>
+  <MeasureModule>
+    <Layout>
+      <Control id="LayoutRecorderFunc" hidden="0"/>
+      <Control id="LayoutFFTFunc" hidden="1"/>
+      <Control id="Layout2DFunc" hidden="1"/>
+      <Control id="LayoutSpectrumFunc" hidden="1"/>
+    </Layout>
+    <Chart>
+      <Control id="ChatRecordModuleAnalysis" hidden="0"/>
+      <Control id="ChatXYRecordModuleAnalysis" hidden="0"/>
+      <Control id="ChatFFTModuleAnalysis" hidden="0"/>
+      <Control id="ChatOctaveModuleAnalysis" hidden="0"/>
+      <Control id="Chat2DModuleAnalysis" hidden="0"/>
+      <Control id="Chat3DModuleAnalysis" hidden="1"/>
+      <Control id="ChatGongliBiaoModuleAnalysis" hidden="1"/>
+      <Control id="ChatMachineStatusModuleAnalysis" hidden="1"/>
+      <Control id="MultiBarControlModuleAnalysis" hidden="1"/>
+      <Control id="ChatPolarModuleAnalysis" hidden="1"/>
+      <Control id="ChatAudioModuleAnalysis" hidden="1"/>
+      <Control id="ChatExampleModuleAnalysis" hidden="1"/>
+      <Control id="LightModuleAnalysis" hidden="1"/>
+      <Control id="ChatCtlBtnModuleAnalysis" hidden="1"/>
+      <Control id="ChatGpsRouteModuleAnalysis" hidden="1"/>
+      <Control id="ChatLatAndLongitutdeModuleAnalysis" hidden="1"/>
+      <Control id="ChatCampbellModuleAnalysis" hidden="1"/>
+      <Control id="ChatVideoModuleAnalysis" hidden="1"/>
+      <Control id="ChatMeterModuleAnalysis" hidden="1"/>
+      <Control id="ChatDigitalModuleAnalysis" hidden="1"/>
+      <Control id="ChatBarModuleAnalysis" hidden="1"/>
+      <Control id="ChatTableModuleAnalysis" hidden="1"/>
+      <Control id="ChatModalModuleAnalysis" hidden="1"/>
+      <Control id="ChatNormalModeModuleAnalysis" hidden="1"/>
+      <Control id="ChatDemarcateModuleAnalysis" hidden="1"/>
+      <Control id="ChatAirConditionModuleAnalysis" hidden="1"/>
+      <Control id="ChatBalanceModuleAnalysis" hidden="1"/>
+      <Control id="HarmonicBalanceModuleAnalysis" hidden="1"/>
+      <Control id="ChatAirConditionExModuleAnalysis" hidden="1"/>
+      <Control id="WaterGasChatModuleAnalysis" hidden="1"/>
+      <Control id="WaterPressChatModuleAnalysis" hidden="1"/>
+      <Control id="ChatAmpModuleAnalysis" hidden="1"/>
+      <Control id="ChatLoadExprtimenetModuleAnalysis" hidden="1"/>
+      <Control id="ChatCableModelModuleAnalysis" hidden="1"/>
+      <Control id="ChatShockCoefModuleAnalysis" hidden="1"/>
+      <Control id="ChatStakeModelModuleAnalysis" hidden="1"/>
+      <Control id="ChatDumpModuleAnalysis" hidden="1"/>
+      <Control id="ChatSpoilageGeneModuleAnalysis" hidden="1"/>
+      <Control id="ChatStockWaveModuleAnalysis" hidden="1"/>
+      <Control id="ChatOrderModuleAnalysis" hidden="1"/>
+      <Control id="TrialChatModuleAnalysis" hidden="1"/>
+      <Control id="ChatStaticModuleAnalysis" hidden="1"/>
+      <Control id="ChatExperimentModuleAnalysis" hidden="1"/>
+      <Control id="ChatPathTrack3DModuleAnalysis" hidden="1"/>
+      <Control id="ChatCloud3DModuleAnalysis" hidden="1"/>
+      <!--扭振分析-->
+      <Control id="ChatWrestShakeModuleAnalysis" hidden="1"/>
+    </Chart>
+  </MeasureModule>
+  <AnalysisModule>
+    <Layout>
+      <Control id="LayoutRecorderFunc" hidden="0"/>
+      <Control id="LayoutFFTFunc" hidden="1"/>
+      <Control id="Layout2DFunc" hidden="1"/>
+      <Control id="LayoutSpectrumFunc" hidden="1"/>
+    </Layout>
+    <Chart>
+      <Control id="ChatRecordModuleAnalysis" hidden="0"/>
+      <Control id="ChatXYRecordModuleAnalysis" hidden="0"/>
+      <Control id="ChatFFTModuleAnalysis" hidden="0"/>
+      <Control id="ChatOctaveModuleAnalysis" hidden="0"/>
+      <Control id="Chat2DModuleAnalysis" hidden="0"/>
+      <Control id="Chat3DModuleAnalysis" hidden="1"/>
+      <Control id="ChatGongliBiaoModuleAnalysis" hidden="1"/>
+      <Control id="ChatStableModuleAnalysis" hidden="1"/>
+      <Control id="ChatScatterModuleAnalysis" hidden="1"/>
+      <Control id="ChatStattableModuleAnalysis" hidden="1"/>
+      <Control id="SoundStatModuleAnalysis" hidden="1"/>
+      <Control id="ChatMachineStatusModuleAnalysis" hidden="1"/>
+      <Control id="ChatPolarModuleAnalysis" hidden="1"/>
+      <Control id="ChatAudioModuleAnalysis" hidden="1"/>
+      <Control id="LightModuleAnalysis" hidden="1"/>
+      <Control id="ChatGpsRouteModuleAnalysis" hidden="1"/>
+      <Control id="ChatLatAndLongitutdeModuleAnalysis" hidden="1"/>
+      <Control id="ChatCampbellModuleAnalysis" hidden="1"/>
+      <Control id="ChatVideoModuleAnalysis" hidden="1"/>
+      <Control id="ChatMeterModuleAnalysis" hidden="1"/>
+      <Control id="ChatDigitalModuleAnalysis" hidden="1"/>
+      <Control id="ChatBarModuleAnalysis" hidden="1"/>
+      <Control id="ChatTableModuleAnalysis" hidden="1"/>
+      <Control id="ChatModalModuleAnalysis" hidden="1"/>
+      <Control id="ChatAirConditionExModuleAnalysis" hidden="1"/>
+      <Control id="ChatLoadExprtimenetModuleAnalysis" hidden="1"/>
+      <Control id="ChatWaveletModuleAnalysis" hidden="1"/>
+      <Control id="ChatHydrovalveModuleAnalysis" hidden="1"/>
+      <Control id="ChatHopkinsonBarModuleAnalysis" hidden="1"/>
+      <Control id="ChatMaterialModuleAnalysis" hidden="1"/>
+      <Control id="ChatCableModelModuleAnalysis" hidden="1"/>
+      <Control id="ChatShockCoefModuleAnalysis" hidden="1"/>
+      <Control id="ChatStakeModelModuleAnalysis" hidden="1"/>
+      <Control id="ChatTimeDumpModuleAnalysis" hidden="1"/>
+      <Control id="ChatDumpModuleAnalysis" hidden="1"/>
+      <Control id="ChatSpoilageGeneModuleAnalysis" hidden="1"/>
+      <Control id="ChatStockWaveModuleAnalysis" hidden="1"/>
+      <Control id="ChatOrderModuleAnalysis" hidden="1"/>
+      <Control id="ChatSlopeModuleAnalysis" hidden="1"/>
+      <Control id="TrialChatModuleAnalysis" hidden="1"/>
+      <Control id="ChatStaticModuleAnalysis" hidden="1"/>
+      <Control id="ChatExperimentModuleAnalysis" hidden="1"/>
+      <!--云图-->
+      <Control id="ChatCloud3DModuleAnalysis" hidden="1"/>
+      <!--3D轴心轨迹插件-->
+      <Control id="ChatPathTrack3DModuleAnalysis" hidden="1"/>
+      <!--模型参数-->
+      <Control id="ChatModelParamModuleAnalysis" hidden="1"/>
+      <Control id="ChatWrestShakeModuleAnalysis" hidden="1"/>
+    </Chart>
+  </AnalysisModule>
+</DHTest>

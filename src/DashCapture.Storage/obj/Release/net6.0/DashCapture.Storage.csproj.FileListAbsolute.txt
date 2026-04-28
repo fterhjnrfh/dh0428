@@ -1,0 +1,17 @@
+E:\NEW-DH\src\DashCapture.Storage\bin\Release\net6.0\DashCapture.Storage.deps.json
+E:\NEW-DH\src\DashCapture.Storage\bin\Release\net6.0\DashCapture.Storage.dll
+E:\NEW-DH\src\DashCapture.Storage\bin\Release\net6.0\DashCapture.Storage.pdb
+E:\NEW-DH\src\DashCapture.Storage\bin\Release\net6.0\DashCapture.Core.dll
+E:\NEW-DH\src\DashCapture.Storage\bin\Release\net6.0\DashCapture.Native.dll
+E:\NEW-DH\src\DashCapture.Storage\bin\Release\net6.0\DashCapture.Core.pdb
+E:\NEW-DH\src\DashCapture.Storage\bin\Release\net6.0\DashCapture.Native.pdb
+E:\NEW-DH\src\DashCapture.Storage\obj\Release\net6.0\DashCapture.Storage.csproj.AssemblyReference.cache
+E:\NEW-DH\src\DashCapture.Storage\obj\Release\net6.0\DashCapture.Storage.GeneratedMSBuildEditorConfig.editorconfig
+E:\NEW-DH\src\DashCapture.Storage\obj\Release\net6.0\DashCapture.Storage.AssemblyInfoInputs.cache
+E:\NEW-DH\src\DashCapture.Storage\obj\Release\net6.0\DashCapture.Storage.AssemblyInfo.cs
+E:\NEW-DH\src\DashCapture.Storage\obj\Release\net6.0\DashCapture.Storage.csproj.CoreCompileInputs.cache
+E:\NEW-DH\src\DashCapture.Storage\obj\Release\net6.0\DashCapt.E2F6E858.Up2Date
+E:\NEW-DH\src\DashCapture.Storage\obj\Release\net6.0\DashCapture.Storage.dll
+E:\NEW-DH\src\DashCapture.Storage\obj\Release\net6.0\refint\DashCapture.Storage.dll
+E:\NEW-DH\src\DashCapture.Storage\obj\Release\net6.0\DashCapture.Storage.pdb
+E:\NEW-DH\src\DashCapture.Storage\obj\Release\net6.0\ref\DashCapture.Storage.dll

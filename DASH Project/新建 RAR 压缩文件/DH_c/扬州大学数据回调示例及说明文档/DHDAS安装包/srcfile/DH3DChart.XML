@@ -1,0 +1,1126 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DH3DChart</name>
+    </assembly>
+    <members>
+        <member name="M:DH3DChart.CommonCoreComponent.UpdateData">
+            <summary>
+            更新数据组件数据
+            </summary>
+        </member>
+        <member name="M:DH3DChart.CommonCoreComponent.ForceUpdate">
+            <summary>
+            强制刷新
+            </summary>
+        </member>
+        <member name="T:DH3DChart.YOscilloscopeDataComponent">
+            <summary>
+            示波器类型数据组件
+            </summary>
+        </member>
+        <member name="P:DH3DChart.YOscilloscopeDataComponent.XRange">
+            <summary>
+            X范围
+            </summary>
+        </member>
+        <member name="P:DH3DChart.YOscilloscopeDataComponent.YMax">
+            <summary>
+            Y最大值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.YOscilloscopeDataComponent.YMin">
+            <summary>
+            Y最小值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.YOscilloscopeDataComponent.ZMax">
+            <summary>
+            Z最大值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.YOscilloscopeDataComponent.ZMin">
+            <summary>
+            Z最小值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.YOscilloscopeDataComponent.Duration">
+            <summary>
+            花费时间
+            </summary>
+        </member>
+        <member name="M:DH3DChart.YOscilloscopeCoreComponent.UpdateData">
+            <summary>
+            更新数据组件数据
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameAxisCustomCoordinateTable.Update">
+            <summary>
+            更新视图
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameAxisCustomCoordinateTable.CombineXYSurface">
+            <summary>
+            组合XY面
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameAxisCustomCoordinateTable.CombineXZSurface">
+            <summary>
+            组合XZ面
+            </summary>
+        </member>
+        <member name="T:DH3DChart.FrameCoordinateTable">
+            <summary>
+            通用线性坐标系
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameCoordinateTable.Update">
+            <summary>
+            更新视图
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameCoordinateTable.CombineSurfaces">
+            <summary>
+            合并面
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameCoordinateTable.CombineXYSurface">
+            <summary>
+            组合XY面
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameCoordinateTable.CombineXZSurface">
+            <summary>
+            组合XZ面
+            </summary>
+        </member>
+        <member name="T:DH3DChart.FrameZCustomCoordinateTable">
+            <summary>
+            Z轴自定义（等分数和坐标）线性坐标系
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameZCustomCoordinateTable.Update">
+            <summary>
+            更新视图
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameZCustomCoordinateTable.CombineSurfaces">
+            <summary>
+            合并面
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameZCustomCoordinateTable.CombineXYSurface">
+            <summary>
+            组合XY面
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameZCustomCoordinateTable.CombineXZSurface">
+            <summary>
+            组合XZ面
+            </summary>
+        </member>
+        <member name="P:DH3DChart.FrameZCustomCoordinateTable.ZTexts">
+            <summary>
+            Z轴坐标值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.FrameZCustomCoordinateTable.ZParts">
+            <summary>
+            Z轴平分数量
+            </summary>
+        </member>
+        <member name="T:DH3DChart.YOscilloscopeFrameCoordinateTable">
+            <summary>
+            通用线性坐标系
+            </summary>
+        </member>
+        <member name="M:DH3DChart.YOscilloscopeFrameCoordinateTable.CombineSurfaces">
+            <summary>
+            更新视图
+            </summary>
+        </member>
+        <member name="T:DH3DChart.FrameCustomCoordinateTable">
+            <summary>
+            Z轴自定义线性坐标系
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameCustomCoordinateTable.Update">
+            <summary>
+            更新视图
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameCustomCoordinateTable.CombineSurfaces">
+            <summary>
+            合并面
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameCustomCoordinateTable.CombineXYSurface">
+            <summary>
+            组合XY面
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameCustomCoordinateTable.CombineXZSurface">
+            <summary>
+            组合XZ面
+            </summary>
+        </member>
+        <member name="P:DH3DChart.FrameCustomCoordinateTable.ZParts">
+            <summary>
+            Z轴平分数量
+            </summary>
+        </member>
+        <member name="T:DH3DChart.ZCloud2DDataSeries">
+            <summary>
+            云图数据
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ZCloud2DDataSeries.Columns">
+            <summary>
+            列数
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ZCloud2DDataSeries.ZBaseValue">
+            <summary>
+            Z基准值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ZCloud2DDataSeries.ZMax">
+            <summary>
+            Z最大值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ZCloud2DDataSeries.ZMin">
+            <summary>
+            Z最小值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ZCloud2DDataSeries.ZSignValue">
+            <summary>
+            阀值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ZCloud2DDataSeries.Opacity">
+            <summary>
+            透明度
+            </summary>
+        </member>
+        <member name="T:DH3DChart.ImagePlugin">
+            <summary>
+            图片插件
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ImagePlugin.ImageUri">
+            <summary>
+            获取或设置显示的图片
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ImagePlugin.ImageOpacity">
+            <summary>
+            获取或设置显示图片的透明度 
+            </summary>
+        </member>
+        <member name="M:DH3DChart.ImagePlugin.Update">
+            <summary>
+            更新视图
+            </summary>
+        </member>
+        <member name="T:DH3DChart.ZCloud2D">
+            <summary>
+            2D云图
+            </summary>
+        </member>
+        <member name="M:DH3DChart.ZCloud2D.Update">
+            <summary>
+            图表发生更改处理方法
+            </summary>
+        </member>
+        <member name="M:DH3DChart.ZCloud2D.UpdateControl">
+            <summary>
+            更新当前控件
+            </summary>
+        </member>
+        <member name="M:DH3DChart.ZCloud2D.CreateGeometry3D(System.Collections.Generic.IList{System.Windows.Media.Media3D.Point3D},System.Int32)">
+            <summary>
+            生成MeshGeometry3D
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DH3DChart.ZCloud2D.CreateModel3D(System.Windows.Media.Media3D.MeshGeometry3D,System.Collections.Generic.IList{System.Windows.Media.Media3D.Point3D},System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            创建Model3D
+            </summary>
+            <param name="geometry"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DH3DChart.ZCloud2D.CalculateTextureCoordinates(System.Collections.Generic.IList{System.Windows.Media.Media3D.Point3D},System.Double,System.Double,System.Double)">
+            <summary>
+            计算纹理坐标
+            </summary>
+        </member>
+        <member name="F:DH3DChart.ZLine2DVisual3D.ThicknessProperty">
+            <summary>
+            Identifies the <see cref="P:DH3DChart.ZLine2DVisual3D.Thickness"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:DH3DChart.ZLine2DVisual3D.PointsProperty">
+            <summary>
+            Identifies the <see cref="P:DH3DChart.ZLine2DVisual3D.Points"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ZLine2DVisual3D.Thickness">
+            <summary>
+            Gets or sets the thickness of the lines.
+            </summary>
+            <value>
+            The thickness.
+            </value>
+        </member>
+        <member name="P:DH3DChart.ZLine2DVisual3D.Points">
+            <summary>
+            Gets or sets the points collection.
+            </summary>
+            <value>
+            The points collection.
+            </value>
+        </member>
+        <member name="T:DH3DChart.CoreComponent">
+            <summary>
+            核心组件，提供图表的核心方法。
+            </summary>
+        </member>
+        <member name="P:DH3DChart.CoreComponent.Chart">
+            <summary>
+            视图
+            </summary>
+        </member>
+        <member name="M:DH3DChart.CoreComponent.UpdateCoordinateTable(DH3DChart.D3CoordinateTable,DH3DChart.D3CoordinateTable)">
+            <summary>
+            更新坐标网格
+            </summary>
+            <param name="oldtable"></param>
+            <param name="newtable"></param>
+        </member>
+        <member name="M:DH3DChart.CoreComponent.UpdateDataComponent(DH3DChart.DataComponent,DH3DChart.DataComponent)">
+            <summary>
+            更新数据组件
+            </summary>
+            <param name="olddata"></param>
+            <param name="newdata"></param>
+        </member>
+        <member name="M:DH3DChart.CoreComponent.UpdateUIComponent(DH3DChart.UIComponent,DH3DChart.UIComponent)">
+            <summary>
+            更新UI组件
+            </summary>
+            <param name="oldui"></param>
+            <param name="newui"></param>
+        </member>
+        <member name="M:DH3DChart.CoreComponent.UpdatePlugin3Ds(DH3DChart.Plugin3DCollection,DH3DChart.Plugin3DCollection)">
+            <summary>
+            更新3D插件
+            </summary>
+            <param name="oldplugins"></param>
+            <param name="newplugins"></param>
+        </member>
+        <member name="M:DH3DChart.CoreComponent.UpdatePlugin2Ds(DH3DChart.Plugin2DCollection,DH3DChart.Plugin2DCollection)">
+            <summary>
+            更新2D插件
+            </summary>
+            <param name="oldplugins"></param>
+            <param name="newplugins"></param>
+        </member>
+        <member name="M:DH3DChart.CoreComponent.UpdateDataSeriesCollection(System.Collections.Generic.List{DH3DChart.ID3DataSeries},System.Collections.Generic.List{DH3DChart.ID3DataSeries})">
+            <summary>
+            更新数据
+            </summary>
+            <param name="olddata"></param>
+            <param name="newdata"></param>
+        </member>
+        <member name="M:DH3DChart.CoreComponent.UpdateCoreComponent">
+            <summary>
+            更新当前组件为核心组件
+            </summary>
+        </member>
+        <member name="M:DH3DChart.CoreComponent.UpdateData">
+            <summary>
+            更新当前数据组件的数据
+            </summary>
+        </member>
+        <member name="M:DH3DChart.CoreComponent.ForceUpdate">
+            <summary>
+            强制刷新
+            </summary>
+        </member>
+        <member name="T:DH3DChart.PointedLineDataSeries">
+            <summary>
+            带点线的数据集合
+            </summary>
+        </member>
+        <member name="P:DH3DChart.PointedLineDataSeries.LineColor">
+            <summary>
+            线颜色
+            </summary>
+        </member>
+        <member name="P:DH3DChart.PointedLineDataSeries.PointColor">
+            <summary>
+            点颜色
+            </summary>
+        </member>
+        <member name="T:DH3DChart.YOscilloscopeDataSeries">
+            <summary>
+            连续云图数据
+            </summary>
+        </member>
+        <member name="P:DH3DChart.YOscilloscopeDataSeries.AddedPoints">
+            <summary>
+            新增的点
+            </summary>
+        </member>
+        <member name="P:DH3DChart.YOscilloscopeDataSeries.RemovedXCount">
+            <summary>
+            移除掉的X方向的点数
+            </summary>
+        </member>
+        <member name="M:DH3DChart.YOscilloscopeDataSeries.Append(System.Collections.Generic.IEnumerable{DH3DChart.ID3DataPoint})">
+            <summary>
+            追加数据
+            </summary>
+            <param name="points"></param>
+        </member>
+        <member name="T:DH3DChart.ZCloudDataSeries">
+            <summary>
+            云图数据
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ZCloudDataSeries.Columns">
+            <summary>
+            列数
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ZCloudDataSeries.ZBaseValue">
+            <summary>
+            Z基准值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ZCloudDataSeries.ZMax">
+            <summary>
+            Z最大值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ZCloudDataSeries.ZMin">
+            <summary>
+            Z最小值
+            </summary>
+        </member>
+        <member name="T:DH3DChart.YCloudDataSeries">
+            <summary>
+            云图数据
+            </summary>
+        </member>
+        <member name="P:DH3DChart.YCloudDataSeries.Columns">
+            <summary>
+            列数
+            </summary>
+        </member>
+        <member name="P:DH3DChart.YCloudDataSeries.YBaseValue">
+            <summary>
+            Y基准值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.YCloudDataSeries.YMax">
+            <summary>
+            Y最大值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.YCloudDataSeries.YMin">
+            <summary>
+            Y最小值
+            </summary>
+        </member>
+        <member name="T:DH3DChart.PointedLine">
+            <summary>
+            带点的线
+            </summary>
+        </member>
+        <member name="M:DH3DChart.PointedLine.Update">
+            <summary>
+            图表发生更改处理方法
+            </summary>
+        </member>
+        <member name="M:DH3DChart.PointedLine.UpdateControl">
+            <summary>
+            更新当前控件
+            </summary>
+        </member>
+        <member name="M:DH3DChart.Polyline.Update">
+            <summary>
+            图表发生更改处理方法
+            </summary>
+        </member>
+        <member name="M:DH3DChart.Polyline.UpdateControl">
+            <summary>
+            更新当前控件
+            </summary>
+        </member>
+        <member name="T:DH3DChart.YOscilloscopeCloud">
+            <summary>
+            Y方向示波器类型的云图
+            </summary>
+        </member>
+        <member name="M:DH3DChart.YOscilloscopeCloud.Update">
+            <summary>
+            图表发生更改处理方法
+            </summary>
+        </member>
+        <member name="M:DH3DChart.YOscilloscopeCloud.UpdateControl">
+            <summary>
+            更新当前控件
+            </summary>
+        </member>
+        <member name="M:DH3DChart.YOscilloscopeCloud.UpdateGeometry">
+            <summary>
+            更新形状
+            </summary>
+        </member>
+        <member name="M:DH3DChart.YOscilloscopeCloud.CreateGeometry3D(System.Collections.Generic.IList{System.Windows.Media.Media3D.Point3D},System.Int32)">
+            <summary>
+            生成MeshGeometry3D
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DH3DChart.YOscilloscopeCloud.CreateModel3D(System.Windows.Media.Media3D.MeshGeometry3D,System.Collections.Generic.IList{System.Windows.Media.Media3D.Point3D},System.Double,System.Double,System.Double)">
+            <summary>
+            创建Model3D
+            </summary>
+            <param name="geometry"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DH3DChart.YOscilloscopeCloud.CalculateTextureCoordinates(System.Collections.Generic.IList{System.Windows.Media.Media3D.Point3D},System.Double,System.Double,System.Double)">
+            <summary>
+            计算纹理坐标
+            </summary>
+        </member>
+        <member name="T:DH3DChart.ZCloud">
+            <summary>
+            云图
+            </summary>
+        </member>
+        <member name="M:DH3DChart.ZCloud.Update">
+            <summary>
+            图表发生更改处理方法
+            </summary>
+        </member>
+        <member name="M:DH3DChart.ZCloud.UpdateControl">
+            <summary>
+            更新当前控件
+            </summary>
+        </member>
+        <member name="M:DH3DChart.ZCloud.CreateGeometry3D(System.Collections.Generic.IList{System.Windows.Media.Media3D.Point3D},System.Int32)">
+            <summary>
+            生成MeshGeometry3D
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DH3DChart.ZCloud.CreateModel3D(System.Windows.Media.Media3D.MeshGeometry3D,System.Collections.Generic.IList{System.Windows.Media.Media3D.Point3D},System.Double,System.Double,System.Double)">
+            <summary>
+            创建Model3D
+            </summary>
+            <param name="geometry"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DH3DChart.ZCloud.CalculateTextureCoordinates(System.Collections.Generic.IList{System.Windows.Media.Media3D.Point3D},System.Double,System.Double,System.Double)">
+            <summary>
+            计算纹理坐标
+            </summary>
+        </member>
+        <member name="T:DH3DChart.YPolyline">
+            <summary>
+            线控件
+            </summary>
+        </member>
+        <member name="M:DH3DChart.YPolyline.Update">
+            <summary>
+            图表发生更改处理方法
+            </summary>
+        </member>
+        <member name="M:DH3DChart.YPolyline.UpdateControl">
+            <summary>
+            更新当前控件
+            </summary>
+        </member>
+        <member name="T:DH3DChart.ShapeFactory">
+            <summary>
+            形状工厂
+            </summary>
+        </member>
+        <member name="T:DH3DChart.FrameAxisCoordinateTable">
+            <summary>
+            通用线性带坐标轴的坐标系
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameAxisCoordinateTable.Update">
+            <summary>
+            更新视图
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameAxisCoordinateTable.CombineXYSurface">
+            <summary>
+            组合XY面
+            </summary>
+        </member>
+        <member name="M:DH3DChart.FrameAxisCoordinateTable.CombineXZSurface">
+            <summary>
+            组合XZ面
+            </summary>
+        </member>
+        <member name="T:DH3DChart.ShapeType">
+            <summary>
+            形状类型
+            </summary>
+        </member>
+        <member name="T:DH3DChart.Size3D">
+            <summarwidth>
+            3D尺寸结构
+            </summarwidth>
+        </member>
+        <member name="T:DH3DChart.Range3D">
+            <summary>
+            3D范围结构
+            </summary>
+        </member>
+        <member name="P:DH3DChart.Range3D.XMax">
+            <summary>
+            X最大值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.Range3D.XMin">
+            <summary>
+            X最小值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.Range3D.YMax">
+            <summary>
+            Y最大值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.Range3D.YMin">
+            <summary>
+            Y最小值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.Range3D.ZMax">
+            <summary>
+            Z最大值
+            </summary>
+        </member>
+        <member name="P:DH3DChart.Range3D.ZMin">
+            <summary>
+            Z最小值
+            </summary>
+        </member>
+        <member name="T:DH3DChart.D2Plugin">
+            <summary>
+            2D插件
+            </summary>
+        </member>
+        <member name="M:DH3DChart.D2Plugin.Update">
+            <summary>
+            图表发生更改处理方法
+            </summary>
+        </member>
+        <member name="M:DH3DChart.D2Plugin.AddElement(System.Windows.UIElement)">
+            <summary>
+            添加控件
+            </summary>
+            <param name="control"></param>
+        </member>
+        <member name="M:DH3DChart.D2Plugin.RemoveElement(System.Windows.UIElement)">
+            <summary>
+            移除控件
+            </summary>
+            <param name="control"></param>
+        </member>
+        <member name="P:DH3DChart.D2Plugin.DataComponent">
+            <summary>
+            数据组件
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D2Plugin.UIComponent">
+            <summary>
+            界面组件
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D2Plugin.Chart">
+            <summary>
+            视图
+            </summary>
+        </member>
+        <member name="T:DH3DChart.D3Plugin">
+            <summary>
+            插件基类
+            </summary>
+        </member>
+        <member name="T:DH3DChart.CommonCoordinateTable">
+            <summary>
+            通用坐标系
+            </summary>
+        </member>
+        <member name="M:DH3DChart.CommonCoordinateTable.Update">
+            <summary>
+            更新视图
+            </summary>
+        </member>
+        <member name="M:DH3DChart.CommonCoordinateTable.CombineXYSurface">
+            <summary>
+            组合XY面
+            </summary>
+        </member>
+        <member name="M:DH3DChart.CommonCoordinateTable.CombineXZSurface">
+            <summary>
+            组合XZ面
+            </summary>
+        </member>
+        <member name="M:DH3DChart.CommonCoordinateTable.CombineYZSurface">
+            <summary>
+            组合YZ面
+            </summary>
+        </member>
+        <member name="M:DH3DChart.CommonCoordinateTable.CreateTableImage(System.Double,System.Double)">
+            <summary>
+            创建XY面的表格
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DH3DChart.CommonCoordinateTable.UpdateBoxMaterial(DHModeling.Toolkit.BoxVisual3D,System.Windows.Media.ImageBrush,System.Double[])">
+            <summary>
+            更新Box材质
+            </summary>
+            <param name="box"></param>
+            <param name="brush"></param>
+            <param name="textureArray"></param>
+        </member>
+        <member name="T:DH3DChart.LegendPlugin">
+            <summary>
+            说明插件
+            </summary>
+        </member>
+        <member name="T:DH3DChart.Plugin3DCollection">
+            <summary>
+            3D插件集合
+            </summary>
+        </member>
+        <member name="T:DH3DChart.Plugin2DCollection">
+            <summary>
+            2D插件集合
+            </summary>
+        </member>
+        <member name="T:DH3DChart.SingleCursorPlugin">
+            <summary>
+            单光标插件
+            </summary>
+        </member>
+        <member name="M:DH3DChart.SingleCursorPlugin.Update">
+            <summary>
+            更新视图
+            </summary>
+        </member>
+        <member name="T:DH3DChart.ZPolyline">
+             <summary>
+            Z线控件
+             </summary>
+        </member>
+        <member name="M:DH3DChart.ZPolyline.Update">
+            <summary>
+            图表发生更改处理方法
+            </summary>
+        </member>
+        <member name="M:DH3DChart.ZPolyline.UpdateControl">
+            <summary>
+            更新当前控件
+            </summary>
+        </member>
+        <member name="T:DH3DChart.TraceLog">
+            <summary>
+            跟踪日志
+            </summary>
+        </member>
+        <member name="M:DH3DChart.TraceLog.Trace(System.String)">
+            <summary>
+            输出跟踪
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="F:DH3DChart.LineVisual3D.ThicknessProperty">
+            <summary>
+            Identifies the <see cref="P:DH3DChart.LineVisual3D.Thickness"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:DH3DChart.LineVisual3D.PointsProperty">
+            <summary>
+            Identifies the <see cref="P:DH3DChart.LineVisual3D.Points"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:DH3DChart.LineVisual3D.Thickness">
+            <summary>
+            Gets or sets the thickness of the lines.
+            </summary>
+            <value>
+            The thickness.
+            </value>
+        </member>
+        <member name="P:DH3DChart.LineVisual3D.Points">
+            <summary>
+            Gets or sets the points collection.
+            </summary>
+            <value>
+            The points collection.
+            </value>
+        </member>
+        <member name="F:DH3DChart.YLine2DVisual3D.ThicknessProperty">
+            <summary>
+            Identifies the <see cref="P:DH3DChart.YLine2DVisual3D.Thickness"/> dependency property.
+            </summary>
+        </member>
+        <member name="F:DH3DChart.YLine2DVisual3D.PointsProperty">
+            <summary>
+            Identifies the <see cref="P:DH3DChart.YLine2DVisual3D.Points"/> dependency property.
+            </summary>
+        </member>
+        <member name="P:DH3DChart.YLine2DVisual3D.Thickness">
+            <summary>
+            Gets or sets the thickness of the lines.
+            </summary>
+            <value>
+            The thickness.
+            </value>
+        </member>
+        <member name="P:DH3DChart.YLine2DVisual3D.Points">
+            <summary>
+            Gets or sets the points collection.
+            </summary>
+            <value>
+            The points collection.
+            </value>
+        </member>
+        <member name="T:DH3DChart.CommonDataComponent">
+            <summary>
+            通用数据组件
+            </summary>
+        </member>
+        <member name="T:DH3DChart.D3Chart">
+            <summary>
+            3D图表
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Chart.DataSeriesCollection">
+            <summary>
+            数据集合
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Chart.Plugin3Ds">
+            <summary>
+            3D插件集合
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Chart.Plugin2Ds">
+            <summary>
+            2D插件集合
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Chart.CoordinateTable">
+            <summary>
+            坐标网格
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Chart.UIComponent">
+            <summary>
+            UI组件
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Chart.DataComponent">
+            <summary>
+            数据组件
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Chart.CoreComponent">
+            <summary>
+            核心逻辑组件
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Chart.SelectedItem">
+            <summary>
+            获取选中项
+            </summary>
+        </member>
+        <member name="E:DH3DChart.D3Chart.SelectionChanged">
+            <summary>
+            选中项改变事件
+            </summary>
+        </member>
+        <member name="T:DH3DChart.DataComponent">
+            <summary>
+            数据组件，提供数据相关所有信息
+            </summary>
+        </member>
+        <member name="P:DH3DChart.DataComponent.Chart">
+            <summary>
+            视图
+            </summary>
+        </member>
+        <member name="M:DH3DChart.DataComponent.GetRange">
+            <summary>
+            获取图表范围
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DH3DChart.DataComponent.Update">
+            <summary>
+            更新图表范围
+            </summary>
+        </member>
+        <member name="T:DH3DChart.UIComponent">
+            <summary>
+            界面组件，提供界面相关所有信息
+            </summary>
+        </member>
+        <member name="M:DH3DChart.UIComponent.GetSize">
+            <summary>
+            获取图表尺寸
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DH3DChart.UIComponent.GetOrigin">
+            <summary>
+            获取原点
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:DH3DChart.UIComponent.Viewport">
+            <summary>
+            视图容器
+            </summary>
+        </member>
+        <member name="P:DH3DChart.UIComponent.Chart">
+            <summary>
+            视图
+            </summary>
+        </member>
+        <member name="P:DH3DChart.UIComponent.GridPanel">
+            <summary>
+            2D的Grid
+            </summary>
+        </member>
+        <member name="M:DH3DChart.UIComponent.AddControl(DH3DChart.D3Control)">
+            <summary>
+            添加或者更新控件
+            </summary>
+            <param name="control"></param>
+        </member>
+        <member name="M:DH3DChart.UIComponent.RemoveControl(DH3DChart.D3Control)">
+            <summary>
+            移除控件
+            </summary>
+            <param name="control"></param>
+        </member>
+        <member name="M:DH3DChart.UIComponent.AddUIElement(System.Windows.UIElement)">
+            <summary>
+            添加UI控件
+            </summary>
+            <param name="element"></param>
+        </member>
+        <member name="T:DH3DChart.D3Control">
+            <summary>
+            图表控件基类
+            </summary>
+        </member>
+        <member name="F:DH3DChart.D3Control.origin">
+            <summary>
+            原点
+            </summary>
+        </member>
+        <member name="F:DH3DChart.D3Control.size">
+            <summary>
+            图表尺寸
+            </summary>
+        </member>
+        <member name="F:DH3DChart.D3Control.range">
+            <summary>
+            3D范围
+            </summary>
+        </member>
+        <member name="F:DH3DChart.D3Control.unitX">
+            <summary>
+            X每单元代表长度
+            </summary>
+        </member>
+        <member name="F:DH3DChart.D3Control.unitY">
+            <summary>
+            Y每单元代表长度
+            </summary>
+        </member>
+        <member name="F:DH3DChart.D3Control.unitZ">
+            <summary>
+            Z每单元代表长度
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Control.Chart">
+            <summary>
+            视图
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Control.Origin">
+            <summary>
+            原点
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Control.Size">
+            <summary>
+            x方向长度
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Control.Range">
+            <summary>
+            获取范围
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Control.UnitX">
+            <summary>
+            X每单元代表长度
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Control.UnitY">
+            <summary>
+            Y每单元代表长度
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Control.UnitZ">
+            <summary>
+            Z每单元代表长度
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Control.DataComponent">
+            <summary>
+            数据组件
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Control.UIComponent">
+            <summary>
+            界面组件
+            </summary>
+        </member>
+        <member name="M:DH3DChart.D3Control.Update">
+            <summary>
+            图表发生更改处理方法
+            </summary>
+        </member>
+        <member name="M:DH3DChart.D3Control.AddControl(DH3DChart.D3Control)">
+            <summary>
+            添加控件
+            </summary>
+            <param name="control"></param>
+        </member>
+        <member name="M:DH3DChart.D3Control.RemoveControl(DH3DChart.D3Control)">
+            <summary>
+            移除控件
+            </summary>
+            <param name="control"></param>
+        </member>
+        <member name="M:DH3DChart.D3Control.TransformToPoint3D(DH3DChart.ID3DataPoint)">
+            <summary>
+            将数据点计算为坐标点
+            </summary>
+            <param name="datapoint"></param>
+            <returns></returns>
+        </member>
+        <member name="T:DH3DChart.D3CoordinateTable">
+            <summary>
+            坐标系基类
+            </summary>
+        </member>
+        <member name="T:DH3DChart.D3Shape">
+            <summary>
+            形状基类，继承类必须包含默认构造函数
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3Shape.DataSeries">
+            <summary>
+            数据集合
+            </summary>
+        </member>
+        <member name="T:DH3DChart.ID3DataSeries">
+            <summary>
+            3D数据集合接口
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ID3DataSeries.Points">
+            <summary>
+            数据点集合
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ID3DataSeries.ShapeType">
+            <summary>
+            形状类型
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ID3DataSeries.Color">
+            <summary>
+            颜色
+            </summary>
+        </member>
+        <member name="P:DH3DChart.ID3DataSeries.Legend">
+            <summary>
+            说明
+            </summary>
+        </member>
+        <member name="T:DH3DChart.ID3DataPoint">
+            <summary>
+            3D数据点接口
+            </summary>
+        </member>
+        <member name="T:DH3DChart.D3DataPoint">
+            <summary>
+            3D数据点
+            </summary>
+        </member>
+        <member name="T:DH3DChart.D3DataSeries">
+            <summary>
+            3D数据集合
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3DataSeries.Points">
+            <summary>
+            数据点集合
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3DataSeries.ShapeType">
+            <summary>
+            形状类型
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3DataSeries.Color">
+            <summary>
+            形状颜色
+            </summary>
+        </member>
+        <member name="P:DH3DChart.D3DataSeries.Legend">
+            <summary>
+            说明
+            </summary>
+        </member>
+        <member name="T:DH3DChart.Properties.Resources">
+            <summary>
+              一个强类型的资源类，用于查找本地化的字符串等。
+            </summary>
+        </member>
+        <member name="P:DH3DChart.Properties.Resources.ResourceManager">
+            <summary>
+              返回此类使用的缓存的 ResourceManager 实例。
+            </summary>
+        </member>
+        <member name="P:DH3DChart.Properties.Resources.Culture">
+            <summary>
+              使用此强类型资源类，为所有资源查找
+              重写当前线程的 CurrentUICulture 属性。
+            </summary>
+        </member>
+    </members>
+</doc>

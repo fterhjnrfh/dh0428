@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1CD3ADA5-F648-43DA-B71E-CA1C3AD0080F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashCapture.Native", "src\DashCapture.Native\DashCapture.Native.csproj", "{3106D95E-B6FA-4B46-B195-A5B16E67B0A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashCapture.Core", "src\DashCapture.Core\DashCapture.Core.csproj", "{24113138-C325-4942-B548-CFD971AC7E63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashCapture.Storage", "src\DashCapture.Storage\DashCapture.Storage.csproj", "{0DBA61C1-64D4-4B08-A2AA-A59A6E08AFC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashCapture.Display", "src\DashCapture.Display\DashCapture.Display.csproj", "{9203CB3F-C3A3-468A-8084-7AA41439D8B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashCapture.App", "src\DashCapture.App\DashCapture.App.csproj", "{BB290A01-5CBA-4AFD-8D48-323478D29CB8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7E4EEC51-91D4-420B-A6B2-543BE47297F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashCapture.Tests", "tests\DashCapture.Tests\DashCapture.Tests.csproj", "{B0428680-B5C3-47A1-9B11-BE432B272B42}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3106D95E-B6FA-4B46-B195-A5B16E67B0A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3106D95E-B6FA-4B46-B195-A5B16E67B0A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3106D95E-B6FA-4B46-B195-A5B16E67B0A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3106D95E-B6FA-4B46-B195-A5B16E67B0A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24113138-C325-4942-B548-CFD971AC7E63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24113138-C325-4942-B548-CFD971AC7E63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24113138-C325-4942-B548-CFD971AC7E63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24113138-C325-4942-B548-CFD971AC7E63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DBA61C1-64D4-4B08-A2AA-A59A6E08AFC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DBA61C1-64D4-4B08-A2AA-A59A6E08AFC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DBA61C1-64D4-4B08-A2AA-A59A6E08AFC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DBA61C1-64D4-4B08-A2AA-A59A6E08AFC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9203CB3F-C3A3-468A-8084-7AA41439D8B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9203CB3F-C3A3-468A-8084-7AA41439D8B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9203CB3F-C3A3-468A-8084-7AA41439D8B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9203CB3F-C3A3-468A-8084-7AA41439D8B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB290A01-5CBA-4AFD-8D48-323478D29CB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB290A01-5CBA-4AFD-8D48-323478D29CB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB290A01-5CBA-4AFD-8D48-323478D29CB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB290A01-5CBA-4AFD-8D48-323478D29CB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0428680-B5C3-47A1-9B11-BE432B272B42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0428680-B5C3-47A1-9B11-BE432B272B42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0428680-B5C3-47A1-9B11-BE432B272B42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0428680-B5C3-47A1-9B11-BE432B272B42}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3106D95E-B6FA-4B46-B195-A5B16E67B0A9} = {1CD3ADA5-F648-43DA-B71E-CA1C3AD0080F}
+		{24113138-C325-4942-B548-CFD971AC7E63} = {1CD3ADA5-F648-43DA-B71E-CA1C3AD0080F}
+		{0DBA61C1-64D4-4B08-A2AA-A59A6E08AFC3} = {1CD3ADA5-F648-43DA-B71E-CA1C3AD0080F}
+		{9203CB3F-C3A3-468A-8084-7AA41439D8B3} = {1CD3ADA5-F648-43DA-B71E-CA1C3AD0080F}
+		{BB290A01-5CBA-4AFD-8D48-323478D29CB8} = {1CD3ADA5-F648-43DA-B71E-CA1C3AD0080F}
+		{B0428680-B5C3-47A1-9B11-BE432B272B42} = {7E4EEC51-91D4-420B-A6B2-543BE47297F9}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,128 @@
+<UserControl x:Class="Example_Demo.RealTimeChartView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Example_Demo"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" d:DataContext="{d:DesignInstance local:RealTimeChartViewModel}">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <local:IsEnabledConverter x:Key="IsEnabledConverter"></local:IsEnabledConverter>
+            <local:MonitorTextConverter x:Key="MonitorTextConverter"></local:MonitorTextConverter>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+
+        <!-- 中间图表区域 -->
+        <Border Grid.Row="0" Background="#FF2D2D2D" Margin="10">
+            <lvc:CartesianChart x:Name="MainChart" Background="#FF2D2D2D" DisableAnimations="True"
+                              Series="{Binding SeriesCollection}"
+                              LegendLocation="None">
+                <lvc:CartesianChart.AxisY>
+                    <lvc:Axis Title="数值" Foreground="White" FontSize="12" LabelFormatter="{Binding YFormatter}">
+                        <lvc:Axis.Separator>
+                            <lvc:Separator StrokeThickness="1" Stroke="#444444"/>
+                        </lvc:Axis.Separator>
+                    </lvc:Axis>
+                </lvc:CartesianChart.AxisY>
+                <lvc:CartesianChart.AxisX>
+                    <lvc:Axis Title="" Foreground="White" FontSize="12" Labels="{Binding Labels}">
+                        <lvc:Axis.Separator>
+                            <lvc:Separator StrokeThickness="1" Stroke="#444444"/>
+                        </lvc:Axis.Separator>
+                    </lvc:Axis>
+                </lvc:CartesianChart.AxisX>
+            </lvc:CartesianChart>
+        </Border>
+
+        <!-- 底部控制栏 -->
+        <Grid Grid.Row="1" Background="#FF2D2D2D">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" x:Name="btnStart" Content="开始监控" Width="100" Height="40" Margin="10,0,5,0" BorderThickness="0" Click="btnStart_Click" 
+                    IsEnabled="{Binding IsMonitoring,Converter={StaticResource IsEnabledConverter}}">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="4"/>
+                    </Style>
+                </Button.Resources>
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#FF4CAF50"/>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#FF808080"/>
+                                <Setter Property="Foreground" Value="#FFCCCCCC"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+            <Button Grid.Column="1" x:Name="btnStop" Content="停止监控" Width="100" Height="40" Margin="5,0,10,0" BorderThickness="0" 
+                    Click="btnStop_Click" IsEnabled="{Binding IsMonitoring}">
+                <Button.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="CornerRadius" Value="4"/>
+                    </Style>
+                </Button.Resources>
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#FFE0E0E0"/>
+                        <Setter Property="Foreground" Value="Black"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="True">
+                                <Setter Property="Background" Value="#FFFF5252"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#FF808080"/>
+                                <Setter Property="Foreground" Value="#FFCCCCCC"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+            <TextBlock Grid.Column="2" Text="显示通道:" VerticalAlignment="Center" Foreground="White" Margin="10,0,5,0"/>
+
+            <ComboBox Grid.Column="3" Width="150" Height="30" Margin="5,0,10,0"  
+                      ItemsSource="{Binding TimeChannels}" SelectedItem="{Binding SelectHardChannel}"
+                      VerticalContentAlignment="Center" SelectionChanged="cmbChannel_SelectionChanged" DisplayMemberPath="m_strChannelName">
+            </ComboBox>
+
+            <CheckBox Grid.Column="4" x:Name="chkAutoScale" Content="自动缩放" VerticalAlignment="Center" Foreground="White" Margin="10,0,10,0" 
+                      IsChecked="{Binding IsAutoScrolling}" Checked="ChkAutoScale_Checked" Unchecked="ChkAutoScale_Unchecked"/>
+
+            <StackPanel Grid.Column="6" Orientation="Horizontal" Margin="0,0,20,0">
+                <TextBlock Text="数据点数:" Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <TextBlock Text="{Binding DataCount}" Foreground="White" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock Text="当前值:" Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <TextBlock Text="{Binding CurrentData}" Foreground="White" VerticalAlignment="Center"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Column="7" Orientation="Horizontal" Margin="0,0,20,0">
+                <TextBlock Text="状态:" Foreground="White" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <Border x:Name="StatusBorder" >
+                    <TextBlock x:Name="StatusText" Text="{Binding IsMonitoring,Converter={StaticResource MonitorTextConverter}}" Foreground="White" VerticalAlignment="Center"/>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl> 

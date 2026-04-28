@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DHTest>
+	<!--工程管理-->
+	<Module type ="ProjectModule" id ="ProjectModuleAnalysis" Default="1">
+		<menu id ="ProjectModuleAnalysis" analysis="1">
+			<toolbar>
+				<Control id="NewPrjFunc" switch="MeasureModule|ChnSetupModuleAnalysis"/>
+			</toolbar>
+			<toolbar>
+				<Control id="OpenPrjFunc" switch="AnalysisModule|AnalysisModuleAnalysis"/>
+				<Control id="RenamePrjFunc"/>
+				<Control id="DelPrjFunc"/>
+			</toolbar>
+		</menu>
+	</Module>
+	<!--测量-->
+	<Module type ="MeasureModule" id ="MeasureModuleAnalysis">
+		<!--参数管理-->
+		<menu id ="ParamModuleAnalysis" analysis="1">
+			<toolbar>
+				<Control id="NewParamFunc" switch="MeasureModule|ChnSetupModuleAnalysis|AnalogParamModuleAnalysis"/>
+			</toolbar>
+			<toolbar>
+				<Control id="SaveParamFunc"/>
+				<Control id="SaveToParamFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="LoadParamFunc" switch="MeasureModule|MeasureModuleAnalysis"/>
+				<Control id="RenameParamFunc"/>
+				<Control id="DelParamFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="CopyParamFunc"/>
+				<Control id="CutParamFunc"/>
+				<Control id="PasteParamFunc"/>
+			</toolbar>
+		</menu>
+		<!--通道设置-->
+		<menu id ="ChnSetupModuleAnalysis" analysis ="0">
+			<toolbar>
+				<Control id="SaveParamFunc"/>
+				<Control id="SaveToParamFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="AnalogParamModuleAnalysis" UserControl ="1"/>
+				<Control id="TachoParamModuleAnalysis" UserControl ="1"/>
+				<Control id="SignalParamModuleAnalysis" UserControl ="1"/>
+				<Control id="GPSParamModuleAnalysis" UserControl ="1"/>
+				<Control id="CANParamModuleAnalysis" UserControl ="1"/>
+				<Control id="OutDataParamModuleAnalysis" UserControl ="1"/>
+				<Control id="VideoParamModuleAnalysis" UserControl ="1"/>
+				<Control id="AudioParamModuleAnalysis" UserControl ="1"/>
+				<Control id="DigitalParamModuleAnalysis" UserControl ="1"/>
+				<Control id="CounterParamModuleAnalysis" UserControl ="1"/>
+				<Control id="CalibrateParamModuleAnalysis" UserControl ="1"/>
+				<Control id="MicParamModuleAnalysis" UserControl ="1"/>
+				<Control id="PCI1553ParamModuleAnalysis" UserControl ="1"/>
+				<Control id="MoogParamModuleAnalysis" UserControl ="1"/>
+				<Control id="DIOParamModuleAnalysis" UserControl ="1"/>
+        <Control id="AxisParamModuleAnalysis" UserControl="1"/>
+			</toolbar>
+		</menu>
+		<!--存储规则-->
+		<menu id ="StoreModuleAnalysis" analysis ="0">
+			<toolbar>
+				<Control id="SaveParamFunc"/>
+				<Control id="SaveToParamFunc"/>
+			</toolbar>
+		</menu>
+		<menu id ="MeasureModuleAnalysis" analysis ="0">
+			<toolbar>
+				<Control id="MeasureStoreFunc"/>
+				<Control id="MeasurePauseFunc"/>
+				<Control id="MeasureRebackDataFunc"/>
+				<Control id="MeasureContinueFunc"/>
+				<Control id="MeasureStopFunc"/>
+				<Control id="MeasureShiBoFunc"/>
+				<Control id="MeasureTrigFunc"/>
+				<Control id="MeasureFreezeFunc"/>
+				<Control id="MeasureBalanceZero"/>
+				<Control id="MeasureTagFunc"/>
+				<Control id="MeasureSnapFunc"/>
+				<Control id="MeasureMoogContinueFunc"/>
+				<Control id="MeasureHighStoreFunc"/>
+				<Control id="MeasureSurveyFunc"/>
+				<Control id="MeasureMoogZeroFunc"/>
+				<Control id="MeasureMoogStoreFunc"/>
+        <Control id="MeasureAudioFunc"/>
+			</toolbar>
+      <toolbar>
+        <Control id="MeasureSignalSourceFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="DelAllChatFunc"/>
+        <Control id="DelChatFunc"/>
+        <Control id="ChatHorizFunc"/>
+        <Control id="ChatVertFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="MultiScreenFunc"/>
+        <Control id="MultiScreenLayOutMgrFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="LayoutGroupbuttonAnalysis" chartMenu="StudentMenu_chart.xml" type="Layout"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChartGroupbuttonAnalysis" chartMenu="StudentMenu_chart.xml" type="Chart"/>
+      </toolbar>
+			<toolbar>
+				<Control id="RunInfoFunc"/>
+			</toolbar>
+		</menu>
+	</Module>
+	<!--切换定义-->
+	<Switch>
+		<SwitchItem id="SwitchMeasurePath" path="MeasureModule|MeasureModuleAnalysis"></SwitchItem>
+    <SwitchItem id="SwitchChnAnalogPath" path="MeasureModule|ChnSetupModuleAnalysis|AnalogParamModuleAnalysis"></SwitchItem>
+	</Switch>
+</DHTest>

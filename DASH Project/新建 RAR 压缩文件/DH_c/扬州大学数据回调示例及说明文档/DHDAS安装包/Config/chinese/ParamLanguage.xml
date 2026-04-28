@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--查询多语言范围定义
+千兆网仪器类型：50000-60000
+按钮名称：1-5000
+Module名称：60001- 69999
+Combo控件选项名称：70000-
+-->
+
+<HardLanguage>
+	<item id="1" str="应用" />
+	<item id="2" str="读取" />
+	<item id="3" str="格式化" />
+	<item id="4" str="更改" />
+	<item id="5" str="复位" />
+	<item id="6" str="设置采集器号" />
+	<item id="7" str="机号设置" />
+	<item id="8" str="同步仪器时间" />
+
+
+	<item id="5001" str="仪器机号" />
+	<item id="5002" str="仪器IP" />
+	<item id="5003" str="计算机IP" />
+	<item id="5004" str="仪器网关" />
+	<item id="5005" str="仪器子网掩码" />
+	<item id="5006" str="NTP服务器IP" />
+	<item id="5007" str="IRIG" />
+	<item id="5008" str="通道数" />
+	<item id="5009" str="序列号" />
+	<item id="5010" str="仪器类型" />
+	<item id="5011" str="版本" />
+	<item id="5012" str="第三标识" />
+	<item id="5013" str="总空间(MB)" />
+	<item id="5014" str="剩余空间(MB)" />
+	<item id="5015" str="上电自启动离线采样" />
+	<item id="5016" str="老板卡号" />
+	<item id="5017" str="新板卡号" />
+	<item id="5018" str="新机号" />
+	<item id="5019" str="仪器序列号" />
+	<item id="5020" str="SSID" />
+	<item id="5021" str="网络模式" />
+	<item id="5022" str="MAC地址" />
+	<item id="5023" str="TCP端口号" />
+	<item id="5024" str="UDP端口号" />
+	<item id="5025" str="采集卡数" />
+	<item id="5026" str="新采集器号" />
+	<item id="5027" str="旧采集器号" />
+	<item id="5028" str="IP地址" />
+	<item id="5029" str="4路串口新采集器号1" />
+	<item id="5030" str="4路串口新采集器号2" />
+	<item id="5031" str="4路串口新采集器号3" />
+	<item id="5032" str="4路串口新采集器号4" />
+	<item id="5033" str="4GIP" />
+	<item id="5034" str="4G端口" />
+	<item id="5035" str="WIFI_IP" />
+	<item id="5036" str="密码" />
+	<item id="5037" str="仪器时间" />
+	<item id="5038" str="仪器休眠时间" />
+
+  <item id="50000" str="DH5921"/>
+  <item id="50001" str="DH5922"/>
+  <item id="50002" str="DH5960"/>
+  <item id="50003" str="DH7000"/>
+  <item id="50004" str="DH7003"/>
+
+	<item id="60001" str="网络参数设置" />
+	<item id="60002" str="仪器参数设置" />
+	<item id="60003" str="Flash管理" />
+	<item id="60004" str="板卡号设置" />
+	<item id="60005" str="5928W参数设置" />
+	<item id="60006" str="4G参数设置" />
+	<item id="60007" str="仪器信息" />
+	<item id="60008" str="WIFI参数" />
+	<item id="60009" str="仪器休眠唤醒" />
+	<item id="60010" str="仪器时间同步" />
+  
+  <item id="70000" str="AP模式" />
+  <item id="70001" str="无线网卡模式" />
+  <item id="70002" str="LAN模式" />
+  
+</HardLanguage>

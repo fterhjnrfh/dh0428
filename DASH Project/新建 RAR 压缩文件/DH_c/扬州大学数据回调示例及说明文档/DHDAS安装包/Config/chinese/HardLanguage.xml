@@ -1,0 +1,2483 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<HardLanguage>
+	<item id="0" str="申请缓存失败" />
+	<item id="1" str="打开仪器接口失败。" />
+	<item id="2" str="等待%.1fs预采样结束" />
+	<item id="3" str="等待%dms预采样结束" />
+	<item id="4" str="等待第%d次触发" />
+	<item id="5" str="硬件已触发..." />
+	<item id="6" str="等待采集足够的数据" />
+	<item id="7" str="回收采集的数据" />
+	<item id="8" str="一次瞬态采集结束" />
+	<item id="9" str="回收%d号机%d通道数据..." />
+	<item id="10" str="采集不到数据打开仪器接口失败。" />
+	<item id="11" str="回收%d号机%d通道第%d次触发数据%d%%" />
+	<item id="12" str="等待触发" />
+	<item id="13" str="采集不到数据打开仪器接口失败。" />
+	<item id="14" str="硬件已触发..." />
+	<item id="15" str="无积分" />
+	<item id="16" str="一次积分" />
+	<item id="17" str="二次积分" />
+	<item id="18" str="仪器%s未连接！" />
+	<item id="19" str="回收%s仪器的%s" />
+	<item id="20" str="剩余%.1f秒" />
+	<item id="21" str="剩余%.1f分钟" />
+	<item id="22" str="剩余%.1f小时" />
+	<item id="23" str="仪器没有连接上" />
+	<item id="24" str="文件查找出错，退回，请查明原因!!!" />
+	<item id="25" str="查找文件%s 初始化连接失败." />
+	<item id="26" str="查找文件连接 FtpName: %s nPort: %d FtpUse: %s FtpPassword: %s 失败.\n请检查网络连接后重新连接仪器." />
+	<item id="27" str="文件查找出错，退回，请查明原因" />
+	<item id="28" str="下传软件%s 初始化连接失败." />
+	<item id="29" str="下传软件连接 FtpName: %s nPort: %d FtpUse: %s FtpPassword: %s 失败.\n请检查网络连接后重新连接仪器." />
+	<item id="30" str="设置当前指向目录未成功, 更新下层软件失败!" />
+	<item id="31" str="更新下层软件" />
+	<item id="32" str="备份下层软件" />
+	<item id="33" str="备份文件%s" />
+	<item id="34" str="备份下层%s文件失败!" />
+	<item id="35" str="删除下层软件" />
+	<item id="36" str="删除文件%s" />
+	<item id="37" str="删除下层%s文件失败!" />
+	<item id="38" str="下传更新的下层软件" />
+	<item id="39" str="下传文件%s" />
+	<item id="40" str="下传%s文件失败!" />
+	<item id="41" str="更改文件可执行属性" />
+	<item id="42" str="创建FTPsocket未成功, 更新下层软件失败!" />
+	<item id="43" str="更改当前指向目录失败未成功, 更新下层软件失败!" />
+	<item id="44" str="建立数据连接未成功, 更新下层软件失败!" />
+	<item id="45" str="更改下层软件DH5925文件可执行属性失败。" />
+	<item id="46" str="设置当前指向目录未成功, 更新下层软件失败!" />
+	<item id="47" str="获取备份软件%s 初始化连接失败." />
+	<item id="48" str="获取备份软件连接 FtpName: %s nPort: %d FtpUse: %s FtpPassword: %s 失败.\n请检查网络连接后重新连接仪器." />
+	<item id="49" str="设置当前指向目录未成功, 更新下层软件失败!" />
+	<item id="50" str="上传软件%s 初始化连接失败." />
+	<item id="51" str="上传软件连接 FtpName: %s nPort: %d FtpUse: %s FtpPassword: %s 失败.\n请检查网络连接后重新连接仪器." />
+	<item id="52" str="设置当前指向目录未成功, 上传失败!" />
+	<item id="53" str="查找目录下文件未成功, 上传失败!" />
+	<item id="54" str="目录为空, 上传失败!" />
+	<item id="55" str="上传下层软件" />
+	<item id="56" str="上传文件%s" />
+	<item id="57" str="上传%s文件失败!" />
+	<item id="58" str="恢复下位机软件%s 初始化连接失败." />
+	<item id="59" str="恢复下位机软件连接 FtpName: %s nPort: %d FtpUse: %s FtpPassword: %s 失败.\n请检查网络连接后重新连接仪器." />
+	<item id="60" str="目录下不存在可用软件, 不能恢复!" />
+	<item id="61" str="设置当前指向目录未成功, 更新下层软件失败!" />
+	<item id="62" str="恢复下层软件" />
+	<item id="63" str="恢复备份的下层软件" />
+	<item id="64" str="设置当前指向目录未成功, 恢复失败!" />
+	<item id="65" str="查找目录下文件未成功, 恢复失败!" />
+	<item id="66" str="目录为空, 不能恢复!" />
+	<item id="67" str="恢复文件%s" />
+	<item id="68" str="恢复下层%s文件失败!" />
+	<item id="69" str="删除文件%s 初始化连接失败." />
+	<item id="70" str="删除文件连接 FtpName: %s nPort: %d FtpUse: %s FtpPassword: %s 失败.\n请检查网络连接后重新连接仪器." />
+	<item id="71" str="删除%s出错,请查明原因" />
+	<item id="72" str="删除%s文件夹出错,请查明原因" />
+	<item id="73" str="删除文件夹连接 FtpName: %s nPort: %d FtpUse: %s FtpPassword: %s 失败.\n请检查网络连接后重新连接仪器." />
+	<item id="74" str="删除%s出错，返回" />
+	<item id="75" str="文件传输: 初始化连接失败 错误码 %d." />
+	<item id="76" str="文件传输连接 FtpName: %s 错误码 %d." />
+	<item id="77" str="ReceiveFileThread 仪器上文件目录设置错误" />
+	<item id="78" str="仪器上文件目录设置错误" />
+	<item id="79" str="传输文件出现错误" />
+	<item id="80" str="参数" />
+	<item id="81" str="数据" />
+	<item id="82" str="转速数据" />
+	<item id="83" str="计数数据" />
+	<item id="84" str="GPS数据" />
+	<item id="85" str="数据回收%d/%d" />
+	<item id="86" str="未回收到声音文件，是否继续回收数据？\r\n继续回收将不再回收声音数据。" />
+	<item id="87" str="未回收到视频文件，是否继续回收数据？\r\n继续回收将不再回收视频数据。" />
+	<item id="88" str="通道%d-%d读取量程信息错误,请检查" />
+	<item id="89" str="通道%d-%d读取滤波器信息错误,请检查" />
+	<item id="90" str="触发......" />
+	<item id="91" str="第%d次触发已回收%.2f%%的数据" />
+	<item id="92" str="接收到全部数据" />
+	<item id="93" str="等待%.1fs预采集结束" />
+	<item id="94" str="等待%dms预采样结束" />
+	<item id="95" str="延迟点数采集结束" />
+	<item id="96" str="正在采集" />
+	<item id="97" str="进度提示" />
+	<item id="98" str="终止" />
+	<item id="99" str="是否终止当前操作？" />
+	<item id="100" str="获取导线电阻数据" />
+	<item id="101" str="获取仪器通道%d导线电阻数据" />
+	<item id="102" str="设置GND和满度参数" />
+	<item id="103" str="采集导线电阻零点值" />
+	<item id="104" str="恢复原先桥路状态" />
+	<item id="105" str="采集导线电阻测量值" />
+	<item id="106" str="恢复原先的参数" />
+	<item id="107" str="检查通道状态" />
+	<item id="108" str= "计算导线电阻" />
+	<item id="109" str="等待参数设置完毕失败." />
+	<item id="110" str="采集仪器零点值" />
+	<item id="111" str="恢复输入端状态" />
+	<item id="112" str="测热状态下采集值" />
+	<item id="113" str="计算电阻两端电压" />
+	<item id="114" str="采集电阻值" />
+	<item id="115" str="计算电阻值" />
+	<item id="116" str="被测电阻超出测量范围，请重新测量。" />
+	<item id="117" str="Ch%d\tfltA0:%.3f\tfltA1:%.3f\tfltDlt:%.3f\t自检值:%.3f\n" />
+	<item id="118" str="%d号机电量不足, 将停止采样." />
+	<item id="119" str="%d号机发送数据异常，网络堵塞." />
+	<item id="120" str="%d号机硬盘空间已满，不能继续采集." />
+	<item id="121" str="%d号机未采集到数据，请检查." />
+	<item id="122" str="ReceiveResponseData:%d,依然没有数据\n" />
+	<item id="123" str="可见卫星数: %d 跟踪卫星数: %d 经度: %f 纬度: %f %f %f\n" />
+	<item id="124" str="used:%d串口号%d，波特率%d\n" />
+	<item id="125" str="%s连接时间 %d \n" />
+	<item id="126" str="%s 获取参数时间 %d \n" />
+	<item id="127" str="网络工程查询条件" />
+	<item id="128" str="查询条件" />
+	<item id="129" str="序号 查询条件" />
+	<item id="130" str="序号 查询个数" />
+	<item id="131" str="时间 开始时间" />
+	<item id="132" str="时间 结束时间" />
+	<item id="133" str="网络工程查询条件" />
+	<item id="134" str="查询结果" />
+	<item id="135" str="仪器硬盘空间" />
+	<item id="136" str="开始时间" />
+	<item id="137" str="结束时间" />
+	<item id="138" str="工程个数" />
+	<item id="139" str="字节数" />
+	<item id="140" str="仪器个数" />
+	<item id="141" str="将%d号机" />
+	<item id="142" str="通道设置到短路状态..." />
+	<item id="143" str="通道恢复默认设置..." />
+	<item id="144" str="等待获取平均数据失败." />
+	<item id="145" str="等待获取仪器采集状态超时." />
+	<item id="146" str="等待获取仪器采集工程名称超时." />
+	<item id="147" str="等待清零结束失败!" />
+	<item id="148" str="等待放大器平衡超时." />
+	<item id="149" str="等待平衡结束失败!" />
+	<item id="150" str="等待试采样." />
+	<item id="151" str="等待试采样结束超时." />
+	<item id="152" str="不正常工作仪器" />
+	<item id="153" str="%d号机" />
+	<item id="154" str="可能同步线未插，请检查。" />
+	<item id="155" str="%d号机获取剩余空间失败。" />
+	<item id="156" str="%d号机剩余%dM空间，需要清理仪器存储空间。" />
+	<item id="157" str="正在检查 %s 仪器信息有效性......" />
+	<item id="158" str="设备[%s]未建立网络连接，请检查!" />
+	<item id="159" str="设备[%s]与设备[%s]机号定义重复，请检查!" />
+	<item id="160" str="%d号机下位机软件不存在当前设置的采样频率，不能采集。" />
+	<item id="161" str="%d号机下位机软件不存在当前设置的采样频率，不能采集。" />
+	<item id="162" str="在默认采样频率中未查找到当前频率索引。" />
+	<item id="163" str="仪器机号存在冲突！" />
+	<item id="164" str="获取电阻两端电压数据" />
+	<item id="165" str="未查找到应变应力通道。" />
+	<item id="166" str="\n导线电阻" />
+	<item id="167" str="开路" />
+	<item id="168" str="短路" />
+	<item id="169" str="未发现应变通道!" />
+	<item id="170" str="通道自检" />
+	<item id="171" str="发送采样分析参数给下位机" />
+	<item id="172" str="获取数采平均值" />
+	<item id="173" str="获取自检平均值" />
+	<item id="174" str="\n平均值A1" />
+	<item id="175" str="参数恢复" />
+	<item id="176" str="计算自检值" />
+	<item id="177" str="提示" />
+	<item id="178" str="打开设备失败\n" />
+	<item id="179" str="打开设备成功\n" />
+	<item id="180" str="    设备地址\r\n标志位0x%X\r\n总线地址0x%X\r\n节点地址0x%X\r\n" />
+	<item id="181" str="获取设备地址失败\n" />
+	<item id="182" str="  主机地址   \r\n标志位0x%X\r\n总线地址0x%X\r\n节点地址0x%X\r\n" />
+	<item id="183" str="获取主机地址失败\n" />
+	<item id="184" str="分配地址范围失败" />
+	<item id="185" str="分配地址范围失败" />
+	<item id="186" str="仪器采样频率不一致，请重新设置采样频率。" />
+	<item id="187" str="采集完成" />
+	<item id="188" str="正在采集" />
+	<item id="189" str="等待采样结束" />
+	<item id="190" str="正在回收数据" />
+	<item id="191" str="跟踪卫星数不足" />
+	<item id="192" str="跟踪卫星数恢复" />
+	<item id="193" str="创建临时文件失败!" />
+	<item id="194" str="创建%d号机文件映射对象失败!" />
+	<item id="195" str="%d号机保存数据" />
+	<item id="196" str="%d号机获取数据异常" />
+	<item id="197" str="%d号机回收数据失败" />
+	<item id="198" str="CreateMapAddress ErrorIndex %d ErrorCode: %d ErrorInfo：%d" />
+	<item id="199" str="创建%s失败! ErrorCode: %d 错误信息：%s" />
+	<item id="200" str="创建文件映射对象失败！ErrorCode: %d 错误信息：%s" />
+	<item id="201" str="CreateMapAddress Error %s ErrorCode: %d 错误信息：%s" />
+	<item id="202" str="卸载 DHAgilentControl.dll，调整电压" />
+	<item id="203" str="卸载 DHAgilentControl.dll，设置信号" />
+	<item id="204" str="打开仪器失败。" />
+	<item id="205" str="卸载 PtAndThermoCalc.dll PtVoltageToTemperature" />
+	<item id="206" str="卸载 PtAndThermoCalc.dll ThermoVoltageToTemperature" />
+	<item id="207" str="卸载 PtAndThermoCalc.dll ThermoTemperatureToVoltage" />
+	<item id="208" str="读取%s信息异常。" />
+	<item id="209" str="创建仪器控制类失败。" />
+	<item id="210" str="绑定端口%d失败!" />
+	<item id="211" str="已长时间未收到仪器发送的数据，异常仪器信息如下：\n%s\n可通过重新连接仪器来回收异常仪器的数据。\n是否忽略未回收数据的仪器？" />
+	<item id="212" str="创建接收触发数据文件失败!" />
+	<item id="213" str="未发现同步时钟控制器!" />
+	<item id="214" str="获取控制器参数失败！请检查网络设置问题。" />
+	<item id="215" str="未选择控制器IP地址，读取网络参数失败！" />
+	<item id="216" str="未选择控制器IP地址，不能设置网络参数！" />
+	<item id="217" str="设置控制器网络参数失败！" />
+	<item id="218" str="设置网络参数失败！" />
+	<item id="219" str="设置网络参数成功，请重启控制器应用新参数！" />
+	<item id="220" str="唤醒时间必须比当前时间晚60秒以上，请重新设置！" />
+	<item id="221" str="唤醒时间不可超出当前时间一个月，请重新设置！" />
+	<item id="222" str="设置%s模块网络参数失败!" />
+	<item id="223" str="网络参数控制" />
+	<item id="224" str="设置%s网络参数成功，请重启仪器应用新参数。" />
+	<item id="225" str="SSID不能为空" />
+	<item id="226" str="SSID太长,请重新设置" />
+	<item id="227" str="设置%s模块SSID失败!" />
+	<item id="228" str="等待获取GPS同步时钟信息失败。" />
+	<item id="229" str="获取工程采样数据大小失败。" />
+	<item id="230" str="文件%s传输有错，请查明原因。" />
+	<item id="231" str="1588时钟未准备就绪!" />
+	<item id="232" str="等待仪器停止采集失败。" />
+	<item id="234" str="低通：阻带截止频率应大于通带下截止频率!!" />
+	<item id="235" str="高通：阻带截止频率应小于通带下截止频率!!" />
+	<item id="236" str="带通：阻带下限截止频率应小于通带下限截止频率且阻带上限截止频率应大于通带上限截止频率!!" />
+	<item id="237" str="带阻：阻带下限截止频率应大于通带下限截止频率且阻带上限截止频率应小于通带上限截止频率!!" />
+	<item id="238" str="%d号机[%s]: 已回收%.2fK数据, 未回收%.2fK。" />
+	<item id="239" str="存在异常仪器，可通过重新连接仪器来回收异常仪器的数据。" />
+	<item id="240" str="已保存%d%%的数据" />
+	<item id="241" str="设置调理器GND" />
+	<item id="242" str="采集放大器零点值" />
+	<item id="243" str="设置输入端到电压测量状态" />
+	<item id="244" str="采集初始电压值" />
+	<item id="245" str="恢复参数" />
+	<item id="246" str="设置电阻测量参数" />
+	<item id="247" str="设置输入端接地" />
+	<item id="248" str="切换输入端到测电阻状态" />
+	<item id="249" str="平衡失败通道：" />
+	<item id="250" str="自检前设置参数" />
+	<item id="251" str="平衡" />
+	<item id="252" str="获取零点值" />
+	<item id="253" str="获取标准值" />
+	<item id="254" str="%d号机GPS时钟未准备就绪!" />
+	<item id="255" str="共有%d台仪器，已回收%d台。文件数：%d/%d" />
+	<item id="256" str="该站点不支持断点续传。" />
+	<item id="257" str="该站点支持断点续传。" />
+	<item id="258" str="连接断开 %s\n" />
+	<item id="259" str="%s未采集到数据." />
+	<item id="260" str="等待GPS同步...%dS" />
+	<item id="261" str="等待1588时钟同步...%dS" />
+	<item id="262" str="%d号机1588时钟未准备就绪!\n" />
+	<item id="263" str="%d号机正在读取通道参数，请稍候..." />
+	<item id="264" str="%s:读取通道信息%dms，创建通道和设置通道参数%dms" />
+	<item id="265" str="%d号机正在设置通道参数，请稍候..." />
+	<item id="266" str="转换文件%d%%" />
+	<item id="267" str="仪器数据已清除，请重启仪器" />
+	<item id="268" str="%s 下传采样参数无应答，下传失败" />
+	<item id="269" str="仪器序列号长度必须为8" />
+	<item id="270" str="转换数据文件" />
+	<item id="271" str="确定" />
+	<item id="272" str="取消" />
+	<item id="273" str="数据回收" />
+	<item id="274" str="数字传感器通道" />
+	<item id="275" str="设置..." />
+	<item id="276" str="加载状态" />
+	<item id="277" str="动态库" />
+	<item id="278" str="传感器说明" />
+	<item id="279" str="公司" />
+	<item id="280" str="通道号" />
+	<item id="281" str="通道状态" />
+	<item id="282" str="测点名称" />
+	<item id="283" str="单位" />
+	<item id="284" str="提示" />
+	<item id="285" str="仪器时钟控制" />
+	<item id="286" str="(*)提示：低版本仪器无时钟控制功能，不可选择！" />
+	<item id="287" str="唤醒时间：" />
+	<item id="288" str="(*)未同步机箱\n不可休眠" />
+	<item id="289" str="查看仪器时间" />
+	<item id="290" str="时间同步" />
+	<item id="291" str="开始休眠" />
+	<item id="292" str="选择" />
+	<item id="293" str="机箱号" />
+	<item id="294" str="仪器时间" />
+	<item id="295" str="同步" />
+	<item id="296" str="休眠" />
+	<item id="297" str="仪器参数控制" />
+	<item id="298" str="仪器参数" />
+	<item id="299" str="网络参数" />
+	<item id="300" str="仪器设置" />
+	<item id="301" str="机箱号：" />
+	<item id="302" str="通道数：" />
+	<item id="303" str="版本号：" />
+	<item id="304" str="序列号：" />
+	<item id="305" str="通道数、序列号使用相同值一起设置" />
+	<item id="306" str="模块设置" />
+	<item id="307" str="机号设置" />
+	<item id="308" str="设置" />
+	<item id="309" str="数据率" />
+	<item id="310" str="毫秒/次" />
+	<item id="311" str="*少于12台采集器，采样频率20Hz以上时请选用200；否则选用1000" />
+	<item id="312" str="%s -- %d号机" />
+	<item id="313" str="%s_%d -- %d号机" />
+	<item id="314" str="机号已修改，请重启仪器" />
+	<item id="315" str="Flash管理" />
+	<item id="316" str="清空数据" />
+	<item id="317" str="IP地址设置" />
+	<item id="318" str="仪器IP：" />
+	<item id="319" str="计算机IP：" />
+	<item id="320" str="子网掩码：" />
+	<item id="321" str="默认网关：" />
+	<item id="322" str="计算机网络使用相同参数一起设置" />
+	<item id="323" str="网关地址" />
+	<item id="324" str="子网掩码" />
+	<item id="325" str="MAC地址" />
+	<item id="326" str="IP地址" />
+	<item id="327" str="工作模式" />
+	<item id="328" str="端口号" />
+	<item id="329" str="目的IP地址" />
+	<item id="330" str="目的端口号" />
+	<item id="331" str="LAN模式" />
+	<item id="332" str="无线网卡模式" />
+	<item id="333" str="AP模式" />
+	<item id="334" str="UDP参数" />
+	<item id="335" str="控制器网关：" />
+	<item id="336" str="本地数据端口：" />
+	<item id="337" str="网关上行端口：" />
+	<item id="338" str="本地命令端口：" />
+	<item id="339" str="网关下行端口：" />
+	<item id="340" str="模块" />
+	<item id="341" str="总空间(KB)" />
+	<item id="342" str="剩余空间(KB)" />
+	<item id="343" str="%s将清空仪器Flash数据,是否确定?" />
+	<item id="344" str="请重启仪器" />
+	<item id="345" str="%d号机将清空仪器Flash数据,是否确定?" />
+	<item id="346" str="参数设置" />
+	<item id="347" str="网络参数已修改，请重新启动仪器和软件。" />
+	<item id="348" str="UDP网络参数已修改，请重新启动软件" />
+	<item id="349" str="下位机软件更新" />
+	<item id="350" str="查找仪器" />
+	<item id="351" str="仪器类型" />
+	<item id="352" str="批量下传" />
+	<item id="353" str="上传" />
+	<item id="354" str="仪器" />
+	<item id="355" str="下位机软件" />
+	<item id="356" str="全选" />
+	<item id="357" str="查找到%d台仪器" />
+	<item id="358" str="未有选中的仪器。" />
+	<item id="359" str="请选择下传目录" />
+	<item id="360" str="未指定下位机配置文件的仪器类型，或是文件不全。不能下传。" />
+	<item id="361" str="未配置下传软件版本号，下传失败。" />
+	<item id="362" str="下传软件需将仪器重启，是否下传?" />
+	<item id="363" str="下传失败。" />
+	<item id="364" str="下传成功，请重启仪器。" />
+	<item id="365" str="未查找到仪器。" />
+	<item id="366" str="选中仪器没有可用下位机。" />
+	<item id="367" str="未选中需上传的目录！" />
+	<item id="368" str="上传目录异常！" />
+	<item id="369" str="请选择上传文件存放目录" />
+	<item id="370" str="上传失败。" />
+	<item id="371" str="上传成功。" />
+	<item id="372" str="下位机文件列表" />
+	<item id="373" str="初始化连接失败." />
+	<item id="374" str="下载参数文件：连接 FtpName: %s nPort: %d FtpUse: %s FtpPassword: %s 失败.\n请检查网络连接后重新连接仪器." />
+	<item id="375" str="模块IP" />
+	<item id="376" str="计算机IP" />
+	<item id="377" str="机箱号" />
+	<item id="378" str="通道数" />
+	<item id="379" str="版本" />
+	<item id="380" str="序列号" />
+	<item id="381" str="等待时钟同步...%dS" />
+	<item id="382" str="%d号机丢失的数据包回收失败" />
+	<item id="383" str="读取" />
+	<item id="384" str="获取平衡零点" />
+	<item id="385" str="切换仪器进入导线电阻测量状态" />
+	<item id="387" str="选择通道测量导线电阻" />
+	<item id="388" str="仪器退出导线电阻测量状态" />
+	<item id="390" str="切换仪器进入自检状态" />
+	<item id="391" str="仪器退出自检状态" />
+	<item id="392" str="通道" />
+	<item id="393" str="恢复参数" />
+	<item id="394" str="获取仪器" />
+	<item id="395" str="导线电阻数据" />
+	<item id="396" str="恢复采样参数" />
+	<item id="397" str="仪器类型" />
+	<item id="398" str="通道数、序列号、仪器类型使用相同值一起设置" />
+	<item id="399" str="仪器类型：" />
+	<item id="400" str="%d号机时钟未准备好" />
+	<item id="401" str="当前使用%d通道最大支持%s采样并存储数据，请调整采样频率或通道数。" />
+	<item id="402" str="清除采样工程" />
+	<item id="403" str="清除备份软件" />
+	<item id="404" str="删除下位机采样工程失败" />
+	<item id="405" str="删除备份下位机失败" />
+	<item id="406" str="%s采样工程共有%d个" />
+	<item id="407" str="5910Net参数设置" />
+	<item id="408" str="无线模块参数" />
+	<item id="409" str="离线采样参数" />
+	<item id="410" str="参数下传" />
+	<item id="411" str="无线模块参数设置" />
+	<item id="412" str="5910Net的SSID只能是数字,最多7个" />
+	<item id="413" str="离线参数下传失败" />
+	<item id="414" str="离线参数下传成功" />
+	<item id="415" str="离线参数下传成功" />
+	<item id="416" str="已回收%.2f%%的数据" />
+	<item id="417" str="清空数据完成" />
+	<item id="418" str="清空数据失败" />
+	<item id="419" str="时钟同步完成" />
+	<item id="420" str="时钟同步失败" />
+	<item id="421" str="等待仪器采集数据" />
+	<item id="422" str="采集端已处于采集状态,不能启动采集" />
+	<item id="423" str="等待采集端启动采集" />
+	<item id="424" str="NTP服务器IP" />
+	<item id="425" str="NTP服务器IP:" />
+	<item id="426" str="正在同步数据时间" />
+	<item id="427" str="采集端连接的显示端已达到最大支持连接数,不能连接到采集端。" />
+	<item id="428" str="清零" />
+	<item id="429" str="%s未采集到数据，请检查同步时钟设置" />
+	<item id="430" str="采集端已经被其它控制端控制，不能连接到采集端。" />
+	<item id="431" str="控制端启动采集" />
+	<item id="432" str="控制端停止采集" />
+	<item id="433" str="控制端更改采样参数" />
+	<item id="434" str="控制端更改分组功能" />
+	<item id="435" str="控制端更改组采样参数" />
+	<item id="436" str="控制端刷新查找仪器" />
+	<item id="437" str="控制端重置默认参数" />
+	<item id="438" str="控制端设置硬件" />
+	<item id="439" str="控制端更改使用分组功能" />
+	<item id="440" str="控制端导入通道组参数" />
+	<item id="441" str="控制端更改通道使用状态" />
+	<item id="442" str="控制端刷新通道" />
+	<item id="443" str="控制端平衡" />
+	<item id="444" str="控制端单通道平衡" />
+	<item id="445" str="控制端单通道GND平衡" />
+	<item id="446" str="控制端下传平衡结果" />
+	<item id="447" str="控制端所有通道清零" />
+	<item id="448" str="控制端单通道清零" />
+	<item id="449" str="控制端更改大数据采集状态" />
+	<item	id="450" str="同步模块显示" />
+	<item id="451" str="同步模块号：" />
+	<item id="452" str="正在读取EID信息，请稍候..." />
+	<item id="453" str="温度补偿" />
+	<item id="454" str="已回收%.2f%%,还需%.2f" />
+	<item id="455" str=",回收速度%.2f" />
+	<item id="456" str="秒" />
+	<item id="457" str="分钟" />
+	<item id="458" str="小时" />
+	<item id="459" str="等待GPS同步采集...%ds" />
+	<item id="460" str="仪器未准备好同步，不能启动采集。" />
+	<item id="461" str="等待1588同步采集...%ds" />
+	<item id="462" str="时钟设置" />
+	<item id="463" str="内时钟" />
+	<item id="464" str="外时钟" />
+	<item id="465" str="GPS同步" />
+	<item id="466" str="检测到%d号机接收数据异常，请检查网络带宽与磁盘写入带宽,继续采集将导致丢数" />
+	<item id="467" str="关机" />
+	<item id="468" str="整周期等角度采样" />
+	<item id="469" str="%d号机参数下传 %d%%" />
+	<item id="470" str="工程名长度不能超过8。" />
+	<item id="471" str="回收%d号机数据" />
+	<item id="472" str="回收丢包数据" />
+	<item id="473" str="读取%d号机工程参数失败！" />
+	<item id="474" str="示波下采样频率不能高于%.fHz" />
+	<item id="475" str="停止采样，%d号机取消下传参数" />
+	<item id="476" str="%d号机存储卡数据已全部清除，请重新启动仪器" />
+	<item id="477" str="CAN数据" />
+	<item id="478" str="MIC数据" />
+	<item id="479" str="1553数据" />
+	<item id="480" str="发送启动采样失败！" />
+	<item id="481" str="发送停止采样失败！" />
+	<item id="482" str="%d号机回收工程列表出现异常，请重新回收" />
+	<item id="483" str="总空间(MB)" />
+	<item id="484" str="剩余空间(MB)" />
+	<item id="485" str="无" />
+	<item id="486" str="工程名长度不能超过8。" />
+	<item id="487" str="DHDAS" />
+	<item id="488" str="设置" />
+	<item id="489" str="导线电阻测量" />
+	<item id="490" str="自检" />
+	<item id="491" str="IEPE传感器检测" />
+	<item id="492" str="设置通道参数" />
+	<item id="493" str="计算检测结果" />
+	<item id="494" str="正常" />
+	<item id="495" str="网络模式" />
+	<item id="496" str="独立网络服务端" />
+	<item id="497" str="独立网络客户端" />
+	<item id="498" str="基础网络(接入AP)" />
+	<item id="499" str="调试功能" />
+	<item id="500" str="仪器选择" />
+	<item id="501" str="机号" />
+	<item id="502" str="所有仪器" />
+	<item id="503" str="板号设置" />
+	<item id="504" str="原板号" />
+	<item id="505" str="新板号" />
+	<item id="506" str="写板号" />
+	<item id="507" str="强制写板号" />
+	<item id="508" str="(0x00~0x1F)" />
+	<item id="509" str="(0x00~0x03)" />
+	<item id="510" str="板号超出设置范围，请重设" />
+	<item id="511" str="写板号成功" />
+	<item id="512" str="写板号失败" />
+	<item id="513" str="强制写板号成功" />
+	<item id="514" str="强制写板号失败" />
+	<item id="515" str="无线参数控制" />
+	<item id="516" str="网络模式已改变，请重新启动仪器" />
+	<item id="517" str="%d号机累积数据异常。" />
+	<item id="518" str="未查找到触发位置" />
+	<item id="519" str="仪器未连接" />
+	<item id="520" str="仪器不支持获取触发位置功能" />
+	<item id="521" str="获取触发位置，等待超时" />
+	<item id="522" str="无线模式切换" />
+	<item id="523" str="无线模式" />
+	<item id="524" str="WIFI模式" />
+	<item id="525" str="AP模式" />
+	<item id="526" str="电池供电时间(1~240分钟)" />
+	<item id="527" str="可能同步时钟盒不在线，请检查" />
+	<item id="528" str="同步时钟盒启动采样失败" />
+	<item id="529" str="同步时钟盒停止采样失败" />
+	<item id="530" str="GPS时钟异常" />
+	<item id="531" str="休眠" />
+	<item id="532" str="唤醒" />
+	<item id="533" str="休眠成功" />
+	<item id="534" str="休眠失败" />
+	<item id="535" str="唤醒成功" />
+	<item id="536" str="唤醒失败" />
+	<item id="537" str="压力扫描阀采样参数设置失败" />
+	<item id="538" str="压力扫描阀未采集到数据" />
+	<item id="539" str="下传离线参数成功" />
+	<item id="540" str="解析回收参数失败" />
+	<item id="541" str="当前使用的为USB2.0端口，为确保仪器正常工作请切换到USB3.0接口。" />
+	<item id="542" str="获取数据错误码%d通讯异常"/>
+	<item id="543" str="数据回收异常，请确认仪器通讯正常后，重新回收仪器的数据。" />
+	<item id="544" str="回收数据大小异常(%.2fMB/%.2fMB)，请重新回收"/>
+	<item id="545" str="发送数据回收命令失败，请确认仪器通讯正常" />
+	<item id="546" str="仪器数据已成功回收，可以断开仪器连接。" />
+	<item id="547" str="正在处理数据，请稍候......" />
+	<item id="548" str="回收数据大小异常，是否处理已回收的数据？" />
+	<item id="549" str="处理%s%d数据异常" />
+	<item id="550" str="总共%d台采集模块，已唤醒%d台" />
+	<item id="551" str="总共%d台采集模块，已休眠%d台" />
+	<item id="552" str="正在读取同步时钟，请稍候......" />
+	<item id="553" str="模块未建立连接，请检查" />
+	<item id="554" str="上电自检" />
+	<item id="555" str="%d号机未采集到数据，请确保同步线连接正常。" />
+	<item id="556" str="Fail to begin filling the scan line FIFO" />
+	<item id="557" str="Fail to return number of new scan lines available.%d" />
+	<item id="558" str="未成功获取所有仪器NTP时间" />
+	<item id="559" str="采样频率超过WIA同步时的最大采样频率，切换为常规采集" />
+	<item id="560" str="未准备好同步，同步采集切换为常规采集" />
+	<item id="561" str="未准备好同步，无法继续进行同步采集" />
+	<item id="562" str="检测到清空前后仪器中采样参数不一致，长度分别为%d，%d；请重新下传参数！" />
+	<item id="563" str="版本：" />
+	<item id="564" str="当前频率%s不支持实时采样，请调整采样频率。" />
+	<item id="565" str="仪器Flash数据已清空。" />
+	<item id="566" str="多台仪器间的GPS模式不一致。" />
+	<item id="567" str="GPS" />
+	<item id="568" str="同步时钟盒" />
+	<item id="569" str="仪器参数已修改，请重新启动仪器。" />
+	<item id="570" str="仪器参数已修改，请重新启动仪器和软件。" />
+	<item id="571" str="%d号机控制卡版本与驱动版本不匹配，请与供应商联系." />
+	<item id="572" str="转速模块异常，请检查通讯接口。" />
+	<item id="573" str="磁盘空间不足，数据无法保存" />
+	<item id="574" str="文件：%s 创建失败" />
+	<item id="575" str="参数设置错误，MAC地址最后位应为偶数" />
+	<item id="576" str="获取下位机GPS定位系统配置失败或多台不一致." />
+	<item id="577" str="检测到新连接，如果为关机再连接，需手动执行刷新连接，否则将导致仪器状态与软件不一致。" />
+	<item id="578" str="正在执行查找通道，请稍后..." />
+	<item id="579" str="AI" />
+	<item id="580" str="SPEED" />
+	<item id="581" str="修改序列号成功，请重启仪器" />
+	<item id="582" str="修改序列号失败"/>
+	<item id="583" str="自定义"/>
+	<item id="584" str="停止采样过程中，请等待 %d s"/>
+	<item id="585" str="开始查找仪器中......"/>
+	<item id="586" str="设置仪器参数中......"/>
+	<item id="587" str="查找到%d台仪器，读取第%d台仪器通道信息中..."/>
+	<item id="588" str="查找到%d台仪器，读取第%d台仪器通道信息失败"/>
+	<item id="589" str="正在同时设置各台仪器通道参数，请耐心等待，最长等待时间约30秒 ..."/>
+	<item id="590" str="设置各台仪器通道参数结束"/>
+	<item id="591" str="开始查找WIA模块"/>
+	<item id="592" str="取消查找仪器"/>
+	<item id="593" str="取消查找仪器,但查找到部分仪器"/>
+	<item id="594" str="总共%d台仪器，设置第%d台仪器WIA信息"/>
+	<item id="595" str="删除未找到采集器信息"/>
+	<item id="596" str="总共%d查找，第%d次查找WIA模块..."/>
+	<item id="597" str="第(%d/%d)次查找WIA模块...%d秒"/>
+	<item id="598" str="用户取消第%d次查找WIA模块"/>
+	<item id="599" str="设置频率档位索引......"/>
+	<item id="600" str=",点击界面中断查找"/>
+	<item id="601" str="读取外部仪器状态%s"/>
+	<item id="602" str="无返回数据"/>
+	<item id="603" str="仪器复位失败"/>
+	<item id="604" str="打开COM%d仪器失败。" />
+  <item id="605" str="DH5916-%d号机离线参数下传成功。"/>
+  <item id="606" str="DH5916-%d号机离线参数下传失败。"/>
+  <item id="607" str="DH5916不支持多台仪器的触发采样。"/>
+  <item id="608" str="未连接到DH5916同步时钟控制器，不能同步采样。"/>
+  <item id="609" str="TV" />
+  <item id="610" str="瞬时角速度" />
+  <item id="611" str="平均角速度" />
+  <item id="612" str="扭振角速度" />
+  <item id="613" str="扭振角度" />
+  <item id="614" str="扭振角度(X-deg)" />
+  <item id="615" str="EtherCAT主站初始化失败。"/>
+  <item id="616" str="EtherCAT进入采样状态失败。"/>
+  <item id="617" str="已经回收数据 %.2f %% "/>
+  <item id="618" str="同步时钟已连接"/>
+  <item id="619" str="同步时钟已断开"/> 
+  <item id="620" str="同步时钟启动采样成功"/>
+  <item id="621" str="正在回收数据, 已回收%.1f" />
+  <item id="622" str="机号设置失败"/>
+  <item id="623" str="同步时钟停止采样成功"/>
+  <item id="624" str="%s不支持不同通道不同采样率"/>
+  <item id="625" str="通道目前仅支持最大降采样倍数%d"/>
+  <item id="626" str="同步时钟未连接"/>
+  <item id="627" str="数据回收成功"/>
+  <item id="628" str="格式化"/>
+  <item id="629" str="电量不足20%，请插充电器"/>
+  <item id="630" str="%d号控制器未采集到数据，请检查." />
+  <item id="631" str="%d号控制器未采集到数据，请确保线缆连接正常。" />
+  <item id="632" str="NI设备正在回收数据..." />
+  <item id="633" str="正在回收数据, 已回收%.1f%%" />
+  <item id="634" str="NTP同步时采样频率最高不能超过%.fHz" />
+  <item id="635" str="%d号控制器第%s采集器异常，请检查 " />
+  <item id="636" str="仪器机箱号不可以大于%d" />
+  <item id="637" str="%d号控制器 %d 号采集器没有收到数据" />  
+  <item id="638" str="%d号控制器第 %s采集器连接不正常，请刷新连接再使用" />  
+  <item id="639" str="等待NI设备信号触发并采集足够数据..." />
+  <item id="640" str="等待NI设备外触发并采集足够数据..." />
+  <item id="641" str="等待NI设备采集足够数据..." />
+  <item id="642" str="等待%.1fs采集结束" />
+  <item id="643" str="等待%dms采样结束" />
+  <item id="644" str="已保存%.1f%%的数据，还需%.1f秒时间保存" />
+  <item id="645" str="采集端已经采集，当前模式下不允许存储采集." />
+  <item id="646" str="%d号机通讯方式设置失败请刷新连接" />
+  <item id="647" str="等待所有显示端或控制端启动采集超时。" />
+  <item id="648" str="等待NI设备启动采样..." />
+  <item id="649" str="NI设备无法启动采样，请检查是否连接USB设备" />
+  <item id="650" str="NI设备未连接，无法启动采样" />
+ 	<item id="651" str="NI设备采集命令发送失败，无法启动采样" />
+  <item id="652" str="PFI断开连接" />
+  <item id="653" str="USB设备序列号错误，NI设备无法启动采样" />
+  <item id="654" str="正在处理数据, 已处理%.1f%%" />
+  <item id="655" str="回收数据失败" />
+	<item id="656" str="仪器中离线采集空文件夹数太多，请清空Flash，以免影响获取回收文件信息速度" />
+  <item id="657" str="未回收到CAN通道数据，是否继续回收数据" />
+  <item id="658" str="未回收到外部数据源数据文件，是否继续回收数据" />
+  <item id="659" str="未回收到RS422通道数据，是否继续回收数据" />
+  <item id="660" str="未回收到共用仪器通道数据，是否继续回收数据" />
+  <item id="661" str="实际采样数据与目标采样数据不匹配，请查看" />
+  <item id="662" str="报警参数设置" />
+  <item id="663" str="界面网络参数无效，请更改" />
+  <item id="664" str="等待所有分组进入采集" />
+  <item id="665" str="NI设备未能成功启动采样，请检查" />
+  <item id="666" str="重新打开COM口" />
+  <item id="667" str="共 %d 台仪器，正在设置第%d台仪器通道参数，请耐心等待..."/>
+  <item id="668" str="AP电源"/>
+  <item id="669" str="下传离线参数"/>
+  <item id="670" str="AP定时开关机设置"/>
+  <item id="671" str="开机持续时间（分钟）"/>
+  <item id="672" str="关机持续时间（分钟）"/>
+  <item id="673" str="获取AP定时时间失败"/>
+  <item id="674" str="设置AP定时时间失败"/>
+  <item id="675" str="正在等待采样结果..."/>
+  <item id="676" str="正在等待下一次采样..."/>
+  <item id="677" str="存储空间不足，请清理后再采集." />
+  <item id="678" str="无" />
+  <item id="679" str="启动AP定时失败" />
+  <item id="680" str="关机后只能通过仪器上开机按钮重新启动，是否继续" />
+  <item id="681" str="设置AP定时时间成功"/>
+  <item id="682" str="启动AP定时成功" />
+  <item id="683" str="Temp" />
+  <item id="684" str="Freq" />
+  <item id="685" str="Strain" />
+  <item id="686" str="只允许采样频率取整设置不同通道不同采样频率，请修改" />
+  <item id="687" str="仪器不支持通道目前设置的降采样频率跨度，请修改采样频率"/>
+  <item id="688" str="只允许内时钟设置不同通道不同采样频率，请修改" />
+  <item id="689" str="不同通道不同采样频率下不允许非连续采集，请修改" />
+  <item id="690" str="唤醒值的范围是1-255" />
+  <item id="691" str="设置唤醒值" />
+  <item id="692" str="读取唤醒值" />
+  <item id="693" str="成功" />
+  <item id="694" str="失败" />
+  <item id="695" str="获取硬件通道参数失败" />
+  <item id="696" str="当前工作模式下必须使用同步。" />
+  <item id="697" str="等待启动采样命令超时。" />
+  <item id="698" str="Pres" />
+  <item id="699" str="外部数据源未采集到数据，请检查" />
+  <item id="700" str="惯导%d未采集到数据" />
+  <item id="701" str="DH5916-%d号机通道输出参数设置成功。"/>
+  <item id="702" str="DH5916-%d号机通道输出参数设置失败。"/>
+  <item id="703" str="请确认已经回收采集仪内部数据，并格式化flash，然后再下传离线参数"/>
+  <item id="704" str="设定的GPS采样时间小于当前GPS时间"/>
+  <item id="705" str="相同类型的仪器配置的通道数不一致，请联系售后服务人员解决."/>
+  <item id="706" str="当前仪器使用的的同步模式不一致，请重新设置同步方式."/>
+  <item id="707" str="软件设置的同步方式与仪器同步方式不一致，请重新设置同步方式."/>
+  <item id="708" str="%d号机GPS时钟恢复!"/>
+  <item id="709" str="%d号机GPS时钟异常!"/>
+  <item id="710" str="仪器读取的通道数大于配置文件最大通道数，请联系售后服务人员解决."/>
+  <item id="711" str="等待数据全部发送到远端."/>
+  <item id="712" str="下位机正在采集数据，采集完成后请回收"/>
+  <item id="713" str="已经回收数据(%d/%d)  %.2f %% "/>
+  <item id="714" str="4G参数设置"/>
+  <item id="715" str="控制器参数设置"/>
+  <item id="716" str="采集器参数设置"/>
+  <item id="717" str="仪器参数与软件参数不一致，请下传参数"/>
+  <item id="718" str="%d号机通道总采样频率超过仪器上限，请重新设置通道采样频率"/>
+  <item id="719" str="仪器正在生成测试数据，请等待..."/>
+  <item id="720" str="仪器没有测试文件"/>
+  <item id="721" str="测试"/>
+  <item id="722" str="等待采集足够数据已超出预期等待时间."/>
+  <item id="723" str="触发位置小于%d号机缓存数据起始位置, TrigPos: %I64d, StartPos: %I64d"/>
+  <item id="724" str="触发位置小于%d号机缓存数据起始位置, TrigPos: %I64d, EndPos: %I64d"/>
+  <item id="725" str="由于读取的触发位置存在异常,自动更改触发位置, Last: %I64d, Cur: %I64d"/>
+  <item id="726" str="%d号机不允许跳通道开关！"/>
+  <item id="727" str="数据接收端IP:" />
+  <item id="728" str="客户端IP" />
+  <item id="729" str="仪器版本过低不支持读写唯一编码" />
+  <item id="730" str="等待模拟GPS同步采集...%ds" />
+  <item id="731" str="电阻测量" />
+  <item id="732" str="%d号机同步时钟未准备就绪!" />
+  <item id="733" str="触发位置" />
+  <item id="734" str="%d号机通道采样频率跨度超过%d倍，请重新设置通道采样频率" />
+  <item id="735" str="按键开机" />
+  <item id="736" str="上电自启动，掉电不关机（按键有效）" />
+  <item id="737" str="上电自启动，掉电关机（按键无效）" />
+  <item id="738" str="电源参数" />
+  <item id="739" str=" 设置成功，请重新启动软件" />
+  <item id="740" str=" 服务端和客户端采样频率不一致!" />
+  <item id="741" str=" 服务端和客户端通道信息不匹配！" />
+  <item id="742" str=" 采集端数据上传 %.2f %% " />
+  <item id="743" str="%d号机剩余电量小于6%%，预计10分钟左右电量耗尽，请及时充电！" />
+  <item id="744" str="%d号机剩余电量小于2%%，预计1分钟左右电量耗尽，请中止试验，尽快充电！！剩余电量小于1%%时，将强制停止采样！" />
+  <item id="745" str="%d号机电量过低，即将停止采样，请充电后使用。" />
+  <item id="746" str="%d号机电量即将耗尽，已停止采样，请充电后使用。" />
+  <item id="747" str="%d号机长时间未收到心跳包，请检查" />
+  <item id="748" str="%s重新接收到数据." />
+  <item id="749" str="仪器未全部连接，请检查." />
+  <item id="750" str="仪器存在相同机号，请检查." />
+  <item id="751" str="采样频率设置错误，请检查." />
+  <item id="752" str="1K以下请勿关通道采集,请检查." />
+  <item id="753" str="%d号机未准备好同步，不能启动采集。" />
+  <item id="754" str="无可用仪器，不能启动采集。" />
+  <item id="755" str="等待仪器进入采集超时" />
+  <item id="756" str="%d号机启动采集失败." />
+  <item id="757" str="创建瞬态采样线程失败" />
+  <item id="758" str="大数据量初始化数据块失败" />
+  <item id="759" str="%d号机启动采集，发送命令失败" />
+  <item id="760" str="%d号机启动采集，未等到硬件响应" />
+  <item id="761" str="%d号机停止采集，发送命令失败" />
+  <item id="762" str="%d号机停止采集，未等到硬件响应" />
+  <item id="763" str="%d号机不是有效连接使用的仪器" />
+  <item id="764" str="清零数据量错误" />
+  <item id="765" str="等待清零数据量超时" />
+  <item id="766" str="%d号机 发送参数设置命令失败" />
+  <item id="767" str="%d号机 发送参数设置命令未等到响应" />
+  <item id="768" str="%d号机 发送平衡命令失败" />
+  <item id="769" str="%d号机 发送平衡命令未等到响应" />
+  <item id="770" str="通讯模式更改需重启软件生效" />
+  <item id="771" str="光纤参数控制" />
+  <item id="772" str="：%d号控制器、%d号光纤、%d号传感器断开，请刷新连接." />
+  <item id="773" str="：%d号控制器、%d号光纤、%d号传感器连接，请刷新连接." />
+  <item id="774" str="仪器将进入在线常规采样" />
+  <item id="775" str="仪器即将休眠，进入唤醒采样模式" />
+  <item id="776" str="仪器待机时间为1 - 255 分钟" />
+  <item id="777" str="正在准备回收,请耐心等待..." />
+  <item id="778" str="参数设置成功，刷新外部数据源连接 " />
+  <item id="779" str="等待原子钟同步采集...%ds" />
+  <item id="780" str="%d号机 下位机通道配置为%d, %s, 不支持256K采样！" />
+  <item id="781" str=" 自检通道共 %d 路, 正在自检 第 %d 路  " />
+  <item id="782" str="时统 %d号机" />
+  <item id="783" str="正在查找仪器通道，请勿操作软件..." />
+  <item id="784" str="4G 信号不好导致数据丢失..." />
+  <item id="785" str="机号 %d 仪器数据处理来不及 " />
+  <item id="786" str="%d号机正在重新处理采样数据，请耐心等待..." />
+  <item id="787" str="当前设置的定时采样时长超过下位机一次采样能处理的大小，不能进行采样！" />
+  <item id="788" str="%d号机采样过程中断开连接！" />
+  <item id="789" str="%d号机采样过程中重新连接！" />
+  <item id="790" str="正在下传%d号机离线采样参数，请耐心等待..." />
+  <item id="791" str="仪器 %d号机 仪器内部处于采集状态，需先去设置界面停止" />
+  <item id="792" str="显示端连接，但存在未建立连接仪器：%s号机！" />
+  <item id="793" str="同步时钟盒控制仪器开机失败" />
+  <item id="794" str="同步时钟盒控制仪器关机失败" />
+  <item id="795" str="%s采样过程中出现丢包，可进行事后回收回收数据" />
+  <item id="796" str="%s仪器内磁盘空间不足，数据无法保存" />
+  <item id="797" str="%d号机存储卡数据已全部清除，请重新下发离线参数" />
+  <item id="798" str="%d号机[%s]: 共丢失%d段数据，已回收%d段数据。" />
+  <item id="799" str="风洞已启动" />
+  <item id="800" str="风洞已停止" />
+  <item id="801" str="试验状态反馈：%d" />
+  <item id="802" str="高速采样频率需大于低速采样频率" />
+  <item id="803" str="勾选通道的总数据量超出仪器支持带宽" />
+  <item id="804" str="分组同步模式下不支持瞬态采样！" />
+  <item id="805" str="IRIG" />
+  <item id="806" str="%s采样频率设置错误，20kHz以下和20kHz以上(包含)不可混用" />
+  <item id="807" str="%d号机 补偿通道与被补偿通道采样频率不一致！" />
+  <item id="808" str="%d号机 5902G板卡 总采样频率大于9M！" />
+  <item id="809" str="主机采样触发深度时间不是最大，请校验 ！" />
+  <item id="810" str="当前设置的采样深度不是所有仪器的整周期数据量，请重新设置存储规则！" />
+  <item id="811" str="确认是否需要重新备份监测盒程序？？？" />
+  <item id="812" str="监测盒复位%s"/>
+  <item id="813" str="第%d次触发" />
+  <item id="814" str=" 第%d次 信号触发 " />
+  <item id="815" str=" 第%d次 外触发" />
+  <item id="816" str=" 当前为离线采样" />
+  <item id="817" str="第%d路 切换仪器进入应变计测量状态" />
+  <item id="818" str="第%d路 测量应变计电阻值" />
+  <item id="819" str="第%d路 切换仪器退出测量状态" />
+  <item id="820" str=" %d 号机 外触发参数设置失败 错误码 %d " />
+  <item id="821" str=" %d 号机 应急触发参数设置失败 错误码 %d  " />
+  <item id="822" str="存在仪器模式不一致，请先设置为相同模式采样" />
+  <item id="823" str="仪器桥压检测中" />
+  <item id="824" str="第%d路 切换仪器进入导线电阻值测量状态" />
+  <item id="825" str="第%d路 测量导线电阻值" />
+  <item id="826" str="电荷复位..." />
+  <item id="827" str="Wifi初始化" />
+  <item id="828" str="MTS文件没有数据更新" />
+  <item id="829" str="当前处于高速存储过程中" />
+  <item id="830" str="当前处于连续快照过程中" />
+  <item id="831" str="当前处于存储过程中" />
+  <item id="832" str="当前处于清零过程中" />
+  <item id="833" str="清零不做处理" />
+  <item id="834" str="高速存储不做处理" />
+  <item id="835" str="连续快照不做处理" />
+  <item id="836" str="当前处于定时过程中，定时不做处理" />
+  <item id="837" str="快照不做处理" />
+  <item id="838" str="参数不合法，参数范围%.2f~%.2f" />
+  <item id="839" str="只有5960GC板卡支持瞬态采样" />
+  <item id="840" str="共 %d 台仪器，正在设置第%d台仪器网络参数，请耐心等待..."/>
+  <item id="841" str="该版本下位机不支持读写工作模式，请更新下位机..."/>
+  <item id="842" str="设置成功，请重启仪器..."/>
+  <item id="843" str="设置失败"/>
+  <item id="844" str="停止采样与硬件交互中"/>
+  <item id="845" str="删除临时文件中"/>
+  <item id="846" str="%d 号机 连续采样频率上限100K"/>
+  <item id="847" str="%d 号机 瞬态采样深度偏大，需调整"/>
+  <item id="848" str="不支持定时结束采样，请修改"/>
+  <item id="849" str="%s正在等待仪器触发"/>
+  <item id="850" str="定时开始时间不能早于当前时间，请修改"/>
+  <item id="851" str="该仪器不支持定时采样模式下示波"/>
+  <item id="852" str="采集器号"/>
+  <item id="853" str="%d 号机 不支持通道总采样频率大于60*200k!"/>
+  <item id="854" str="%d 号机 不支持通道总采样频率大于56*200k!"/>
+  <item id="856" str="正在采样，不可读取电池电量，请停止采样后再读取"/>
+  <item id="857" str="正在回收，不可读取电池电量，请停止回收后再读取"/>
+  <item id="858" str="5902G只支持相同采样频率触发"/>
+  <item id="859" str="%d 号机瞬态不支持通道总采样频率大于%dM!"/>
+  <item id="860" str="采样频率过大，仪器不支持上发数据采样"/>
+  <item id="861" str="单端"/>
+  <item id="862" str="差分"/>
+  <item id="863" str="Moog 外部数据源断开连接"/>
+  <item id="864" str="Moog 外部数据源重新连接"/>
+  <item id="865" str="%d号机 采样频率与下位机不一致，请重新设置采样频率!"/>
+  <item id="866" str="仪器未触发，是否停止采样"/>
+  <item id="867" str="仪器已触发，但数据未足够，是否停止采样"/>
+  <item id="868" str="分组%d与其他组瞬态采样频率不一致!"/>
+  <item id="869" str="分组%d与其他组连续采样频率不一致!"/>
+  <item id="870" str="当瞬态分组采样频率小于等于1M时，连续分组频率要与瞬态分组一致!"/>
+  <item id="871" str="读取UDP参数失败"/>
+  <item id="872" str="设置UDP参数失败"/>
+  <item id="873" str="读取UDP参数成功"/>
+  <item id="874" str="设置UDP参数成功"/>
+  <item id="875" str="在线采样不允许使用离线采样的档位"/>
+  <item id="876" str="离线采样不允许使用在线采样的档位"/>
+  <item id="877" str="分组%d与其他组瞬态参数不一致!"/>
+  <item id="878" str="下位机存盘异常，请停止采样!"/>
+  <item id="879" str="单独使用瞬态采样时，总采样频率不能超过8M!"/>
+  <item id="880" str="GPS授时失败，请重新采样!"/>
+  <item id="881" str="%d号机等待采集信号." />
+  <item id="882" str="回收数据存在丢包，请确认仪器通讯正常后，重新回收丢包数据." />
+  <item id="883" str="在线采集时，采样频率不能超过1000Hz, 请重新采样频率或勾选离线采集!" />
+  <item id="884" str="离线采集时，不支持在分析频率取整时输出波形或者特征值，请重新选择采样频率!" />
+  <item id="885" str="该仪器离线模式下仅支持定时采样" />
+  <item id="886" str="距离下一次采样 间隔 %d s" />
+  <item id="887" str="当前频率不支持瞬态采样，请调整采样频率。" />
+  <item id="888" str="仪器%s格式化成功，请重启仪器" />
+  <item id="889" str="仪器%s格式化失败，请重启仪器后重试" />
+  <item id="890" str="请将采样主机设置为1号机" />
+  <item id="891" str="设置仪器网络连接参数失败." />
+  <item id="892" str="%d号机检测到网络丢包" />
+  <item id="893" str="勾选通道的总数据量超出仪器支持带宽，该采样频率下最多支持勾选%d个通道" />
+  <item id="894" str="绑定网卡信息已修改，重启软件后生效！" />
+  <item id="895" str="当前绑定的网卡信息 %s 不存在！" />
+  <item id="896" str="热电偶开关断路检测中" />
+  <item id="897" str="等待IRIG同步采集...%ds" />
+  <item id="898" str="%d号机处理单通道数据异常，异常码:%d" />
+  <item id="899" str="%d号机下传参数失败,请重新点击采样按钮" />
+  <item id="900" str="%d号机同步时钟准备就绪!" />
+  <item id="901" str="%d号机下传参数过于频繁，请稍后" />
+  <item id="902" str="%d号机 采样数据丢失百分比 %f" />
+  <item id="903" str="%d号机 在线不支持触发采集，请调整存储规则。" />
+  <item id="904" str="单频校准%ds" />
+  <item id="905" str="主控或采集端未处于采集状态,不能启动采集" />
+  <item id="906" str="dbc文件为CANFD类型" />
+  <item id="907" str="%d号机中未找到将要回收的数据，无法回收" />
+  <item id="908" str="控制端计算OffSet大气压零点" />
+  <item id="909" str="计算OffSet大气压零点" />
+  <item id="910" str="设置GND" />
+  <item id="911" str="采集GND零点值" />
+  <item id="912" str="获取GND零点值" />
+  <item id="913" str="采集平均值" />
+  <item id="914" str="获取平均值" />
+  <item id="915" str="计算Offset" />
+  <item id="916" str="请设置正确的仪器为主机" />
+  <item id="917" str="不存在可以做主机的仪器" />
+  <item id="918" str="丢包数%d, 回收时间预计%.2f, 建议使用事后回收！是否仍需丢包回收？" />
+  <item id="919" str="%d号机，正在回收丢包数据" />
+  <item id="920" str="%d号机，等待触发" />
+  <item id="921" str="%d号机，硬件已触发，正在采集数据" />
+  <item id="922" str="%d号机，硬件触发结束" />
+  <item id="923" str="%d号机ntp状态异常!" />
+  <item id="924" str="%d号机ntp状态恢复正常!" />
+  <item id="925" str="%d号机相邻两个通道未同时开关或采样频率不一致，请检查并重新设置" />
+  <item id="926" str="设置成功，请重启仪器和软件..."/>
+  <item id="927" str="当前定时时间小于GPS时间，以GPS时间启动采样"/>
+  <item id="928" str="所有通道的抗混滤波设置必须相同，请检查后重新开始采样"/>
+  <item id="929" str="单频校准%ds" />
+  <item id="930" str="当前定时时间小于GPS时间，请重新设置定时时间"/>
+  <item id="931" str="当前模式不支持设置跨天定时时间，请重新设置定时时间"/>
+  <item id="932" str="%d号机声发射通道与常规通道不可同时使用，请根据采样频率重新选择参与采样的通道"/>
+  <item id="933" str="%d号机采样频率2MHz以下不可使用声发射通道，请根据采样频率重新选择参与采样的通道"/>
+  <item id="934" str="%d号机采样频率2MHz及以上不可使用常规通道，请根据采样频率重新选择参与采样的通道"/>
+  <item id="935" str="%d号机通道%d在该采样频率下不可开抗混滤波，请关闭"/>
+  <item id="936" str="BD卫星信号已连接"/>
+  <item id="937" str="BD卫星信号已断开连接"/>
+  <item id="938" str="%d号机485通道%d选择类型错误，请重新选择！"/>
+  <item id="939" str="2008外触发服务端未连接！"/>
+  <item id="940" str="无线模块参数设置成功，请勿退出此界面，等待仪器无线指示灯闪烁后重新启动仪器"/>
+  <item id="941" str="已触发，正在存储数据"/>
+  <item id="942" str="%d号机仪器未连接，请查看"/>
+  <item id="943" str="%d号机仪器处于回收中， 请等待"/>
+  <item id="944" str="%d号机仪器未接收到最新的采样数据，请等待"/>
+  <item id="945" str="参数下传成功，请重启控制器"/>  
+  <item id="946" str="参数下传失败！"/>  
+  <item id="947" str="修正系数写入成功！"/>  
+  <item id="948" str="报警值设置成功"/>    
+  <item id="949" str="报警值设置失败！"/>  
+  <item id="950" str="修正系数写入失败！"/>    
+  <item id="951" str="未选择仪器！"/>     
+  <item id="952" str="参数设置错误！"/>      
+  <item id="953" str="确定停止唤醒仪器？"/>  
+  <item id="954" str="请选择一台仪器设置！"/>   
+  <item id="955" str="机箱号不能为空！"/>   
+  <item id="956" str="机箱号更改失败"/>   
+  <item id="957" str="正在唤醒仪器，请勿关闭窗口！"/>   
+  <item id="958" str="PANID设置错误，PANID范围1-9999"/>    
+  <item id="959" str="PID设置失败"/>   
+  <item id="960" str="设置阈值失败！"/>  
+  <item id="961" str="设置阈值成功！"/>   
+  <item id="962" str="读取温度失败！"/>        
+  <item id="963" str="自校零失败！"/>    
+  <item id="964" str="自校零成功！"/>       
+  <item id="965" str="自校正命令无回复！"/>
+  <item id="966" str="自校正通过！"/>          
+  <item id="967" str="自校正未通过！"/>   
+  <item id="968" str="采集器机号必须大于1"/>         
+  <item id="969" str="校准失败!"/>         
+  <item id="970" str="校准成功!"/>     
+  <item id="971" str="CANId 有效范围：769~1023"/> 
+  <item id="972" str="间隔时间必须大于2分钟！"/>  
+  <item id="973" str="设置成功！"/>
+  <item id="974" str="设置失败！"/>
+  <item id="975" str="休眠成功！"/>
+  <item id="976" str="休眠失败！"/>    
+  <item id="977" str="发动机编号长度不能超过20，请重新输入"/>    
+  <item id="978" str="参数设置成功"/>  
+  <item id="979" str="设定生成文件时长不能超过20s，请重新设置"/>     
+  <item id="980" str="采样间隔不能为小数，请重新设置"/>     
+  <item id="981" str="采样间隔不能超过65536s，请重新设置"/>      
+  <item id="982" str="判定幅值百分比不能超过100，请重新设置"/>      
+  <item id="983" str="判定幅值百分比不能为负数，请重新设置"/>  
+  <item id="984" str="判定相位值不能为负数，请重新设置"/>    
+  <item id="985" str="判定相位值不能超过180，请重新设置"/> 
+  <item id="986" str="分析数据总长需设置60~80圈，请重新设置"/>    
+  <item id="987" str="分析数据总转数必须大于参与时域平均算法（TSA）的转数，请重新设置"/>  
+  <item id="988" str="分析数据总转数必须大于0，请重新设置"/>     
+  <item id="989" str="采样间隔至少是设定生成文件时长的两倍，请重新设置"/>    
+  <item id="990" str="下传下位机软件成功。"/>    
+  <item id="991" str="下传下位机软件失败。"/> 
+  <item id="992" str="机箱标识只能填1 或 2。"/>              
+  <item id="993" str="报警参数设置不能为空！"/>            
+  <item id="994" str="报警参数设置成功"/>         
+  <item id="995" str="报警参数设置失败"/>     
+  <item id="996" str="保存成功！"/>      
+  <item id="997" str="PFI当前设置的参数值无效，请重新设置!"/>         
+  <item id="998" str="加载FBGDriver.dll异常"/>                  
+  <item id="999" str="OPC等待刷新失败"/>                      
+  <item id="1000" str="Com口"/>
+  <item id="1001" str="波特率"/>
+  <item id="1002" str="PID"/>
+  <item id="1003" str="PANID设置错误，PANID范围1-9999"/>
+  <item id="1004" str="PID设置成功,无需重启Zigbee"/>
+  <item id="1005" str="下发485参数失败！"/>
+  <item id="1006" str="下发485参数成功！"/>
+  <item id="1007" str="上限"/>
+  <item id="1008" str="下限"/>
+  <item id="1009" str="开始检测"/>
+  <item id="1010" str="保存成功"/>
+  <item id="1011" str="检测到修改，是否保存？"/>
+  <item id="1012" str="是否保存"/>
+  <item id="1013" str="外时钟触发1"/>
+  <item id="1014" str="外时钟触发2"/>
+  <item id="1015" str="PID设置成功!"/>
+  <item id="1016" str="PID设置失败!"/>
+  <item id="1017" str="未获取到"/>
+  <item id="1018" str="从机"/>
+  <item id="1019" str="主机"/>
+  <item id="1020" str="采样时间(s)"/>
+  <item id="1021" str="设置阈值失败！"/>
+  <item id="1022" str="设置阈值成功！"/>
+  <item id="1023" str="下传成功！"/>	
+  <item id="1024" str="自校正成功，请重启仪器！"/>
+  <item id="1025" str="自校正结果异常！"/>
+  <item id="1026" str="当前版本仪器暂不支持触发连续！"/>
+  <item id="1027" str="未读取到授权信息或授权已过期！"/>	  
+  <item id="1028" str="仪器授权与序列号不匹配！"/>	    
+  <item id="1029" str="读取使用状态异常"/>	
+  <item id="1030" str="加载OPCServiceOperate.dll异常"/>      
+  <item id="1031" str="读取Demo状态异常"/>  
+  <item id="1032" str="读取定时时间状态异常"/>  
+  <item id="1033" str="读取仪器类型异常"/>  
+  <item id="1034" str="读取接口异常"/>            
+  <item id="1035" str="授权已过期!"/>     
+  <item id="1036" str="读取序列号数异常"/>     
+  <item id="1037" str="网络初始化失败!"/>       
+  <item id="1038" str="启动1588服务器时出错！"/>         
+  <item id="1039" str="启动5611服务器时出错！"/>       
+  <item id="1040" str="初始化UDP套接字时出错！"/>         
+  <item id="1041" str="等待多个对象时发生超时"/>         
+  <item id="1042" str="正在等待多个对象。"/>         
+  <item id="1043" str="初始化Winsock时出错！"/>         
+  <item id="1044" str="创建监听套接字失败。"/>         
+  <item id="1045" str="将监听套接字绑定到本地主机时失败\r\n"/>         
+  <item id="1046" str="监听返回套接字错误\r\n"/>         
+  <item id="1047" str=" 不支持！"/>         
+  <item id="1048" str="加载函数失败"/>         
+  <item id="1049" str="加载库 dhdrive 失败"/>         
+  <item id="1050" str="设置 GPS 模式等待超时"/>        
+  <item id="1051" str="GPS时钟未准备就绪！"/>         
+  <item id="1052" str="DC-1接收上位机数据故障"/>         
+  <item id="1053" str="上位机接收DC-1数据故障"/>       
+  <item id="1054" str="传感器故障"/>         
+  <item id="1055" str="变送器CPU故障"/>       
+  <item id="1056" str="变送器电源故障"/>       
+  <item id="1057" str="变送器A/D采集故障"/>         
+  <item id="1058" str="已触发，等待数据足够。"/>         
+  <item id="1059" str="采样频率设置错误"/>         
+  <item id="1060" str="长时间未接收到数据采集结束，将丢失部分仪器数据"/>         
+  <item id="1061" str="采样频率低于200K时只能连续采样，请重新选择采样模式"/>         
+  <item id="1062" str="停止存储设定时间大小大于RAM大小，请重新设置！"/>         
+  <item id="1063" str="该采样频率不支持触发采集"/>         
+  <item id="1064" str="仪器工程文件较多，请尽快处理"/>         
+  <item id="1065" str="当前仪器模拟通道都关闭，不能采集。"/>       
+  <item id="1066" str="开始时间不能等于结束时间！"/>         
+  <item id="1067" str="打开的通道数不能大于1或等于0."/>         
+  <item id="1068" str="5674无电流通道,采样频率应为10k."/>       
+  <item id="1069" str="5674包含电流通道,采样频率应为1k."/>   
+  <item id="1070" str="AllMacSyncStartSample WaitTimeOut! Please StopSample!"/>   
+  <item id="1071" str="ERROR"/> 
+  <item id="1072" str="打开的通道数只能为1."/>   
+  <item id="1073" str="%d号机未配置对应的同步时钟口！"/>   
+  <item id="1074" str="BeginLost:%lld,LostPacketCount:%d,PackSize:%d\r\n"/>   
+  <item id="1075" str="TrigInfoDeal%d.txt"/>   
+  <item id="1076" str=" %s file is not open \n"/>   
+  <item id="1077" str="nBlockCount = %lld ---- nDelayCount = %d  nOneCycleSize = %d nHighCycle = %d \n"/>   
+  <item id="1078" str="uintPosStart = %lld ---- uintPosEnd = %lld m_llPos = %lld  \n"/>   
+  <item id="1079" str="uintPosStartCyc = %lld ---- uintPosEndCyc = %lld  nSrcCyclePeriod = %d -- delt = %d \n"/>   
+  <item id="1080" str="llReadStartPos = %lld llReadEndPos =  %lld  nOneCycleSize = %d llReadDataOffPos = %lld\n"/>   
+  <item id="1081" str="在30秒内无法读取到足够的数据 \n"/>   
+  <item id="1082" str="llSize %lld \n"/>   
+  <item id="1083" str="因读取数据不足而停止采样 %lld \n"/>   
+  <item id="1084" str="%s%d_%lld.dat"/>   
+  <item id="1085" str="AD采样修正_%d"/>   
+  <item id="1086" str="DA输出修正b_%d"/>   
+  <item id="1087" str="DA输出修正a_%d"/>   
+  <item id="1088" str="通道%d"/>   
+  <item id="1089" str=" %d号 "/>   
+  <item id="1090" str="%d号机，回收数据完成"/>   
+  <item id="1091" str="%d号机，等待触发"/>   
+  <item id="1092" str="%d号机，已触发，正在采集数据"/>   
+  <item id="1093" str="%d号机，正在回收数据"/>   
+  <item id="1094" str="nIndex = %d, nMaxRebackCount = %d, 回收结束!\n"/>   
+  <item id="1095" str="%d 号机   %x   %x   %x \n"/>   
+  <item id="1096" str="%d 号机 综合控制自检失败 \n"/>   
+  <item id="1097" str="DealSampleDataNoHead_SampleFreq 异常数据 dwLength:%d nDataCountPerChannel:%d \n"/>   
+  <item id="1098" str="%d号机获取平衡结果失败!\n"/>   
+  <item id="1099" str="%d号机 "/>   
+  
+  <item id="1100" str="流量:"/>	  
+  <item id="1101" str="设定流量"/>	
+  <item id="1102" str="清除累计流量"/> 
+  <item id="1103" str="南航AST10-HSX"/> 
+  <item id="1104" str="3820K参数设置 "/>
+  <item id="1105" str="数据宽度:"/> 
+  <item id="1106" str="回收方式:"/> 
+  <item id="1107" str="数据频率(Hz):"/> 
+  <item id="1108" str="存储空间大小(KB):"/> 
+  <item id="1109" str="通道个数:"/>
+  <item id="1110" str="名称:"/>
+  <item id="1111" str="单位:"/>
+  <item id="1112" str="灵敏度:"/>
+  <item id="1113" str="保存参数"/>
+  <item id="1114" str="仪器复位"/>
+  <item id="1115" str="状态读取"/>
+  <item id="1116" str="波特率:"/>
+  <item id="1117" str="通道号:"/>
+  <item id="1118" str="无副帧"/> 
+  <item id="1119" str="反码副帧"/>
+  <item id="1120" str="ID副帧:"/>
+  <item id="1121" str="帧头"/>
+  <item id="1122" str="帧尾"/>
+  <item id="1123" str="手动码"/>
+  <item id="1124" str="随机码"/>
+  <item id="1125" str="台阶码"/>
+  <item id="1126" str="减计数"/>
+  <item id="1127" str="加计数"/>
+  <item id="1128" str="模拟器-模拟调制"/>
+  <item id="1129" str="仪器："/>
+  <item id="1130" str="模拟器参数"/>
+  <item id="1131" str="PCM输出控制"/>
+  <item id="1132" str="码  型"/>
+  <item id="1133" str="码  率"/>
+  <item id="1134" str="字  长"/>
+  <item id="1135" str="副帧类型"/>
+  <item id="1136" str="子帧长"/>
+  <item id="1137" str="副帧长"/>
+  <item id="1138" str="帧同步码位置"/>
+  <item id="1139" str="信号类型"/>
+  <item id="1140" str="信号初值"/>
+  <item id="1141" str="台阶码步进"/>
+  <item id="1142" str="副帧路序"/>
+  <item id="1143" str="ID码计数方式"/>
+  <item id="1144" str="ID码初值"/>
+  <item id="1145" str="帧同步码"/>
+  <item id="1146" str="帧同步码长"/>
+  <item id="1147" str="获取仪器参数"/>
+  <item id="1148" str="设置仪器参数"/> 
+  <item id="1149" str="基带卡设置"/> 
+  <item id="1150" str="是否使用中频基带链接仪器"/> 
+  <item id="1151" str="计数器高位"/> 
+  <item id="1152" str="计数器中位"/> 
+  <item id="1153" str="计数器低位"/> 
+  <item id="1154" str="接收机-调制模块参数"/> 
+  <item id="1155" str="信号频率(Hz):"/> 
+  <item id="1156" str="调制模式:"/> 
+  <item id="1157" str="信道编码:"/> 
+  <item id="1158" str="载波控制:"/> 
+  <item id="1159" str="调制控制:"/> 
+  <item id="1160" str="信号功率:"/> 
+  <item id="1161" str="TPC同步码:"/> 
+  <item id="1162" str="TPC有效标识:"/>
+  <item id="1163" str="矩阵类型:"/> 
+  <item id="1164" str="副载波波形:"/> 
+  <item id="1165" str="副载波频率:"/>
+  <item id="1166" str="调制频偏(KHz):"/> 
+  <item id="1167" str="扫频:"/> 
+  <item id="1168" str="扫频带宽:"/> 
+  <item id="1169" str="扫频步进:"/> 
+  <item id="1170" str="扫频速率:"/>
+  <item id="1171" str="自动"/> 
+  <item id="1172" str="时间设置"/> 
+  <item id="1173" str="工作时间："/> 
+  <item id="1174" str="电池电量："/> 
+  <item id="1175" str="获取电量"/>
+  <item id="1176" str="通道参数设置"/> 
+  <item id="1177" str="量程:"/> 
+  <item id="1178" str="积分类型:"/>
+  <item id="1179" str="积分K值:"/> 
+  <item id="1180" str="输入方式:"/> 
+  <item id="1181" str="通道类型:"/> 
+  <item id="1182" str="桥路方式:"/> 
+  <item id="1183" str="桥压:"/>
+  <item id="1184" str="接线方式:"/> 
+  <item id="1185" str="是否测温"/> 
+  <item id="1186" str="发送"/> 
+  <item id="1187" str="无效通道"/> 
+  <item id="1188" str="静态电压"/>
+  <item id="1189" str="静态应变"/> 
+  <item id="1190" str="静态电流"/> 
+  <item id="1191" str="动态振动"/> 
+  <item id="1192" str="动态应变"/> 
+  <item id="1193" str="动态电流"/> 
+  <item id="1194" str="铂电阻测温"/> 
+  <item id="1195" str="IEPE"/> 
+  <item id="1196" str="磁电"/> 
+  <item id="1197" str="静态转速"/> 
+  <item id="1198" str="阶次"/> 
+  <item id="1199" str="IO"/> 
+  <item id="1200" str="185T测温"/> 
+  <item id="1201" str="热电偶测温"/> 
+  <item id="1202" str="RS485"/> 
+  <item id="1203" str="IEPE测温"/> 
+  <item id="1204" str="温振1"/> 
+  <item id="1205" str="温振2振动"/> 
+  <item id="1206" str="温振2温度"/> 
+  <item id="1207" str="三线制"/> 
+  <item id="1208" str="四线制"/> 
+  <item id="1209" str="全桥"/> 
+  <item id="1210" str="半桥"/> 
+  <item id="1211" str="1/4桥(120)"/> 
+  <item id="1212" str="1/4桥(350)"/> 
+  <item id="1213" str="长江电力"/> 
+  <item id="1214" str="阈值："/> 
+  <item id="1215" str="温度："/> 
+  <item id="1216" str="设置阈值"/> 
+  <item id="1217" str="读取温度"/> 
+  <item id="1218" str="自校零"/> 
+  <item id="1219" str="自校正"/>  
+  <item id="1220" str="5G控制"/> 
+  <item id="1221" str="需要唤醒："/> 
+  <item id="1222" str="需要休眠："/> 
+  <item id="1223" str="刷新"/> 
+  <item id="1224" str="采集器相关"/> 
+  <item id="1225" str="网卡2-IP："/> 
+  <item id="1226" str="网关："/> 
+  <item id="1227" str="网卡2："/>
+  <item id="1228" str="采集器"/>
+  <item id="1229" str="采集器机号："/>
+  <item id="1230" str="采集器IP："/>
+  <item id="1231" str="MAC地址："/>
+  <item id="1232" str="目的IP："/>
+  <item id="1233" str="设置机号"/>
+  <item id="1234" str="定制参数控制"/> 
+  <item id="1235" str="输出频率(Hz)"/> 
+  <item id="1236" str="RS422波特率"/> 
+  <item id="1237" str="转换模式"/> 
+  <item id="1238" str="CAN参数"/> 
+  <item id="1239" str="CAN接收代码"/> 
+  <item id="1240" str="ID接收屏蔽代码"/> 
+  <item id="1241" str="CAN波特率"/> 
+  <item id="1242" str="CAN接收屏蔽代码"/> 
+  <item id="1243" str="3819N"/> 
+  <item id="1244" str="仪器关机"/>
+  <item id="1245" str="新机箱号："/>
+  <item id="1246" str="Zigbee参数"/>
+  <item id="1247" str="采集器PID："/>
+  <item id="1248" str="控制器PID设置"/>
+  <item id="1249" str="(*)未同步机箱\n不可休眠"/>
+  <item id="1250" str="HardWare4536Set"/>
+  <item id="1251" str="通道1："/>
+  <item id="1252" str="通道2："/>  
+  <item id="1253" str="通道3："/> 
+  <item id="1254" str="通道4："/> 
+  <item id="1255" str="是否参与判断"/> 
+  <item id="1256" str="阈值"/> 
+  <item id="1257" str="写入"/> 
+  <item id="1258" str="5905P"/> 
+  <item id="1259" str="Param"/> 
+  <item id="1260" str="采集器PID:"/>
+  <item id="1261" str="同步时钟盒设置"/>
+  <item id="1262" str="是否同步"/>  
+  <item id="1263" str="仪器IP地址"/> 
+  <item id="1264" str="仪器网关"/> 
+  <item id="1265" str="仪器子网掩码"/> 
+  <item id="1266" str="监听采集器端口号"/> 
+  <item id="1267" str="DH5916M_B控制主机网络参数设置"/> 
+  <item id="1268" str="1号机"/> 
+  <item id="1269" str="2号机"/> 
+  <item id="1270" str="3号机"/>
+  <item id="1271" str="4号机"/>
+  <item id="1272" str="5号机"/>  
+  <item id="1273" str="6号机"/> 
+  <item id="1274" str="7号机"/> 
+  <item id="1275" str="8号机"/> 
+  <item id="1276" str="9号机"/> 
+  <item id="1277" str="开机"/> 
+  <item id="1278" str="网络设置"/> 
+  <item id="1279" str="更改"/> 
+  <item id="1280" str="SSID:"/>
+  <item id="1281" str="NTP地址"/>
+  <item id="1282" str="DO1延迟(s):"/>  
+  <item id="1283" str="DO2延迟(s):"/> 
+  <item id="1284" str="DO1持续(s):"/> 
+  <item id="1285" str="DO2持续(s):"/> 
+  <item id="1286" str="读取DO"/> 
+  <item id="1287" str="设置DO"/> 
+  <item id="1288" str="TCP端口号"/> 
+  <item id="1289" str="UDP端口号"/> 
+  <item id="1290" str="磁体控制盒单设备网络参数设置"/>
+  <item id="1291" str="设备名称："/>
+  <item id="1292" str="设备类型："/>  
+  <item id="1293" str="设备IP："/> 
+  <item id="1294" str="设备端口："/> 
+  <item id="1295" str="控制盒IP："/> 
+  <item id="1296" str="控制盒网关："/> 
+  <item id="1297" str="控制盒端口："/> 
+  <item id="1298" str="软件用ID："/> 
+  <item id="1299" str="设备ID："/> 
+  <item id="1300" str="控制盒ID："/>
+  <item id="1301" str="网口："/>
+  <item id="1302" str="调试模式下是否使用"/>  
+  <item id="1303" str="舱载监测"/> 
+  <item id="1304" str="舱载运控A系"/> 
+  <item id="1305" str="舱载运控B系"/> 
+  <item id="1306" str="地面监控装置"/> 
+  <item id="1307" str="动力泵控制器"/> 
+  <item id="1308" str="制冷压缩机"/> 
+  <item id="1309" str="磁体监测盒"/> 
+  <item id="1310" str="光纤序号"/>
+  <item id="1311" str="光纤个数"/>
+  <item id="1312" str="主机扫描参数"/>  
+  <item id="1313" str="起点位置："/> 
+  <item id="1314" str="扫描步长："/> 
+  <item id="1315" str="终点位置："/> 
+  <item id="1316" str="AD步长："/> 
+  <item id="1317" str="设置扫描参数"/> 
+  <item id="1318" str="光纤参数"/> 
+  <item id="1319" str="刷新光纤个数"/>
+  <item id="1320" str="无线参数"/>
+  <item id="1321" str="是否片选采样"/>
+  <item id="1322" str="SSID："/>  
+  <item id="1323" str="工作模式："/> 
+  <item id="1324" str="加密方式："/> 
+  <item id="1325" str="自动选择信道："/> 
+  <item id="1326" str="信道："/> 
+  <item id="1327" str="无线频段："/> 
+  <item id="1328" str="无线密码："/> 
+  <item id="1329" str="网卡模式"/>
+  <item id="1330" str="不加密"/>
+  <item id="1331" str="WEP"/>
+  <item id="1332" str="WAP"/>  
+  <item id="1333" str="WPA2-PSK"/> 
+  <item id="1334" str="启用"/> 
+  <item id="1335" str="禁用"/> 
+  <item id="1336" str="2.4G"/> 
+  <item id="1337" str="5G"/> 
+  <item id="1338" str="1A199控制界面"/> 
+  <item id="1339" str="采样阈值"/>
+  <item id="1340" str="时间阈值"/>
+  <item id="1341" str="灵敏度系数"/>
+  <item id="1342" str="触发"/>  
+  <item id="1343" str="触发次数"/> 
+  <item id="1344" str="4G"/> 
+  <item id="1345" str="4G网络参数："/> 
+  <item id="1346" str="IP："/> 
+  <item id="1347" str="端口号："/> 
+  <item id="1348" str="模式："/> 
+  <item id="1349" str="切换"/>
+  <item id="1350" str="2006B CAN参数设置"/>
+  <item id="1351" str="CAN帧类型:"/>
+  <item id="1352" str="模式:"/>  
+  <item id="1353" str="仲裁段波特率:"/> 
+  <item id="1354" str="数据段波特率:"/> 
+  <item id="1355" str="标准帧"/> 
+  <item id="1356" str="扩展帧"/> 
+  <item id="1357" str="CAN2.0"/> 
+  <item id="1358" str="CANFD"/> 
+  <item id="1359" str="参数编辑"/>
+  <item id="1360" str="CANID："/>
+  <item id="1361" str="波特率："/>
+  <item id="1362" str="工作模式说明："/>  
+  <item id="1363" str="0：表示模块上电后需接收主机指令后才开始发送"/> 
+  <item id="1364" str="1：表示模块上电后自动平衡，平衡完成后自动发送"/> 
+  <item id="1365" str="2：表示模块上电后自动发送，无自动平衡操作"/> 
+  <item id="1366" str="模块ID"/> 
+  <item id="1367" str="CANID"/> 
+  <item id="1368" str="节点/中继"/> 
+  <item id="1369" str="3817KGC参数设置"/>
+  <item id="1370" str="控制器号:"/>
+  <item id="1371" str="采集器号:"/>
+  <item id="1372" str="工作模式:"/>  
+  <item id="1373" str="新采集器号:"/> 
+  <item id="1374" str="采集器CAN参数"/> 
+  <item id="1375" str="CAN波特率:"/> 
+  <item id="1376" str="CANID:"/> 
+  <item id="1377" str="(769~1024)"/> 
+  <item id="1378" str="设置CANID"/> 
+  <item id="1379" str="节点模式"/>
+  <item id="1380" str="中继模式"/>
+  <item id="1381" str="接收指令"/>
+  <item id="1382" str="应力模式"/>
+  <item id="1383" str="加速度模式"/>
+  <item id="1384" str="5531"/>
+  <item id="1385" str="传感器供电:"/>
+  <item id="1386" str="传感器供电"/>
+  <item id="1387" str="485通道频率:"/>
+  <item id="1388" str="设置频率"/>
+  <item id="1389" str="控制卡清零:"/>
+  <item id="1390" str="控制卡清零"/>
+  <item id="1391" str="关闭"/>
+  <item id="1392" str="上电"/>
+  <item id="1393" str="绝对清零"/>
+  <item id="1394" str="相对清零"/>
+  <item id="1395" str="采样时间设置"/>
+  <item id="1396" str="设置采样时间"/>
+  <item id="1397" str="读取仪器参数"/>
+  <item id="1398" str="仪器IP:"/>
+  <item id="1399" str="目的IP:"/>
+  <item id="1400" str="WIFI目的IP:"/>
+  <item id="1401" str="WIFI模式:"/>
+  <item id="1402" str="单个文件大小(min):"/>
+  <item id="1403" str="NetParam"/>
+  <item id="1404" str="仪器版本号："/>
+  <item id="1405" str="车轮直径(mm)"/>
+  <item id="1406" str="设置NTP地址"/>
+  <item id="1407" str="设置车轮直径"/>
+  <item id="1408" str="仪器IP"/>
+  <item id="1409" str="目的IP"/>
+  <item id="1410" str="目的端口"/>
+  <item id="1411" str="WIFI参数"/>
+  <item id="1412" str="WIFI模式:"/>
+  <item id="1413" str="5G目的IP"/>
+  <item id="1414" str="5G连接端口"/>
+  <item id="1415" str="SSID"/>
+  <item id="1416" str="5G唤醒端口"/>
+  <item id="1417" str="设置无线参数"/>
+  <item id="1418" str="读取无线参数"/>
+  <item id="1419" str="密码"/>
+  <item id="1420" str="WIFI目的IP	"/>
+  <item id="1421" str="读取网络参数"/>
+  <item id="1422" str="设置网络参数"/>
+  <item id="1423" str="WIFI_IP"/>
+  <item id="1424" str="NTP_IP:"/>
+  <item id="1425" str="温度阈值"/>
+  <item id="1426" str="设置温度阈值"/>
+  <item id="1427" str="设置5G"/>
+  <item id="1428" str="休眠参数"/>
+  <item id="1429" str="唤醒时间:"/>
+  <item id="1430" str="无操作自动休眠时间(min):"/>
+  <item id="1431" str="单次采集时长(min):"/>
+  <item id="1432" str="采集时长（min）："/>
+  <item id="1433" str="采集间隔（min）："/>
+  <item id="1434" str="开始采集时间："/>
+  <item id="1435" str="误差："/>
+  <item id="1436" str="无操作自动休眠时间（min）："/>
+  <item id="1437" str="UDP外发参数设置"/>
+  <item id="1438" str="端口"/>
+  <item id="1439" str="使用?"/>
+  <item id="1440" str="地址1"/>
+  <item id="1441" str="地址2"/>
+  <item id="1442" str="地址3"/>
+  <item id="1443" str="地址4"/>
+  <item id="1444" str="波特率设置"/>
+  <item id="1445" str="DH5916网络参数设置"/>
+  <item id="1446" str="仪器是否存储数据"/>
+  <item id="1447" str="保存通道参数"/>
+  <item id="1448" str="有线网络地址"/>
+  <item id="1449" str="主网络参数"/>
+  <item id="1450" str="副网络参数"/>
+  <item id="1451" str="网关"/>
+  <item id="1452" str="存储设置"/>
+  <item id="1453" str="存储"/>
+  <item id="1454" str="DH5976B参数设置"/>
+  <item id="1455" str="单个文件大小(Kb)："/>
+  <item id="1456" str="BDS对时模式："/>
+  <item id="1457" str="间隔时间(s)："/>
+  <item id="1458" str="模式读取"/>
+  <item id="1459" str="模式设置"/>
+  <item id="1460" str="获取仪器内部时间"/>
+  <item id="1461" str="采样深度："/>
+  <item id="1462" str="间隔时间："/>
+  <item id="1463" str="分"/>
+  <item id="1464" str="5991A参数设置"/>
+  <item id="1465" str="设置DA"/>
+  <item id="1466" str="5995_422Set"/>
+  <item id="1467" str="通道:"/>
+  <item id="1468" str="初始文件路径:"/>
+  <item id="1469" str="过程文件路径:"/>
+  <item id="1470" str="设置初始文件路径"/>
+  <item id="1471" str="设置过程文件路径"/>
+  <item id="1472" str="端口："/>
+  <item id="1473" str="15215H"/>
+  <item id="1474" str="机号："/>
+  <item id="1475" str="无线供电方波："/>
+  <item id="1476" str="4mA："/>
+  <item id="1477" str="20mA："/>
+  <item id="1478" str="转速阈值(V)："/>
+  <item id="1479" str="转速传感器数："/>
+  <item id="1480" str="设置方波"/>
+  <item id="1481" str="电流输出系数"/>
+  <item id="1482" str="设置转速阈值"/>
+  <item id="1483" str="板卡设置"/>
+  <item id="1484" str="采集卡号："/>
+  <item id="1485" str="休眠时间(min):"/>
+  <item id="1486" str="定时设置"/>
+  <item id="1487" str="启动休眠"/>
+  <item id="1488" str="获取休眠时间 "/>
+  <item id="1489" str="删除数据"/>
+  <item id="1490" str="时间"/>
+  <item id="1491" str="仪器时间："/>
+  <item id="1492" str="获取时间"/>
+  <item id="1493" str="设置时间"/>
+  <item id="1494" str="Lora模式"/>
+  <item id="1495" str="网络参数设置"/>
+  <item id="1496" str="仪器网关地址"/>
+  <item id="1497" str="接收命令端口号"/>
+  <item id="1498" str="接收数据端口号"/>
+  <item id="1499" str="UDP目的地址"/>
+  
+  <item id="1500" str="温度传感器_%d_温度"/>   
+  <item id="1501" str="温湿度传感器_%d_湿度"/>   
+  <item id="1502" str="风速传感器_%d_风速"/>   
+  <item id="1503" str="烟雾传感器_1_温度数据"/>   
+  <item id="1504" str="检测平台温度传感器_空气温度"/>   
+  <item id="1505" str="检测平台湿度传感器_空气湿度"/>   
+  <item id="1506" str="检测平台气压传感器_大气压强"/>   
+  <item id="1507" str="检测平台风速传感器_风速"/>   
+  <item id="1508" str="检测平台风向传感器_风向"/>   
+  <item id="1509" str="检测平台降雨量传感器_降雨量"/>   
+  <item id="1510" str="检测平台太阳辐射传感器_辐射量"/>   
+  <item id="1511" str="温湿度传感器_%d_温度"/>   
+  <item id="1512" str="%s已链接"/>   
+  <item id="1513" str="%s断开链接"/>   
+  <item id="1514" str="%s测量类型与绑定PFI通道不一致，请重新设置\r\n"/>   
+  <item id="1515" str="PFI%d-%d通道不存在，请重新设置\r\n"/>   
+  <item id="1516" str="PFI%d-%d通道重复绑定，请重新设置\r\n"/>   
+  <item id="1517" str="万测_负荷_%d"/>   
+  <item id="1518" str="电缸1_压力传感器"/>   
+  <item id="1519" str="电缸2_压力传感器"/>   
+  <item id="1520" str="电缸1_推力"/>   
+  <item id="1521" str="电缸2_推力"/>   
+  <item id="1522" str="电缸1_位置"/>   
+  <item id="1523" str="电缸2_位置"/>   
+  <item id="1524" str="电缸1_速度"/>   
+  <item id="1525" str="电缸2_速度"/>   
+  <item id="1526" str="nDataCount = %d nChnPerChn =%d 周秒数= %.6f Pos= %lld\n"/>   
+  <item id="1527" str="油缸%d径向"/>  
+  <item id="1528" str="%s连接!!!"/>  
+  <item id="1529" str="%s断开连接!!!"/>  
+  <item id="1530" str="转速%d"/>  
+  <item id="1531" str="液位值_%d"/>  
+  <item id="1532" str="温度值_%d"/>  
+  <item id="1533" str="数据%d"/>  
+  <item id="1534" str="ZHKD_%d_转矩"/>  
+  <item id="1535" str="ZHKD_%d_转速"/>  
+  <item id="1536" str="ZHKD_%d_功率"/>  
+  <item id="1537" str="作动器_试验力_%d"/>  
+  <item id="1538" str="作动器_位移_%d"/>  
+  <item id="1539" str="对仪器控制权 m_bInssMainControl:%d \n"/>  
+  <item id="1540" str="连接采集端%s失败."/>  
+  <item id="1541" str="%d号"/>  
+  <item id="1542" str="大小%d\n"/>  
+  <item id="1543" str="间隔%d:时长%d\n"/>  
+  <item id="1544" str="转速%d-%d"/>  
+  <item id="1545" str="扭矩%d-%d"/>  
+  <item id="1546" str="功率%d-%d"/>  
+  <item id="1547" str="声道%d"/>  
+  <item id="1548" str="5983 GPS同步时间hour = %d, min = %d, sec = %d"/>  
+  <item id="1549" str="5925NGPS 时间 hour = %d ， min = %d ， sec = %d"/>  
+  <item id="1550" str="压力_%d"/>  
+  <item id="1551" str="温度_%d"/>  
+  <item id="1552" str="ProcessWriteData pid:%d-GetValidWritedBufferCount 处理起始位置不正确 llStorePos:%lld &lt; llThrowPos:%lld \n"/>  
+  <item id="1553" str="ProcessWriteData pid:%d-GetValidWritedBufferCount 处理起始位置不正确 llStorePos:%I64d &lt; llThrowPos:%I64d \n"/>  
+  <item id="1554" str="5925N仪器读取的GPS信息 = %d"/>  
+  <item id="1555" str="只能回收%s之后的数据"/>  
+  <item id="1556" str="温度传感器_1_状态"/>  
+  <item id="1557" str="温度传感器_2_状态"/>  
+  <item id="1558" str="温湿度传感器_1_状态"/>  
+  <item id="1559" str="温湿度传感器_2_状态"/>  
+  <item id="1560" str="温湿度传感器_3_状态"/>  
+  <item id="1561" str="温湿度传感器_4_状态"/>  
+  <item id="1562" str="温湿度传感器_5_状态"/>  
+  <item id="1563" str="温湿度传感器_6_状态"/>  
+  <item id="1564" str="风速传感器_1_状态"/>  
+  <item id="1565" str="风速传感器_2_状态"/>  
+  <item id="1566" str="风速传感器_3_状态"/>  
+  <item id="1567" str="风速传感器_4_状态"/>  
+  <item id="1568" str="风速传感器_5_状态"/>  
+  <item id="1569" str="风速传感器_6_状态"/>  
+  <item id="1570" str="风速传感器_7_状态"/>  
+  <item id="1571" str="风速传感器_8_状态"/>  
+  <item id="1572" str="风速传感器_9_状态"/>  
+  <item id="1573" str="风速传感器_10_状态"/>  
+  <item id="1574" str="风速传感器_11_状态"/>  
+  <item id="1575" str="风速传感器_12_状态"/>  
+  <item id="1576" str="风速传感器_13_状态"/>  
+  <item id="1577" str="风速传感器_14_状态"/>  
+  <item id="1578" str="风速传感器_15_状态"/>  
+  <item id="1579" str="风速传感器_16_状态"/>  
+  <item id="1580" str="烟雾传感器_1_状态"/>  
+  <item id="1581" str="检测平台太阳辐射传感器状态"/>  
+  <item id="1582" str="检测平台降雨量传感器状态"/>  
+  <item id="1583" str="检测平台风速传感器状态"/>  
+  <item id="1584" str="检测平台气压传感器状态"/>  
+  <item id="1585" str="检测平台湿度传感器状态"/>  
+  <item id="1586" str="检测平台温度传感器状态"/>  
+  <item id="1587" str="温度传感器_1_温度"/>  
+  <item id="1588" str="温度传感器_2_温度"/>  
+  <item id="1589" str="温湿度传感器_1_温度"/>  
+  <item id="1590" str="温湿度传感器_1_湿度"/>  
+  <item id="1591" str="温湿度传感器_2_温度"/>  
+  <item id="1592" str="温湿度传感器_2_湿度"/>  
+  <item id="1593" str="温湿度传感器_3_温度"/>  
+  <item id="1594" str="温湿度传感器_3_湿度"/>  
+  <item id="1595" str="温湿度传感器_4_温度"/>  
+  <item id="1596" str="温湿度传感器_4_湿度"/>  
+  <item id="1597" str="温湿度传感器_5_温度"/>  
+  <item id="1598" str="温湿度传感器_5_湿度"/>  
+  <item id="1599" str="温湿度传感器_6_温度"/>  
+  <item id="1600" str="温湿度传感器_6_湿度"/>  
+  <item id="1601" str="烟雾突变"/>  
+  <item id="1602" str="高温报警"/>  
+  <item id="1603" str="火灾报警"/>  
+  <item id="1604" str="烟雾报警"/>  
+  <item id="1605" str="烟雾传感器_1_温度数据"/>  
+  <item id="1606" str="检测平台温度传感器_空气温度"/>  
+  <item id="1607" str="空气温度，加40放大100倍"/>  
+  <item id="1608" str="检测平台湿度传感器_空气湿度"/>  
+  <item id="1609" str="空气湿度，放大100倍"/>  
+  <item id="1610" str="检测平台气压传感器_大气压强"/>  
+  <item id="1611" str="大气压强，放大10倍"/>  
+  <item id="1612" str="检测平台风速传感器_风速"/>  
+  <item id="1613" str="风速，放大100倍"/>  
+  <item id="1614" str="检测平台风向传感器_风向"/>  
+  <item id="1615" str="检测平台降雨量传感器_降雨量"/>  
+  <item id="1616" str="10分钟雨量，放大10倍"/>  
+  <item id="1617" str="检测平台太阳辐射传感器_辐射量"/>  
+  <item id="1618" str="温度传感器_%d_温度"/>  
+  <item id="1619" str="温度传感器_%d_状态"/>  
+  <item id="1620" str="温度传感器1"/>  
+  <item id="1621" str="温度传感器2"/>  
+  <item id="1622" str="温度传感器3"/>  
+  <item id="1623" str="温度传感器4"/>  
+  <item id="1624" str="温度传感器5"/>  
+  <item id="1625" str="温湿度传感器1 温度"/>  
+  <item id="1626" str="温湿度传感器1 湿度"/>  
+  <item id="1627" str="风速传感器1"/>  
+  <item id="1628" str="Temperature_1_状态"/>  
+  <item id="1629" str="Temperature_2_状态"/>  
+  <item id="1630" str="Temperature_3_状态"/>  
+  <item id="1631" str="Temperature_4_状态"/>  
+  <item id="1632" str="Temperature_5_状态"/>  
+  <item id="1633" str="Humiture_状态"/>  
+  <item id="1634" str="WindSpeed_1_状态"/>  
+  <item id="1635" str="漏液传感器_1_状态"/>  
+  <item id="1636" str="漏液传感器数据"/>  
+  <item id="1637" str="只能回收%s之后的数据"/>  
+  <item id="1638" str="%s:读取通道信息%dms，创建通道和设置通道参数%dms"/> 
+  <item id="1639" str="控制卡Ver:%d 通道Ver:%d"/>   
+  <item id="1640" str="%s wave data 未找到采集器moduleId = %s \n"/>  
+  <item id="1641" str="%s eigen data 未找到采集器moduleId = %s \n"/>  
+  <item id="1642" str="数据异常 caseId = %d, nCurPacketId = %d  nPrePacketId = %d \n"/>  
+  <item id="1643" str=" %s 查找采集器超时 \n"/>  
+  <item id="1644" str=" %s 采集器moduleId = %s 查找通道超时 \n"/>  
+  <item id="1645" str=" %s 配置文件中未找到 serial = %s \n"/>  
+  <item id="1646" str=" %d号机 %s"/>  
+  <item id="1647" str="%d 号机NTP未同步！"/>  
+  <item id="1648" str="%d-%02d温度"/>  
+  <item id="1649" str="%d-%02d振动速度有效值"/>  
+  <item id="1650" str="%d-%02d速度频带值"/>  
+  <item id="1651" str="%d-%02d包络有效值"/>  
+  <item id="1652" str="%d-%d-0%d振动速度有效值"/>  
+  <item id="1653" str="%d-%d-%d振动速度有效值"/>  
+  <item id="1654" str="%d-%d-0%d速度频带值"/>  
+  <item id="1655" str="%d-%d-%d速度频带值"/> 
+  <item id="1656" str="%d-%d-0%d加速度峰值"/> 
+  <item id="1657" str="%d-%d-%d加速度峰值"/> 
+  <item id="1658" str="%d-%d-0%d包络有效值"/> 
+  <item id="1659" str="%d-%d-%d包络有效值"/> 
+  <item id="1660" str="%d-%d-0%d温度"/> 
+  <item id="1661" str="%d-%d-%d温度"/> 
+  <item id="1662" str="温度%d自检"/> 
+  <item id="1663" str="补偿通道自检"/> 
+  <item id="1664" str="温度%d"/> 
+  <item id="1665" str="温度补偿通道"/> 
+  <item id="1666" str="%d号机 %s"/> 
+  <item id="1667" str="Q%d频率"/> 
+  <item id="1668" str="Q%d电流A"/> 
+  <item id="1669" str="Q%d电流B"/> 
+  <item id="1670" str="Q%d电流C"/> 
+  <item id="1671" str="Q%d断路器状态"/> 
+  <item id="1672" str="Q%d电量附件状态"/> 
+  <item id="1673" str="Q%d有功功率"/> 
+  <item id="1674" str="Q%d视在功率"/> 
+  <item id="1675" str="Q%d功率因数"/> 
+  <item id="1676" str="Q%d事件代码"/> 
+  <item id="1677" str="%s 配置文件为空 \n"/> 
+  <item id="1678" str="%s 配置文件中未找到采集器moduleId = %s \n"/> 
+  <item id="1679" str="%d 号机 m_bNTPSyncFlag = %d \n"/> 
+  <item id="1680" str="[丢包信息]nPackId = %d m_llLastPacket = %d \n"/> 
+  <item id="1681" str="%ld,标记%d"/> 
+  <item id="1682" str="%d-0%d振动速度有效值"/> 
+  <item id="1683" str="%d-%d振动速度有效值"/> 
+  <item id="1684" str="%d-0%d速度频带值"/> 
+  <item id="1685" str="%d-%d速度频带值"/> 
+  <item id="1686" str="%d-0%d包络有效值"/> 
+  <item id="1687" str="%d-%d包络有效值"/> 
+  <item id="1688" str="数据包不完整 %d %d %d \n"/> 
+  <item id="1689" str="异常幅值"/> 
+  <item id="1690" str="异常频率"/> 
+  <item id="1691" str="异常幅值%d"/> 
+  <item id="1692" str="异常频率%d"/> 
+  <item id="1693" str="COM%d-应变%d"/> 
+  <item id="1694" str="COM%d-扭矩%d"/> 
+  <item id="1695" str="COM%d-转速%d"/> 
+  <item id="1696" str="COM%d-功率%d"/> 
+  <item id="1697" str="机箱号为%d的仪器设置唤醒参数成功"/> 
+  <item id="1698" str="工作信道设置错误"/> 
+  <item id="1699" str="%d号机设置超时"/> 
+  
+  <item id="1700" str="UDP目的端口号"/>
+  <item id="1701" str="是否使用UDP"/>
+  <item id="1702" str="是否开机自启动"/>
+  <item id="1703" str="常规"/>
+  <item id="1704" str="旋翼振动"/>
+  <item id="1705" str="传动振动"/>
+  <item id="1706" str="齿轮振动"/>
+  <item id="1707" str="轴承振动"/>
+  <item id="1708" str="行星齿轮"/>
+  <item id="1709" str="发动机"/>
+  <item id="1710" str="时"/>
+  <item id="1711" str="测点类型"/>
+  <item id="1712" str="分析数据总长(圈)"/>
+  <item id="1713" str="整周期采样点数"/>
+  <item id="1714" str="TSA(圈)"/>
+  <item id="1715" str="幅值(%)"/>
+  <item id="1716" str="相位(°)"/>
+  <item id="1717" str="关联转速通道"/>
+  <item id="1718" str="仪器通讯2IP地址"/>
+  <item id="1719" str="通讯2数据端口号"/>
+  <item id="1720" str="下传下位机"/>
+  <item id="1721" str="5960DZJ机箱标识:"/>
+  <item id="1722" str="复位"/>
+  <item id="1723" str="离线参数"/>
+  <item id="1724" str="任务名称"/>
+  <item id="1725" str="采样频率Hz"/>
+  <item id="1726" str="采集时间s"/>
+  <item id="1727" str="校准时间"/>
+  <item id="1728" str="下传"/>
+  <item id="1729" str="增加"/>
+  <item id="1730" str="编辑"/>
+  <item id="1731" str="删除"/>
+  <item id="1732" str="下传离线参数后，请勿修改通道参数！"/>
+  <item id="1733" str="退出"/>
+  <item id="1734" str="任务"/>
+  <item id="1735" str="文件名"/>
+  <item id="1736" str="大小"/>
+  <item id="1737" str="修改日期"/>
+  <item id="1738" str="测量量"/>
+  <item id="1739" str="量程档位"/>
+  <item id="1740" str="输入方式"/>
+  <item id="1741" str="上限频率"/>
+  <item id="1742" str="信号触发同时使用外部触发"/>
+  <item id="1743" str="触发点数([1，100]可设置):"/>
+  <item id="1744" str="休眠时间:"/>
+  <item id="1745" str="设置休眠参数"/>
+  <item id="1746" str="机号:"/>
+  <item id="1747" str="过热电阻值:"/>
+  <item id="1748" str="获取参数"/>
+  <item id="1749" str="电桥平衡:"/>
+  <item id="1750" str="方波频率:"/>
+  <item id="1751" str="Val幅值："/>
+  <item id="1752" str="设置过热电阻"/>
+  <item id="1753" str="设置电桥平衡"/>
+  <item id="1754" str="设置方波参数"/>
+  <item id="1755" str="统计时间（h）："/>
+  <item id="1756" str="进入标定"/>
+  <item id="1757" str="主机设置"/>
+  <item id="1758" str="采集器直连模式"/>
+  <item id="1759" str="硬件整合PCM模式"/>
+  <item id="1760" str="PCM使用黑盒子模式"/>
+  <item id="1761" str="查找通道模式"/>
+  <item id="1762" str="控制连接模式"/>
+  <item id="1763" str="模式每秒平均"/>
+  <item id="1764" str="模式平均时间可设"/>
+  <item id="1765" str="在线采样上发数据"/>
+  <item id="1766" str="在线采样不上发数据"/>
+  <item id="1767" str="在线启动离线采样"/>
+  <item id="1768" str="常规模式"/>
+  <item id="1769" str="校准模式"/>
+  <item id="1770" str="生成文件"/>
+  <item id="1771" str="回收数据"/>
+  <item id="1772" str="测试丢包"/>
+  <item id="1773" str="循环范围："/>
+  <item id="1774" str="循环次数："/>
+  <item id="1775" str="MCAST_ADDRESS"/>
+  <item id="1776" str="MCAST_PORT"/>
+  <item id="1777" str="WORDS_PER_FRAME"/>
+  <item id="1778" str="FRAMES_PER_MAJOR_FRAME"/>
+  <item id="1779" str="BITS_PER_WORD"/>
+  <item id="1780" str="TTC Setting"/>
+  <item id="1781" str="磁体监测盒文件更新"/>
+  <item id="1782" str="复位监测盒程序"/>
+  <item id="1783" str="备份监测盒程序"/>
+  <item id="1784" str="获取log"/>
+  <item id="1785" str="文件类型"/>
+  <item id="1786" str="清空文件列表"/>
+  <item id="1787" str="文件选择"/>
+  <item id="1788" str="下传文件"/>
+  <item id="1789" str="更新文件"/>
+  <item id="1790" str="文件更新"/>
+  <item id="1791" str="仪器唤醒"/>
+  <item id="1792" str="唤醒时间"/>
+  <item id="1793" str="唤醒设置"/>
+  <item id="1794" str="同步时间"/>
+  <item id="1795" str="定时时间(分):"/>
+  <item id="1796" str="结束休眠"/>
+  <item id="1797" str="仪器在线时间："/>
+  <item id="1798" str="仪器关机时间："/>
+  <item id="1799" str="是否为休眠唤醒采样模式"/>
+  <item id="1800" str="获取待机时间"/>
+  <item id="1801" str="设置待机时间"/>
+  <item id="1802" str="有线模式"/>
+  <item id="1803" str="报警参数"/>
+  <item id="1804" str="是否有报警参数"/>
+  <item id="1805" str="报警通道"/>
+  <item id="1806" str="持续报警时间"/>
+  <item id="1807" str="拉丶扭上限"/>
+  <item id="1808" str="压丶扭下限"/>
+  <item id="1809" str="监测"/>
+  <item id="1810" str="准备"/>
+  <item id="1811" str="点火"/>
+  <item id="1812" str="7950A 点火设置"/>
+  <item id="1813" str="阀门开关1"/>
+  <item id="1814" str="阀门开关2"/>
+  <item id="1815" str="阀门开关3"/>
+  <item id="1816" str="阀门开关4"/>
+  <item id="1817" str="阀门开关5"/>
+  <item id="1818" str="阀门开关6"/>
+  <item id="1819" str="阀门开关7"/>
+  <item id="1820" str="阀门开关8"/>
+  <item id="1821" str="点火器1"/>
+  <item id="1822" str="点火器2"/>
+  <item id="1823" str="设备地址："/>
+  <item id="1824" str="命令字："/>
+  <item id="1825" str="数据："/>
+  <item id="1826" str="通道："/>
+  <item id="1827" str="电压修正:"/>
+  <item id="1828" str="电压零点:"/>
+  <item id="1829" str="绝压零点:"/>
+  <item id="1830" str="设置点火"/>
+  <item id="1831" str="通道读取"/>
+  <item id="1832" str="通道设置"/>
+  <item id="1833" str="设置485输出"/>
+  <item id="1834" str="LXI"/>
+  <item id="1835" str="LXIIP:"/>
+  <item id="1836" str="添加"/>
+  <item id="1837" str="修改"/>
+  <item id="1838" str="5921GA_PSI"/>
+  <item id="1839" str="采样频率："/>
+  <item id="1840" str="RION"/>
+  <item id="1841" str="RionPort:"/>
+  <item id="1842" str="HTSQ"/>
+  <item id="1843" str="是否使用485外发"/>
+  <item id="1844" str="外发频率："/>
+  <item id="1845" str="485波特率："/>
+  <item id="1846" str="485串口名："/>
+  <item id="1847" str="目的IP地址(UDP)"/>
+  <item id="1848" str="目的端口号(UDP)"/>
+  <item id="1849" str="控制器"/>
+  <item id="1850" str="2004采集器"/>
+  <item id="1851" str="采集器机号"/>
+  <item id="1852" str="读取时间"/>
+  <item id="1853" str="定时日期:"/>
+  <item id="1854" str="定时时间:"/>
+  <item id="1855" str="定时休眠"/>
+  <item id="1856" str="新机号:"/>
+  <item id="1857" str="采集器PID"/>
+  <item id="1858" str="读取PID"/>
+  <item id="1859" str="设置PID"/>
+  <item id="1860" str="（*未同步采集器不可休眠）"/>
+  <item id="1861" str="控制器IP:"/>
+  <item id="1862" str="控制器IP："/>
+  <item id="1863" str="4G参数"/>
+  <item id="1864" str="4G读取"/>
+  <item id="1865" str="4G设置"/>
+  <item id="1866" str="控制器PID："/>
+  <item id="1867" str="端口号:"/>
+  <item id="1868" str="控制器参数"/>
+  <item id="1869" str="控制器机号："/>
+  <item id="1870" str="NTP服务器IP地址"/>
+  <item id="1871" str="控制盒目的IP地址"/>
+  <item id="1872" str="控制盒目的端口号"/>
+  <item id="1873" str="新机号"/>
+  <item id="1874" str="仪器工作模式"/>
+  <item id="1875" str="设置仪器机号"/>
+  <item id="1876" str="设置外发模式"/>
+  <item id="1877" str="设置工作模式"/>
+  <item id="1878" str="设置模式参数"/>
+  <item id="1879" str="使用构造数据发送"/>
+  <item id="1880" str="PLC参数设置"/>
+  <item id="1881" str="CPU类型："/>
+  <item id="1882" str="数据地址："/>
+  <item id="1883" str="Rack："/>
+  <item id="1884" str="Slot："/>
+  <item id="1885" str="通道名称："/>
+  <item id="1886" str="通道量程："/>
+  <item id="1887" str="单位："/>
+  <item id="1888" str="生成"/>
+  <item id="1889" str="以&quot;,&quot;分隔"/>
+  <item id="1890" str="转速参数设置"/>
+  <item id="1891" str="测点名称："/>
+  <item id="1892" str="测点描述："/>
+  <item id="1893" str="工程单位："/>
+  <item id="1894" str="每转脉冲数："/>
+  <item id="1895" str="转速比："/>
+  <item id="1896" str="仪器编号:"/>
+  <item id="1897" str="设置序列号"/>
+  <item id="1898" str="设置仪器编号"/>
+  <item id="1899" str="批量设置"/>
+  <item id="1900" str="使用相同IP地址(网段前三)"/>
+  <item id="1901" str="使用相同目的IP地址"/>
+  <item id="1902" str="使用相同NTP服务器IP地址"/>
+  <item id="1903" str="使用相同子网掩码地址"/>
+  <item id="1904" str="保存"/>
+  <item id="1905" str="WFCK"/>
+  <item id="1906" str="外发通道数："/>
+  <item id="1907" str="ZigbeeControl"/>
+  <item id="1908" str="千分尺_Com%d"/>
+  <item id="1909" str="ProcessWriteData pid:%d-GetValidWritedBufferCount 处理起始位置不正确 llStorePos:%lld  llThrowPos:%lld \n"/>
+  <item id="1910" str="客户端 GetHandleTrigAddr :%lld \n"/>
+  <item id="1911" str="显示端 GetHandleTrigAddr :%lld \n"/>
+  <item id="1912" str="%s 5928W心跳包长度 %d"/>
+  <item id="1913" str="%s 电池电量 %d"/>
+  <item id="1914" str="5611同步时钟盒"/>
+  <item id="1915" str="通道未找到"/>
+  <item id="1916" str="参数设置失败"/>
+  <item id="1917" str="5916LT同步时钟盒"/>
+  <item id="1918" str="补零 Start %d Len %d\n"/>
+  <item id="1919" str="CRC 校验错误 \n"/>
+  <item id="1920" str="无积分"/>
+  <item id="1921" str="准静态"/>
+  <item id="1922" str="通断"/>
+  <item id="1923" str="加速度档"/>
+  <item id="1924" str="大速度档"/>
+  <item id="1925" str="DA修正"/>
+  <item id="1926" str="电压测量"/>
+  <item id="1927" str="电流测量"/>
+  <item id="1928" str="AD-PT100修正系数"/>
+  <item id="1929" str="AD-PT100零点"/>
+  <item id="1930" str="AD-热电偶修正系数"/>
+  <item id="1931" str="AD-热电偶零点"/>
+  <item id="1932" str="线性修正修正系数"/>
+  <item id="1933" str="线性修正零点"/>
+  <item id="1934" str="DA输出修正系数"/>
+  <item id="1935" str="DA输出零点"/>
+  <item id="1936" str="调理器恒流"/>
+  <item id="1937" str="AD电路修正"/>
+  <item id="1938" str="峰值(pk)"/>
+  <item id="1939" str="峰-峰值(pk-pk)"/>
+  <item id="1940" str="速度"/>
+  <item id="1941" str="加速度"/>
+  <item id="1942" str="位移"/>
+  <item id="1943" str="是"/>
+  <item id="1944" str="否"/>
+  <item id="1945" str="灵敏度"/>
+  <item id="1946" str="高灵敏度"/>
+  <item id="1947" str="低灵敏度"/>
+  <item id="1948" str="小速度档"/>
+  <item id="1949" str="中速度档"/>
+  <item id="1950" str="大速度档"/>
+  <item id="1951" str="热流积分"/>
+  <item id="1952" str="触发结束"/>
+  <item id="1953" str="冷水机1540HPros_温度"/>
+  <item id="1954" str="冷水机1540HPros_流量"/>
+  <item id="1955" str="冷水机1540HPros_报警"/>
+  <item id="1956" str="冷水机1540HPros_启停"/>
+  <item id="1957" str="冷水机15Pros_温度"/>
+  <item id="1958" str="冷水机15Pros_流量"/>
+  <item id="1959" str="冷水机15Pros_报警"/>
+  <item id="1960" str="冷水机15Pros_启停"/>
+  <item id="1961" str="三木_温度"/>
+  <item id="1962" str="三木_湿度"/>
+  <item id="1963" str="三木_报警"/>
+  <item id="1964" str="三木_启停"/>
+  <item id="1965" str="Chroma_电压"/>
+  <item id="1966" str="Chroma_电流"/>
+  <item id="1967" str="Chroma_功率"/>
+  <item id="1968" str="Chroma_报警"/>
+  <item id="1969" str="Chroma_启停"/>
+  <item id="1970" str="艾普斯_电压"/>
+  <item id="1971" str="艾普斯_电流"/>
+  <item id="1972" str="艾普斯_功率"/>
+  <item id="1973" str="艾普斯_报警"/>
+  <item id="1974" str="艾普斯_启停"/>
+  <item id="1975" str="巨孚_温度"/>
+  <item id="1976" str="巨孚_湿度"/>
+  <item id="1977" str="巨孚_报警"/>
+  <item id="1978" str="巨孚_启停"/>
+  <item id="1979" str="U8555P_温度1"/>
+  <item id="1980" str="U8555P_温度2"/>
+  <item id="1981" str="U8555P_湿度"/>
+  <item id="1982" str="U8555P_报警"/>
+  <item id="1983" str="U8555P_启停"/>
+  <item id="1984" str="PBZ40_电压"/>
+  <item id="1985" str="PBZ40_电流"/>
+  <item id="1986" str="PBZ40_报警"/>
+  <item id="1987" str="PBZ40_启停"/>
+  <item id="1988" str="有效值"/>
+  <item id="1989" str="平均值"/>
+  <item id="1990" str="峰值"/>
+  <item id="1991" str="二进制"/>
+  <item id="1992" str="线性"/>
+  <item id="1993" str="传感器A端"/>
+  <item id="1994" str="校准"/>
+  <item id="1995" str="转速"/>
+  <item id="1996" str="频率"/>
+  <item id="1997" str="不支持网卡模式"/>
+  <item id="1998" str="电触发"/>
+  <item id="1999" str="光触发"/>
+  <item id="2000" str="共%d台仪器设置成功，请重启仪器"/>  
+  <item id="2001" str="共唤醒%d台"/>  
+  <item id="2002" str="成功关机"/>  
+  <item id="2003" str="关机失败"/>  
+  <item id="2004" str="%d使用备用电源失败"/>  
+  <item id="2005" str="使用备用电源成功"/>  
+  <item id="2006" str="%d 不使用备用电源失败"/>  
+  <item id="2007" str="不使用备用电源成功"/>  
+  <item id="2008" str="%d设置PID超时"/>  
+  <item id="2009" str="设置PID成功，请重启仪器"/>  
+  <item id="2010" str="流量设置成功"/>  
+  <item id="2011" str="流量设置失败"/>  
+  <item id="2012" str="清除累计流量成功"/>  
+  <item id="2013" str="清除累计流量失败"/>  
+  <item id="2014" str="输出"/>  
+  <item id="2015" str="TPC码"/>  
+  <item id="2016" str="正弦波"/>  
+  <item id="2017" str="方波"/>  
+  <item id="2018" str="%d号采集器"/>  
+  <item id="2019" str="%d号机设置设置成功，请重启仪器"/>  
+  <item id="2020" str="数据过长"/>  
+  <item id="2021" str="仪器版本为%d，版本过低，不支持无线模式切换！最低支持版本为2"/>  
+  <item id="2022" str="当前仪器最低版本为%d"/>  
+  <item id="2023" str="无线供电方波频率范围1-2000！！！"/>  
+  <item id="2024" str="无线供电方波设置成功"/>  
+  <item id="2025" str="无线供电方波设置失败"/>  
+  <item id="2026" str="电流输出系数设置成功!"/>  
+  <item id="2027" str="转速阈值范围0.1-20！！！"/>  
+  <item id="2028" str="传感器数量不能为负！！！"/>  
+  <item id="2029" str="转速阈值设置成功"/>  
+  <item id="2030" str="转速阈值设置失败"/>  
+  <item id="2031" str="采集器CAN参数设置成功"/>  
+  <item id="2032" str="采集器CAN参数设置失败"/>  
+  <item id="2033" str="采集器ID及工作模式设置成功"/>  
+  <item id="2034" str="采集器ID及工作模式设置失败"/>  
+  <item id="2035" str="采集器CANID设置成功"/>  
+  <item id="2036" str="采集器CANID设置失败"/>  
+  <item id="2037" str="CANID号，不能与控制器CANID一致"/>  
+  <item id="2038" str="传感器供电设置失败!"/>  
+  <item id="2039" str="传感器供电设置成功!"/>  
+  <item id="2040" str="频率设置失败!"/>  
+  <item id="2041" str="频率设置成功!"/>  
+  <item id="2042" str="清零失败!"/>  
+  <item id="2043" str="清零成功!"/>  
+  <item id="2044" str="%d号机参数设置失败"/>  
+  <item id="2045" str="通道_%d"/>  
+  <item id="2046" str="取消报警成功"/>  
+  <item id="2047" str="取消报警失败"/>  
+  <item id="2048" str="下传成功"/>  
+  <item id="2049" str="读采样率成功"/>  
+  <item id="2050" str="读采样率失败"/>  
+  <item id="2051" str="采样率设置成功"/>  
+  <item id="2052" str="采样率设置失败"/>  
+  <item id="2053" str="校准命令发送成功"/>  
+  <item id="2054" str="校准命令发送失败"/>  
+  <item id="2055" str="所有通道状态不一致，不能采集"/>
+  <item id="2056" str="设置电源开关机模式失败"/>  
+  <item id="2057" str="上限值应大于下限值"/>
+  <item id="2058" str="结束刷新失败"/>	
+  <item id="2059" str="请先获取仪器中的离线工程信息！"/>	  
+  <item id="2060" str="所选文件夹不存在，请重新设置"/>	   
+  <item id="2061" str="液压空挡"/>    
+  <item id="2062" str="1档"/>    
+  <item id="2063" str="2档"/>    
+  <item id="2064" str="3档"/>    
+  <item id="2065" str="4档"/>    
+  <item id="2066" str="5档"/>    
+  <item id="2067" str="6档"/>    
+  <item id="2068" str="倒档"/>    
+  <item id="2069" str="累计里程总计(米)"/>    
+  <item id="2070" str="车型车号"/>   
+  <item id="2071" str="开始时间"/>   
+  <item id="2072" str="结束时间"/>   
+  <item id="2073" str="行驶里程(km)"/>   
+  <item id="2074" str="平均车速(km/h)"/>   
+  <item id="2075" str="平均油耗(L/100km)"/>   
+  <item id="2076" str="总里程(km)"/>   
+  <item id="2077" str="摩托小时(h)"/>   
+  <item id="2078" str="油耗(L/100km)"/>   
+  <item id="2079" str="速度(km/h)"/>   
+  <item id="2080" str="加速度(g)"/>   
+  <item id="2081" str="日期"/>   
+  <item id="2082" str="时间"/>   
+  <item id="2083" str="纬度"/>   
+  <item id="2084" str="经度"/>   
+  <item id="2085" str="偏航角"/>   
+  <item id="2086" str="俯仰角"/>   
+  <item id="2087" str="横滚角"/>   
+  <item id="2088" str="东向速度(米/秒)"/>   
+  <item id="2089" str="北向速度(米/秒)"/>   
+  <item id="2090" str="天向速度(米/秒)"/>   
+  <item id="2091" str="X轴加速度(g)"/>   
+  <item id="2092" str="Y轴加速度(g)"/>   
+  <item id="2093" str="Z轴加速度(g)"/>   
+  <item id="2094" str="速度(米/秒)"/>   
+  <item id="2095" str="两次接收间行驶里程(米)"/>   
+  <item id="2096" str="要求转速(转/分)"/>   
+  <item id="2097" str="实际转速(r/min)"/>   
+  <item id="2098" str="齿杆位置(mm)"/>   
+  <item id="2099" str="水温(℃)"/>   
+  <item id="2100" str="油压(MPa)"/>   
+  <item id="2101" str="档位1"/>   
+  <item id="2102" str="档位2"/>   
+	<item id="2103" str="网络发数据模式"/>
+	<item id="2104" str="CAN 发数据模式"/>
+	<item id="2105" str="设置通道开关"/>
+	<item id="2106" str="设置发数模式"/>  
+	<item id="2107" str="上限值应大于下限值！"/>  
+  
+  <item id="2200" str="和软件"/>   
+  <item id="2201" str="找到的通道信息有误"/>   
+  <item id="2202" str="测点名称"/>   
+  <item id="2203" str="采样频率"/>   
+  <item id="2204" str="[绝对时间]"/>   
+  <item id="2205" str="报警值上限"/>   
+  <item id="2206" str="报警值下限"/>   
+  <item id="2207" str="修正系数"/>   
+  <item id="2208" str="报警值"/>   
+  <item id="2209" str="风速传感器2"/>   
+  <item id="2210" str="是否已唤醒"/>   
+  <item id="2211" str="唤醒间隔(s)"/>   
+  <item id="2212" str="唤醒时长(s)"/>   
+  <item id="2213" str="号机响应超时"/>   
+  <item id="2214" str="仪器控制"/>   
+  <item id="2215" str="仪器时钟控制"/>   
+  <item id="2216" str="ZigbeePID设置"/>   
+  <item id="2217" str="测试读写"/>    
+  <item id="2218" str="回收数据"/>   
+  <item id="2219" str="设备名"/>  
+  <item id="2220" str="设备类型"/>  
+  <item id="2221" str="设备IP"/>   
+  <item id="2222" str="设备端口号"/>   
+  <item id="2223" str="控制盒网卡IP"/>   
+  <item id="2224" str="控制盒端口号"/>   
+  <item id="2225" str="机号(软件用)"/>   
+  <item id="2226" str="设备ID"/>   
+  <item id="2227" str="控制盒设备ID"/>   
+  <item id="2228" str="网口"/>   
+  <item id="2229" str="仪器待机时间"/>   
+  <item id="2230" str="组播地址"/>   
+  <item id="2231" str="组播端口号"/>   
+  <item id="2232" str="方式3"/>   
+  <item id="2233" str="水箱1温度"/>   
+  <item id="2234" str="水箱2温度"/>   
+  <item id="2235" str="水箱3温度"/>   
+  <item id="2236" str="水箱4温度"/>   
+  <item id="2237" str="供水温度"/>   
+  <item id="2238" str="供水压力"/>    
+  <item id="2239" str="循环水流量"/>   
+  <item id="2240" str="振动峰峰值"/>  
+  <item id="2241" str="轴心位置"/>      
+  <item id="2242" str="轴频幅值"/>   
+  <item id="2243" str="轴频相位"/>   
+  <item id="2244" str="二倍频幅值"/>   
+  <item id="2245" str="二倍频相位"/>   
+  <item id="2246" str="叶频幅值"/>   
+  <item id="2247" str="叶频相位"/>   
+  <item id="2248" str="位移波形"/>    
+  <item id="2249" str="波形下限"/>   
+  <item id="2250" str="波形上限"/>  
+  <item id="2251" str="加速度db幅值"/>    
+  <item id="2252" str="转速"/>   
+  <item id="2253" str="负荷"/>   
+  <item id="2254" str="温度设定值"/>   
+  <item id="2255" str="湿度设定值"/>   
+  <item id="2256" str="温度实际值"/>   
+  <item id="2257" str="湿度实际值"/>   
+  <item id="2258" str="离心力"/>    
+  <item id="2259" str="挥舞位移"/>   
+  <item id="2260" str="摆振位移"/>  
+  <item id="2261" str="上夹板测试"/>    
+  <item id="2262" str="下夹板测试"/>   
+  <item id="2263" str="振动"/>   
+  <item id="2264" str="ConST273压力计"/>   
+  <item id="2265" str="次"/>   
+  <item id="2266" str="直升机"/>   
+  <item id="2267" str="直升机各部位折叠次数"/>   
+  <item id="2268" str="压力数值"/>    
+  <item id="2269" str="收到数据大于缓存大小\n"/>   
+  <item id="2270" str="数据量不足\n"/>  
+  <item id="2271" str="角速度"/>    
+  <item id="2272" str="深度"/>   
+  <item id="2273" str="方位角"/>   
+  <item id="2274" str="电压数值"/>   
+  <item id="2275" str="开关量"/>   
+  <item id="2276" str="测功机冷却就绪"/>   
+  <item id="2277" str="舱内环境就绪"/>   
+  <item id="2278" str="测功机风冷前端断路器开闭状态"/>    
+  <item id="2279" str="舱内压力"/>   
+  <item id="2280" str="喷口温度"/>  
+  <item id="2281" str="喷口湿度"/>    
+  <item id="2282" str="喷口风速"/>   
+  <item id="2283" str="电压_LAN"/>   
+  <item id="2284" str="电压_COM"/>   
+  <item id="2285" str="电流_LAN"/>   
+  <item id="2286" str="电流_COM"/>   
+  <item id="2287" str="力"/>   
+  <item id="2288" str="试验力值"/>    
+  <item id="2289" str="主旋翼转速"/>   
+  <item id="2290" str="尾推转速"/>  
+  <item id="2291" str="上旋翼总距角"/>  
+  <item id="2292" str="上旋翼总距角"/>  
+  <item id="2293" str="纵向周期变距角"/>   
+  <item id="2294" str="下旋翼总距角"/>   
+  <item id="2295" str="横向周期变距角"/>   
+  <item id="2296" str="纵向周期变距角"/>   
+  <item id="2297" str="尾推总距角"/>   
+  <item id="2298" str="轴倾角"/>    
+  <item id="2299" str="车速"/>   
+  <item id="2300" str="通载次数"/>  
+  <item id="2301" str="通道开关"/>    
+  <item id="2302" str="测点描述"/>   
+  <item id="2303" str="应变计阻值"/>   
+  <item id="2304" str="导线电阻"/>   
+  <item id="2305" str="灵敏度系数"/>   
+  <item id="2306" str="泊松比"/>   
+  <item id="2307" str="弹性模量"/>   
+  <item id="2308" str="传感器灵敏度"/>    
+  <item id="2309" str="5983 准备采集"/>   
+  <item id="2310" str="VOC数据段"/>  
+  <item id="2311" str="一氧化氮数据段"/>   
+  <item id="2312" str="氧气数据段"/>   
+  <item id="2313" str="二氧化氮数据段"/>   
+  <item id="2314" str="噪声数据段"/>   
+  <item id="2315" str="一氧化碳数据段"/>   
+  <item id="2316" str="呼尘数据段"/>    
+  <item id="2317" str="温度数据段"/>   
+  <item id="2318" str="湿度数据段"/>  
+  <item id="2319" str="大气压数据段"/>   
+  <item id="2320" str="总尘数据段"/>   
+  <item id="2321" str="二氧化碳数据段"/>   
+  <item id="2322" str="氮氧化物数据段"/>   
+  <item id="2323" str="NTP同步"/>   
+  <item id="2324" str="电压"/>    
+  <item id="2325" str="燃机转速≥105%  值："/>   
+  <item id="2326" str="解除报警 燃机转速≥105%  值："/>  
+  <item id="2327" str="燃机转速≤95%  值："/>   
+  <item id="2328" str="解除报警 燃机转速≤95%  值："/>   
+  <item id="2329" str="燃机转速≥108%  值："/>   
+  <item id="2330" str="解除报警 燃机转速≥108%  值："/>   
+  <item id="2331" str="燃机转速≤92%  值："/>   
+  <item id="2332" str="解除报警 燃机转速≤92%  值："/>    
+  <item id="2333" str="排气温度≥650℃  值："/>   
+  <item id="2334" str="解除报警 排气温度≥650℃  值："/>  
+  <item id="2335" str="排气温度预留1报警"/>  
+  <item id="2336" str="解除排气温度预留1报警"/>  
+  <item id="2337" str="排气温度≥680℃ 值："/>  
+  <item id="2338" str="解除排气温度≥680℃ 值："/>  
+  <item id="2339" str="排气温度预留2报警"/>  
+  <item id="2340" str="解除排气温度预留2报警"/>  
+  <item id="2341" str="滑油温度≥130℃ 值："/>   
+  <item id="2342" str="解除报警 滑油温度≥130℃ 值："/>    
+  <item id="2343" str="滑油温度预留1报警"/>   
+  <item id="2344" str="解除滑油温度预留1报警"/>  
+  <item id="2345" str="滑油温度≥150℃ 值："/>  
+  <item id="2346" str="解除报警 滑油温度≥150℃ 值："/>  
+  <item id="2347" str="滑油温度预留2报警"/>  
+  <item id="2348" str="解除滑油温度预留2报警"/>  
+  <item id="2349" str="滑油压力≥412kPa 值："/>  
+  <item id="2350" str="解除报警 滑油压力≥412kPa 值："/>  
+  <item id="2351" str="滑油压力≤103kPa 值："/>   
+  <item id="2352" str="解除报警 滑油压力≤103kPa 值："/>    
+  <item id="2353" str="滑油压力预留报警"/>   
+  <item id="2354" str="解除滑油压力预留报警"/>  
+  <item id="2355" str="滑油压力≤48.3kPa 值："/>  
+  <item id="2356" str="解除报警 滑油压力≤48.3kPa 值："/>  
+  <item id="2357" str="转电~~~~~OlDataCountPerCh:%lld"/>  
+  <item id="2358" str="时统信号~~~~~ullTrigAddr:%lld-OlDataCountPerCh:%lld %lld\n"/>  
+  <item id="2359" str="准静态"/>  
+  <item id="2360" str="读取GPS信息超时"/>  
+  <item id="2361" str="声发射和转速通道采样频率固定为1.024M，其他通道采样频率不得超过256K。"/>   
+  <item id="2362" str="时戳"/>    
+  <item id="2363" str="航向角"/>   
+  <item id="2364" str="艏向角"/>  
+  <item id="2365" str="横倾角"/>  
+  <item id="2366" str="纵倾角"/>  
+  <item id="2367" str="艏向角速度"/>  
+  <item id="2368" str="%d号机 %d / %d"/>  
+  <item id="2369" str="显示端来数 CMD_CTS_SAMPLEDATA_CHANGE MsgID:%d Len:%d \n"/>  
+  <item id="2370" str="未打开授权文件 "/>  
+  <item id="2371" str="%d 号机是否继续回收"/>   
+  <item id="2372" str="阶数太大，滤波器不稳定，返回"/>    
+  <item id="2373" str="加速度传感器"/>   
+  <item id="2374" str="内嵌放大器麦克风传感器"/>  
+  <item id="2375" str="麦克风传感器"/>  
+  <item id="2376" str="号机"/>  
+  <item id="2377" str="通道,工程单位："/>  
+  <item id="2378" str="温度"/>  
+  <item id="2379" str="含水率"/>  
+  <item id="2380" str="压力"/>  
+  <item id="2381" str="供电电压"/>   
+  <item id="2382" str="校验"/>   
+  <item id="2383" str="年-月-日"/>   
+  <item id="2384" str="时-分-秒.毫秒"/>   
+  <item id="2385" str="发送方设备号"/>   
+  <item id="2386" str="报文类型"/>   
+  <item id="2387" str="数据区字长"/>   
+  <item id="2388" str="标志位"/>   
+  <item id="2389" str="辅机板A相电压"/>   
+  <item id="2390" str="辅机板B相电压"/>   
+  <item id="2391" str="辅机板C相电压"/>   
+  <item id="2392" str="RAM自检(上电)"/>    
+  <item id="2393" str="FLASH自检(上电)"/>   
+  <item id="2394" str="CPU自检(上电)"/>  
+  <item id="2395" str="定时器自检(上电)"/>  
+  <item id="2396" str="RAM自检(运行)"/>  
+  <item id="2397" str="CPU自检(运行)"/>  
+  <item id="2398" str="电源过压"/>  
+  <item id="2399" str="电源欠压"/>  
+  <item id="2400" str="量表数据"/>  
+  <item id="2401" str="公制：mm  英制：inch"/>  
+  <item id="2402" str="应变"/>  
+  <item id="2403" str="全桥(无系数)"/>  
+  <item id="2404" str="半桥(无系数)"/>  
+  <item id="2405" str="1/4桥(1000Ω)"/>  
+  <item id="2406" str="1/4桥(三线制)"/>  
+  <item id="2407" str="计算机时间"/>  
+  <item id="2408" str=" 已同步"/>  
+  <item id="2409" str=" 未同步"/>  
+  <item id="2410" str=" 目录创建失败！"/>  
+  <item id="2411" str="丢失quality:\n"/>  
+  <item id="2412" str="处理数据"/>  
+  <item id="2413" str="输入值必须大于0！"/>  
+  <item id="2414" str="输入的频率应小于等于采样频率/2.56！"/>  
+  <item id="2415" str="阻带衰减范围20-160dB！"/>  
+  <item id="2416" str="阻带边界频率应大于通带边界频率！"/>  
+  <item id="2417" str="通带边界频率应大于阻带边界频率！"/>  
+  <item id="2418" str="通带下边界频率应大于阻带下边界频率！"/>  
+  <item id="2419" str="阻带上边界频率应大于通带上边界频率！"/>  
+  <item id="2420" str="通带上边界频率应大于通带下边界频率！"/>  
+  <item id="2421" str="阻带下边界频率应大于通带下边界频率！"/>  
+  <item id="2422" str="通带上边界频率应大于阻带上边界频率！"/>  
+  <item id="2423" str="阻带上边界频率应大于阻带下边界频率！"/>  
+  <item id="2424" str="输入的频率应小于等于采样频率/2.0！"/>  
+  <item id="2425" str="%d 号机是否继续回收"/>  
+  <item id="2426" str="确定(%d s)"/>  
+  <item id="2427" str="年"/>  
+  <item id="2428" str="月"/>  
+  <item id="2429" str="日"/>  
+  <item id="2430" str="时"/>  
+  <item id="2431" str="分"/>  
+  <item id="2432" str="秒"/>  
+  <item id="2433" str="毫秒"/>  
+  <item id="2434" str="速度"/>  
+  <item id="2435" str="里程"/>  
+  <item id="2436" str="经度"/>  
+  <item id="2437" str="纬度"/>  
+  <item id="2438" str="行车方向"/>  
+  <item id="2439" str="路线名称" />  
+  <item id="2440" str="间接法轮轨力1-左垂"/>  
+  <item id="2441" str="间接法轮轨力2-右垂"/>  
+  <item id="2442" str="间接法轮轨力3-横向"/>  
+  <item id="2443" str="间接法轮轨力4-脱轨系数"/>  
+  <item id="2444" str="间接法轮轨力5-轮重减载率"/>  
+  <item id="2445" str="实时值"/>  
+  <item id="2446" str="平均值"/>  
+  <item id="2447" str="最大值"/>  
+  <item id="2448" str="最小值"/>  
+  <item id="2449" str="转速测量"/>  
+  <item id="2450" str="脉冲计数器测量"/>  
+  <item id="2451" str="CAN测量"/>  
+  <item id="2452" str="是否上发块数据"/>  
+  <item id="2453" str="监测上发数据类型"/>  
+  <item id="2454" str="上发特征值类型"/>  
+  <item id="2455" str="间隔时间"/>  
+  <item id="2456" str="上发块大小"/>  
+  <item id="2457" str="创建文件失败: 将处理不到数据, 请查找原因"/>  
+  <item id="2458" str="整周期采样数据"/>  
+  <item id="2459" str="转速数据"/>  
+  <item id="2460" str=" 存在包不在可回收范围内"/>  
+  <item id="2461" str="发动机转速"/>  
+  <item id="2462" str="油量"/>  
+  <item id="2463" str="时间戳"/>  
+  <item id="2464" str="当车速、油量、电量等信息不发送时，xxx分钟后自动关机."/>  
+  <item id="2465" str="当外界无供电时，15分钟后自动关机."/>  
+  <item id="2466" str="调试模式 若为内置锂电池供电，则连续运行2小时后自动关机."/>  
+  <item id="2467" str="总线错误信息:%s"/>  
+  <item id="2468" str="应用程序向导生成的本地应用程序"/>  
+  <item id="2469" str="时间\t转向\t转速\t"/>  
+  <item id="2470" str="时间\t转速\t"/>  
+  <item id="2471" str="通频峰峰值\t轴频幅值\t叶频幅值\t传感器静态距离\t静态位移\t"/>  
+  <item id="2472" str="加速度标准差\t"/>  
+  <item id="2473" str="未找到转速2#"/>  
+  <item id="2474" str="未能判断正反转"/>  
+  <item id="2475" str="转速不稳定"/>  
+  <item id="2476" str="正常"/>  
+  <item id="2477" str="正转"/>  
+  <item id="2478" str="反转"/>
+
+  <item id="2479" str="DH5916T_G串口参数设置"/>
+  <item id="2480" str="发送串口："/>
+  <item id="2481" str="RS232波特率："/>
+  <item id="2482" str="RS485波特率："/>
+  <item id="2483" str="主控或采集端当前为示波状态，不允许采集。"/>
+  <item id="2484" str="缺少采样日期，无法导入"/>
+  <item id="2485" str="采样日期"/>
+  <item id="2486" str="缺少采样频率，无法导入"/>
+  <item id="2487" str="单文件存在不同采样频率，无法导入"/>
+  <item id="2488" str="缺少单位，无法导入"/>
+  <item id="2489" str="增益"/>
+  <item id="2490" str="数据格式不支持导入"/>
+  <item id="2491" str="BIT自检中..."/>
+  <item id="2492" str="大气压"/>
+  <item id="2493" str="加大气压"/>
+  <item id="2494" str="5611G-16发送通道触发量级命令失败"/>
+  <item id="2495" str="5611G-16发送分组命令失败"/>
+  <item id="2496" str="转速和CAN不支持1K以下采样频率，请重新设置参数"/>
+  <item id="2497" str="连续采样频率上限%.fHz"/>
+  <item id="2498" str="触发采集不允许示波！"/>
+  <item id="2499" str="未连接PSI扫描阀，不允许采样"/>
+  <item id="2500" str="NTP同步采样时，采样频率不能大于200Hz，请重新选择采样频率"/>
+  <item id="2501" str="5611G-16最多支持2通道采样，请关闭通道后再尝试"/>
+  <item id="2502" str="缓存数据已保存."/>
+  <item id="2503" str="5955Q-2左边两个或者右边三个控制卡必须同时启动采样！"/>
+  <item id="2504" str="5955Q-2勾选同步时必须有左边控制卡连接！"/>
+  <item id="2505" str="10M瞬态最大支持30s！"/>
+  <item id="2506" str="5M瞬态最大支持30min！"/>
+  <item id="2507" str="高速板卡不支持256K采样！" />
+  <item id="2508" str="5611G-16发送触发输出延迟命令失败！" />
+  <item id="2509" str="瞬态采样负延迟最大支持100M点！"/>
+  <item id="2510" str="采集卡数"/>
+  <item id="2511" str="仪器停止"/>
+  <item id="2512" str="设置采集器号"/>
+  <item id="2513" str="4路串口新采集器号:"/>
+  <item id="2514" str="旧采集器号:"/>
+  <item id="2515" str="获取下位机采样频率超时！"/>
+  <item id="2516" str="%d号机实时总丢包数据量：%.1fs，目前正在回收的起始位置：%.1fs，已回收数据量：%.1fs"/>
+  <item id="2517" str="%d号机启动采样设置的同步时间小于当前时间，无法启动采样"/>
+  <item id="2518" str="%d号机实时丢包数据回收超时"/>
+  <item id="2519" str="上电是否自动离线采样"/>
+  <item id="2520" str="同步时钟未准备就绪!" />
+  <item id="2521" str="瞬态缓存数据保存到文件%.1f%%" />
+
+  <item id="2522" str="网卡IP" />
+  <item id="2523" str="网卡子网掩码" />
+  <item id="2524" str="USB网卡IP" />
+  <item id="2525" str="USB网卡子网掩码" />
+  <item id="2526" str="网卡目的IP" />
+  <item id="2527" str="USB网卡目的IP" />
+  <item id="2528" str="测力承载鞍 报警信息" />
+  <item id="2529" str="测力承载鞍 报警数据" />
+  <item id="2530" str="%d 控制器 %s 采集器回收丢包数据失败，请检查" />
+  <item id="2531" str="波形抽点" />
+  <item id="2532" str="正" />
+  <item id="2533" str="反" />
+  <item id="2534" str="%s 程控箱未连接!" />
+  <item id="2535" str="切换工位失败!" />
+  <item id="2536" str="切换仪器进入绝缘电阻测量状态" />
+  <item id="2537" str="仪器退出绝缘电阻测量状态" />
+
+  <item id="2538" str="多台仪器同步离线触发采样时，不支持多次触发！" />
+  
+  <item id="2539" str="拱桥" />
+  <item id="2540" str="斜拉桥" />
+  <item id="2541" str="悬索桥主索" />
+  <item id="2542" str="悬索桥吊索" />
+  <item id="2543" str="256Hz" />
+  <item id="2544" str="512Hz" />
+  <item id="2545" str="1024Hz" />
+  <item id="2546" str="平均次数" />
+  <item id="2547" str="扫描阀参数设置" />
+  <item id="2548" str="DH5503D-A参数设置" />
+  <item id="2549" str="当前为离线触发采样模式，请停止采样，从事后回收数据！" />
+  <item id="2550" str="客户端" />
+  <item id="2551" str="服务端" />
+  <item id="2552" str="UDP单播" />
+  <item id="2553" str="网口选择" />
+  <item id="2554" str="网口名称" />
+  <item id="2555" str="网口功能" />
+  <item id="2556" str="自诊断：" />
+  <item id="2557" str="读取" />
+  <item id="2558" str="读取传感器状态失败" />
+  <item id="2559" str="自诊断正常" />
+  <item id="2560" str="自诊断异常" />
+  <item id="2561" str="阈值设置" />
+  <item id="2562" str="读取传感器状态" />
+  <item id="2563" str="读取传感器状态成功" />
+  <item id="2564" str="温度设置" />
+  <item id="2565" str="应变通道和电荷通道总使用通道个数必须为2的整数倍，请重新设置!" />
+  <item id="2566" str="离线采样时，每秒数据量不可超过2.5Mb，请重新设置!" />
+  <item id="2567" str="下位机存储空间不足，停止采样!"/>
+</HardLanguage>

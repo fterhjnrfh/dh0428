@@ -1,0 +1,29 @@
+<MOOG>
+	<LCStoDAS Count="7">
+		<LCS Command="TAKE_SNAPSHOT" Bitmask="1" CmdID="1"/>
+		<LCS Command="TAKE_CONTINOUS_MEASURMENT" Bitmask="2" CmdID="2"/>
+		<LCS Command="START_ZERO_BALANCE" Bitmask="3" CmdID="3"/>
+		<LCS Command="SURVEY" Bitmask="4" CmdID="7"/>
+		<LCS Command="STORAGE" Bitmask="5" CmdID="8"/>
+		<LCS Command="FAST_TRIGGER" Bitmask="6" CmdID="9"/>
+    <LCS Command="WATCHDOG" Bitmask="22" CmdID="10"/>
+  </LCStoDAS>
+	<DAStoLCS Count="16">
+		<DAS Command="SNAPSHOT_STARTED" Bitmask="1" CmdID="2"/>
+		<DAS Command="SNAPSHOT_COMPLETED" Bitmask="2" CmdID="3"/>
+		<DAS Command="CONTINOUS_STARTED" Bitmask="3" CmdID="4"/>
+		<DAS Command="CONTINOUS_COMPLETED" Bitmask="4" CmdID="5"/>
+		<DAS Command="ZERO_BALANCE_STARTED" Bitmask="5" CmdID="6"/>
+		<DAS Command="ZERO_BALANCE_COMPLETED" Bitmask="6" CmdID="7"/>
+		<DAS Command="SURVEY_STARTED" Bitmask="7" CmdID="14"/>
+		<DAS Command="SURVEY_COMPLETED" Bitmask="8" CmdID="15"/>
+		<DAS Command="STORAGE_STARTED" Bitmask="9" CmdID="16"/>
+		<DAS Command="STORAGE_COMPLETED" Bitmask="10" CmdID="17"/>
+		<DAS Command="FAST_TRIGGER_STARTED" Bitmask="11" CmdID="18"/>
+		<DAS Command="FAST_TRIGGER_COMPLETED" Bitmask="12" CmdID="19"/>
+		<DAS Command="DAS_READY_FOR_START" Bitmask="21" CmdID="22"/>
+		<DAS Command="DAS_PROCESSING" Bitmask="22" CmdID="23"/>
+    <DAS Command="WATCHDOG_STARTED" Bitmask="25" CmdID="20"/>
+    <DAS Command="WATCHDOG_COMPLETED" Bitmask="26" CmdID="21"/>
+  </DAStoLCS>
+</MOOG>

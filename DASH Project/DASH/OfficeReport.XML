@@ -1,0 +1,1797 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OfficeReportEx</name>
+    </assembly>
+    <members>
+        <member name="T:OfficeReport.Reader.ExcelReader">
+            <summary>
+            导入excel
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Reader.ExcelReader.ReadSheetParam(System.String)">
+            <summary>
+            读取excel的第一页参数
+            只有一页或者只需要第一页可
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Reader.ExcelReader.ReadSheetParams(System.String,System.Boolean)">
+            <summary>
+            读取excel的多页参数
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Service.ExcelWraper">
+            <summary>
+            导入excel
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Service.ExcelWraper.ReadSheetParams(System.String,System.Boolean)">
+            <summary>
+            读取excel的多页参数
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Writer.BooleanExtended">
+            <summary>
+            布尔值扩展类
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.BooleanExtended.ToBooleanString(System.Boolean)">
+            <summary>
+            变成布尔字符串（"true"或"false")
+            </summary>
+            <param name="b"></param>
+            <returns></returns>
+        </member>
+        <member name="T:OfficeReport.Writer.DocSecturities">
+            <summary>
+            文档安全模式
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.DocSecturities.None">
+            <summary>
+            无保护
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.DocSecturities.PasswordProtected">
+            <summary>
+            密码保护
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.DocSecturities.RecommendedReadOnly">
+            <summary>
+            推荐只读
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.DocSecturities.EnforcedReadOnly">
+            <summary>
+            强制只读
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.DocSecturities.LockForAnnotation">
+            <summary>
+            锁住
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Writer.ExcelWriter">
+            <summary>
+            写Excel基类
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelWriter.m_XmlExcel">
+            <summary>
+            操作接口类
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelWriter.m_SheetCount">
+            <summary>
+            总页数
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelWriter.m_ExcelSheet">
+            <summary>
+            页参数,多少页就需要初始化多少次
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.#ctor(System.String,System.Int32)">
+            <summary>
+            创建excel
+            </summary>
+            <param name="fileName">文件名</param>
+            <param name="sheetCount">页数</param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.#ctor(System.String,System.Collections.Generic.List{System.String})">
+            <summary>
+            创建excel
+            </summary>
+            <param name="fileName">文件名</param>
+            <param name="sheetNames">页名</param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.SetSheetIndex(System.Int32)">
+            <summary>
+            设置需要编辑的页数
+            </summary>
+            <param name="sheetIndex">页数</param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.GetSheetIndex">
+            <summary>
+            获取当前编辑的页数
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.SetHeight(System.Int32,System.Double)">
+            <summary>
+            设置行高
+            </summary>
+            <param name="x">行数</param>
+            <param name="height">行高</param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.SetWidth(System.Int32,System.Double)">
+            <summary>
+            设置宽度
+            </summary>
+            <param name="y">列数</param>
+            <param name="width">列宽</param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.SetCellValue(System.Int32,System.Int32,System.Object)">
+            <summary>
+            设置单元格值
+            </summary>
+            <param name="x">行数</param>
+            <param name="y">列数</param>
+            <param name="value">值</param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.SetCellStyle(System.Int32,System.Int32,System.Object[])">
+            <summary>
+            设置单元格样式
+            </summary>
+            <param name="x">行数</param>
+            <param name="y">列数</param>
+            <param name="styles">样式</param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.SetCellValue(System.Int32,System.Int32,System.Object,System.Object[])">
+            <summary>
+            设置单元格值(带样式)
+            </summary>
+            <param name="x">行数</param>
+            <param name="y">列数</param>
+            <param name="value">值</param>
+            <param name="styles">样式</param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.SetMergeCell(System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            合并单元格
+            </summary>
+            <param name="x">起始行数</param>
+            <param name="y">起始列数</param>
+            <param name="endX">终止行数</param>
+            <param name="endY">终止列数</param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.SetCellValue(System.Int32,System.Int32,System.Int32,System.Int32,System.Object)">
+            <summary>
+            设置单元格值(合并)
+            </summary>
+            <param name="x">起始行数</param>
+            <param name="y">起始列数</param>
+            <param name="endX">终止行数</param>
+            <param name="endY">终止列数</param>
+            <param name="value">值</param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.SetCellStyle(System.Int32,System.Int32,System.Int32,System.Int32,System.Object[])">
+            <summary>
+            设置合并单元格样式
+            </summary>
+            <param name="x">行数</param>
+            <param name="y">列数</param>
+            <param name="endX">终止行数</param>
+            <param name="endY">终止列数</param>
+            <param name="styles">样式</param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.SetCellValue(System.Int32,System.Int32,System.Int32,System.Int32,System.Object,System.Object[])">
+            <summary>
+            设置单元格值(合并带样式)
+            </summary>
+            <param name="x">起始行数</param>
+            <param name="y">起始列数</param>
+            <param name="endX">终止行数</param>
+            <param name="endY">终止列数</param>
+            <param name="value">值</param>
+            <param name="styles">样式</param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.GetMergeStyles(System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Int32,System.Object[])">
+            <summary>
+            合并单元格边框设置需要精确到每个单元格上
+            </summary>
+            <param name="x">起始行数</param>
+            <param name="y">起始列数</param>
+            <param name="endX">终止行数</param>
+            <param name="endY">终止列数</param>
+            <param name="i">当前行数</param>
+            <param name="j">当前列数</param>
+            <param name="styles">样式</param>
+            <returns></returns>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.SetCellValue(System.Int32,System.Int32,System.Object,System.Collections.Generic.List{System.String})">
+            <summary>
+            设置单元格(单元格带下拉)
+            </summary>
+            <param name="x">行数</param>
+            <param name="y">列数</param>
+            <param name="value">值</param>
+            <param name="values">下拉列表值</param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.SetCellValue(System.Int32,System.Int32,System.Object,System.Collections.Generic.List{System.String},System.Object[])">
+            <summary>
+            设置单元格(带下拉和样式)
+            </summary>
+            <param name="x">行数</param>
+            <param name="y">列数</param>
+            <param name="value">值</param>
+            <param name="values">下拉列表值</param>
+            <param name="styles"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.AddSheet">
+            <summary>
+            中途写入，大数据防止内存溢出
+            调用之后不能再反写之前的行的数据
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.Close">
+            <summary>
+            结束写入并生成excel
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelWriter.InsertImage(System.String,System.String,System.Int64,System.Int64,System.Nullable{System.Int64},System.Nullable{System.Int64},System.String)">
+            <summary>
+            一个excel单元格宽大约为74，高为23（像素）
+            </summary>
+            <param name="fileName"></param>
+            <param name="sheet"></param>
+            <param name="x"></param>
+            <param name="y"></param>
+            <param name="width"></param>
+            <param name="height"></param>
+            <param name="sImagePath"></param>
+        </member>
+        <member name="T:OfficeReport.Writer.OpenXmlExcel">
+            <summary>
+            Excel操作
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.OpenXmlExcel.m_Wizard">
+            <summary>
+            当前报表向导
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.OpenXmlExcel.CreateExcel(System.String,System.Int32)">
+            <summary>
+            创建excel
+            </summary>
+            <param name="fileName">excel文件名</param>
+            <param name="sheetCount">sheet页数</param>
+            <returns></returns>
+        </member>
+        <member name="M:OfficeReport.Writer.OpenXmlExcel.CreateExcel(System.String,System.Collections.Generic.List{System.String})">
+            <summary>
+            创建excel
+            </summary>
+            <param name="fileName">excel文件名</param>
+            <param name="sheetNames">sheet名称</param>
+            <returns></returns>
+        </member>
+        <member name="M:OfficeReport.Writer.OpenXmlExcel.CreateSheets(System.Collections.Generic.List{System.String})">
+            <summary>
+            创建excel的sheet页
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.OpenXmlExcel.AddSheet(OfficeReport.Writer.ExcelSheet,System.Boolean)">
+            <summary>
+            添加页数据
+            </summary>
+            <param name="set"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.OpenXmlExcel.Close">
+            <summary>
+            关闭
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Writer.SharedStringTablePartFactory">
+            <summary>
+            共享字符串表工厂
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.SharedStringTablePartFactory.BeginCreate(DocumentFormat.OpenXml.Packaging.WorkbookPart,System.String)">
+            <summary>
+            开始进行建造（最初步骤）
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.SharedStringTablePartFactory.FinishedCreate">
+            <summary>
+            结束建造（最后步骤）
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:OfficeReport.Writer.ExcelBigDataXmlWriter">
+            <summary>
+            操作xml
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelBigDataXmlWriter.m_Package">
+            <summary>
+            Excel文件包
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelBigDataXmlWriter.n_SharedStringStream">
+            <summary>
+            字符串XML文件流
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelBigDataXmlWriter.m_SharedStringIndex">
+            <summary>
+            字符串索引
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelBigDataXmlWriter.m_SharedStrings">
+            <summary>
+            待保存至XML的字符串
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelBigDataXmlWriter.m_SwSharedString">
+            <summary>
+            sharedString流写入
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelBigDataXmlWriter.Write(OfficeReport.Writer.ExcelSheet,System.Boolean)">
+            <summary>
+            写入
+            </summary>
+            <param name="sheet"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelBigDataXmlWriter.End(OfficeReport.Writer.ExcelStyle)">
+            <summary>
+            整体结束
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelBigDataXmlWriter.WriteSheet(OfficeReport.Writer.ExcelSheet,System.Boolean)">
+            <summary>
+            写入有效数据
+            </summary>
+            <param name="sheet"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelBigDataXmlWriter.WriteStrings">
+            <summary>
+            写字符串至文件流
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelBigDataXmlWriter.WriteStyle(OfficeReport.Writer.ExcelStyle)">
+            <summary>
+            写样式
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Writer.ExcelCell">
+            <summary>
+            单元格
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCell.CellFormatId">
+            <summary>
+            样式Id
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCell.Y">
+            <summary>
+            列序号
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCell.Value">
+            <summary>
+            填充值
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Writer.ExcelRow">
+            <summary>
+            行
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelRow.X">
+            <summary>
+            行序号
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelRow.Cells">
+            <summary>
+            单元格集合
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelRow.ApplyHeight">
+            <summary>
+            是否设置行高
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelRow.Height">
+            <summary>
+            行高
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelRow.SetCellStyle(System.Int32,System.Int32)">
+            <summary>
+            设置单元格样式
+            </summary>
+            <param name="y"></param>
+            <param name="cellFormatId"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelRow.SetCellValue(System.Int32,System.Object,System.Int32)">
+            <summary>
+            设置单元格值
+            </summary>
+            <param name="y"></param>
+            <param name="value"></param>
+            <param name="cellFormatId"></param>
+        </member>
+        <member name="T:OfficeReport.Writer.SpreadsheetPrinterSettingsPartFactory">
+            <summary>
+            Excel打印机设置生成工厂
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.SpreadsheetPrinterSettingsPartFactory.BeginCreate(DocumentFormat.OpenXml.Packaging.WorksheetPart,System.String)">
+            <summary>
+            开始进行建造（最初步骤）
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.SpreadsheetPrinterSettingsPartFactory.FeedData(System.String)">
+            <summary>
+            添加NamespaceDeclaration(中间步骤）
+            </summary>
+            <param name="prefix"></param>
+            <param name="uri"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.SpreadsheetPrinterSettingsPartFactory.FinishedCreate">
+            <summary>
+            结束建造（最后步骤）
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:OfficeReport.Writer.PackagePropertiesPartFactory">
+            <summary>
+            Excel文件包属性生成工厂
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.PackagePropertiesPartFactory.BeginCreate(DocumentFormat.OpenXml.Packaging.OpenXmlPackage)">
+            <summary>
+            开始进行建造（最初步骤）
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.PackagePropertiesPartFactory.AddBaseInfos(System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            添加基本信息
+            </summary>
+            <param name="creator">作者</param>
+            <param name="title">标题</param>
+            <param name="subject">主题</param>
+            <param name="category">类别</param>
+            <param name="keywords">标记</param>
+            <param name="description">备注</param>
+        </member>
+        <member name="M:OfficeReport.Writer.PackagePropertiesPartFactory.AddExtendedInfos(System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            添加额外信息
+            </summary>
+            <param name="contentStatus">内容状态</param>
+            <param name="version">版本号</param>
+            <param name="revision">修订号</param>
+            <param name="language">语言</param>
+            <param name="lastModifiedBy">最后修改者</param>
+            <param name="createdTime">创建时间</param>
+            <param name="modifiedTime">修改时间</param>
+        </member>
+        <member name="M:OfficeReport.Writer.PackagePropertiesPartFactory.FinishedCreate">
+            <summary>
+            结束建造（最后步骤）
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:OfficeReport.Writer.WorkbookPartFactory">
+            <summary>
+            Excel文件工作薄生成工厂
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookPartFactory.BeginCreate(DocumentFormat.OpenXml.Packaging.SpreadsheetDocument)">
+            <summary>
+            开始进行建造（最初步骤）
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookPartFactory.AddNamespaceDeclaration(System.String,System.String)">
+            <summary>
+            添加NamespaceDeclaration(中间步骤）
+            </summary>
+            <param name="prefix"></param>
+            <param name="uri"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookPartFactory.AddFileVersion(System.String,System.UInt32,System.UInt32,System.UInt32)">
+            <summary>
+            添加应用程序信息给Excel设置的版本(中间步骤）
+            </summary>
+            <param name="applicationName">应用程序名</param>
+            <param name="lastEdited">应用程序最后一次保存的版本</param>
+            <param name="lowestEdited">应用程序保存的最早版本</param>
+            <param name="buildVersion">应用程序版本</param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookPartFactory.AddWorkbookProperties(System.Boolean,System.UInt32)">
+            <summary>
+            添加工作薄属性(中间步骤）
+            </summary>
+            <param name="filterPrivacy">该值指示应用程序是否已检查工作簿中的个人识别信息。如果设置此标志，应用程序警告用户执行将插入到文档的操作。默认值为false</param>
+            <param name="defaultThemeVersion">指定要应用工作簿中的主题的默认版本。</param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookPartFactory.AddBookViews(DocumentFormat.OpenXml.Spreadsheet.WorkbookView)">
+            <summary>
+            添加工作簿视图的集合。窗口位置、 筛选器选项和其他配置(中间步骤）
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookPartFactory.AddSheets(DocumentFormat.OpenXml.Spreadsheet.Sheet[])">
+            <summary>
+            添加工作簿中的工作表基本信息的集合。最常见的工作表类型是电子表格(中间步骤）
+            </summary>
+            <param name="sheets"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookPartFactory.AddCalculationProperties(System.UInt32)">
+            <summary>
+            添加详细信息记录的计算状态与应用程序使用的属性的集合(中间步骤）
+            </summary>
+            <param name="calculationId"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookPartFactory.FinishedCreate">
+            <summary>
+            结束建造（最后步骤）
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:OfficeReport.Writer.ExtendedFilePropertiesPartFactory">
+            <summary>
+            Excel文件属性详细信息生成工厂
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ExtendedFilePropertiesPartFactory.BeginCreate(DocumentFormat.OpenXml.Packaging.SpreadsheetDocument,System.String)">
+            <summary>
+            开始进行建造（最初步骤）
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ExtendedFilePropertiesPartFactory.AddNamespaceDeclaration(System.String,System.String)">
+            <summary>
+            添加NamespaceDeclaration(中间步骤）
+            </summary>
+            <param name="prefix"></param>
+            <param name="uri"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExtendedFilePropertiesPartFactory.AddApplicatoin(System.String)">
+            <summary>
+            添加程序名称(中间步骤）
+            </summary>
+            <param name="text"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExtendedFilePropertiesPartFactory.AddDocumentSecurity(OfficeReport.Writer.DocSecturities)">
+            <summary>
+            添加文档安全（中间步骤）
+            </summary>
+            <param name="text"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExtendedFilePropertiesPartFactory.AddScaleCrop(System.Boolean)">
+            <summary>
+            添加内容比例（中间步骤）
+            </summary>
+            <param name="text"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExtendedFilePropertiesPartFactory.AddHeadingPairs(System.String,System.UInt32)">
+            <summary>
+            添加所有表单头信息（中间步骤）
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ExtendedFilePropertiesPartFactory.AddTitlesOfParts(System.String[])">
+            <summary>
+            添加所有表单名称信息（中间步骤）
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ExtendedFilePropertiesPartFactory.AddManager(System.String)">
+            <summary>
+            添加管理者信息（中间步骤）
+            </summary>
+            <param name="manager"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExtendedFilePropertiesPartFactory.AddCompany(System.String)">
+            <summary>
+            添加公司信息（中间步骤）
+            </summary>
+            <param name="company"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExtendedFilePropertiesPartFactory.AddLinksUpToDate(System.Boolean)">
+            <summary>
+            添加链接是否有效。如果为true,自动更新（中间步骤）
+            </summary>
+            <param name="company"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExtendedFilePropertiesPartFactory.AddSharedDocument(System.Boolean)">
+            <summary>
+            设置文档是否共享 （中间步骤）
+            若设为true，则在更新文档时要特别注意是否有其他人在编辑
+            </summary>
+            <param name="canShare"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExtendedFilePropertiesPartFactory.AddHyperlinksChanged(System.Boolean)">
+            <summary>
+            当一个或多个指定的超链接被一个用户更新 下一个用户打开文档时也应该更新最新的超链接（中间步骤）
+            </summary>
+            <param name="hyperLinksChanged"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExtendedFilePropertiesPartFactory.AddApplicationVersion(System.String)">
+            <summary>
+            指定版本（中间步骤）
+            </summary>
+            <param name="version"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExtendedFilePropertiesPartFactory.FinishedCreate">
+            <summary>
+            结束建造（最后步骤）
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:OfficeReport.Writer.ThemePartFactory">
+            <summary>
+            Excel文件主题生成工厂
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ThemePartFactory.BeginCreate(DocumentFormat.OpenXml.Packaging.WorkbookPart,System.String)">
+            <summary>
+            开始进行建造（最初步骤）
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ThemePartFactory.AddThemeName(System.String)">
+            <summary>
+            添加主题名
+            </summary>
+            <param name="name"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ThemePartFactory.AddNamespaceDeclaration(System.String,System.String)">
+            <summary>
+            添加命名空间声明
+            </summary>
+            <param name="prefix"></param>
+            <param name="uri"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ThemePartFactory.AddThemeElements(DocumentFormat.OpenXml.Drawing.ThemeElements)">
+            <summary>
+            添加主题元素
+            </summary>
+            <param name="elements"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ThemePartFactory.AddObjectDefaults(DocumentFormat.OpenXml.Drawing.ObjectDefaults)">
+            <summary>
+            添加对象默认值
+            </summary>
+            <param name="objectDefaults"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ThemePartFactory.AddExtraColorSchemeList(DocumentFormat.OpenXml.Drawing.ExtraColorSchemeList)">
+            <summary>
+            添加ExtraColorSchemeList
+            </summary>
+            <param name="extraColorSchemelist"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ThemePartFactory.FinishedCreate">
+            <summary>
+            结束建造（最后步骤）
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:OfficeReport.Writer.WorksheetPartFactory">
+            <summary>
+            WorkSheetPart
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.WorksheetPartFactory.BeginCreate(DocumentFormat.OpenXml.Packaging.WorkbookPart,System.String)">
+            <summary>
+            开始进行建造（最初步骤）
+            </summary>
+            <param name="document"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorksheetPartFactory.AddNamespaceDeclaration(System.String,System.String)">
+            <summary>
+            添加NamespaceDeclaration(中间步骤）
+            </summary>
+            <param name="prefix"></param>
+            <param name="uri"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorksheetPartFactory.AddSheetDimension(System.String)">
+            <summary>
+            增加宏 Sheet 尺寸(中间步骤）
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorksheetPartFactory.AddSheetViews(DocumentFormat.OpenXml.Spreadsheet.SheetView[])">
+            <summary>
+            增加对话框工作表视图(中间步骤）
+            </summary>
+            <param name="sheetviews"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorksheetPartFactory.AddSheetFormatProperties(DocumentFormat.OpenXml.Spreadsheet.SheetFormatProperties)">
+            <summary>
+            增加对话框工作表格式属性(中间步骤）
+            </summary>
+            <param name="defaultrowheight"></param>
+            <param name="dydescent"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorksheetPartFactory.AddSheetData">
+            <summary>
+            增加工作表的数据(中间步骤）
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.WorksheetPartFactory.AddPhoneticProperties(DocumentFormat.OpenXml.Spreadsheet.PhoneticProperties)">
+            <summary>
+            增加拼音属性(中间步骤）
+            </summary>
+            <param name="phoneticProperties"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorksheetPartFactory.AddPageMargins(DocumentFormat.OpenXml.Spreadsheet.PageMargins)">
+            <summary>
+            增加页边距(中间步骤）
+            </summary>
+            <param name="pageMargins"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorksheetPartFactory.AddPageSetup(DocumentFormat.OpenXml.Spreadsheet.PageSetup)">
+            <summary>
+            增加页面设置(中间步骤）
+            </summary>
+            <param name="pageSetup"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorksheetPartFactory.FinishedCreate">
+            <summary>
+            结束建造（最后步骤）
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:OfficeReport.Writer.WorksheetConsts">
+            <summary>
+            Excel文件表格常量
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Writer.WorkbookConsts">
+            <summary>
+            Excel文件薄常量
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Writer.ExtendedFilePropertiesConsts">
+            <summary>
+            Excel文件属性详细信息常量
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Writer.CreateExcelReportWizard">
+            <summary>
+            创建Excel报表向导
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.CreateExcelReportWizard.SetTargetPath(System.String)">
+            <summary>
+            设置目标路径
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.CreateExcelReportWizard.SetStructInfos(OfficeReport.Writer.ExcelStructInfo)">
+            <summary>
+            设置结构信息
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.CreateExcelReportWizard.SetVersionInfos(OfficeReport.Writer.ExcelVersionInfo)">
+            <summary>
+            设置版本信息
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.CreateExcelReportWizard.SetPackageInfo(OfficeReport.Writer.PackageInfo)">
+            <summary>
+            添加文件包
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.CreateExcelReportWizard.ExcutingReport">
+            <summary>
+            执行创建过程
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Writer.PackageInfo">
+            <summary>
+            文件包属性
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.PackageInfo.Creator">
+            <summary>
+            作者
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.PackageInfo.Title">
+            <summary>
+            标题
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.PackageInfo.Subject">
+            <summary>
+            主题
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.PackageInfo.Category">
+            <summary>
+            类别
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.PackageInfo.Keywords">
+            <summary>
+            标记
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.PackageInfo.Description">
+            <summary>
+            备注
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.PackageInfo.ContentStatus">
+            <summary>
+            内容状态
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.PackageInfo.Version">
+            <summary>
+            版本号
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.PackageInfo.Revision">
+            <summary>
+            修订号
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.PackageInfo.Created">
+            <summary>
+            创建时间
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.PackageInfo.Modified">
+            <summary>
+            修改时间
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.PackageInfo.LastModifiedBy">
+            <summary>
+            最后修改者
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.PackageInfo.Language">
+            <summary>
+            语言
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Writer.RandomIdGenerator">
+            <summary>
+            随机Id生成器
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.RandomIdGenerator.GetRandomId">
+            <summary>
+            获取随机Id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:OfficeReport.Writer.CreateBigDataExcelReportWizard">
+            <summary>
+            创建简单Excel报表向导
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.CreateBigDataExcelReportWizard.AddNewSheet(System.String)">
+            <summary>
+            添加新表单
+            </summary>
+            <param name="name"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.CreateBigDataExcelReportWizard.AddNewSheets(System.String[])">
+            <summary>
+            添加多个新表单
+            </summary>
+            <param name="names"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.CreateBigDataExcelReportWizard.BuildUriPartDictionary(DocumentFormat.OpenXml.Packaging.SpreadsheetDocument)">
+            <summary>
+            Stores the references to all the parts in the package.
+            They could be retrieved by their URIs later.
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Writer.ExcelStructInfo">
+            <summary>
+            Excel报表结构信息
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelStructInfo.ApplicationName">
+            <summary>
+            应用程序名
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelStructInfo.DocumentSecturity">
+            <summary>
+            文档安全
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelStructInfo.SheetTitles">
+            <summary>
+            表单名称
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelStructInfo.Manager">
+            <summary>
+            管理者信息
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelStructInfo.Company">
+            <summary>
+            公司信息
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelStructInfo.LinksUpToDate">
+            <summary>
+            文档内链接是否自动更新
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelStructInfo.FilterPrivacy">
+            <summary>
+            在插入操作时是否进行警告
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Writer.ExcelVersionInfo">
+            <summary>
+            Excel文档版本信息等
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelVersionInfo.LastEdited">
+            <summary>
+            最后一次保存的版本
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelVersionInfo.LowestEdited">
+            <summary>
+            应用程序保存的最早版本
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Writer.ExcelSheet">
+            <summary>
+            页
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelSheet.SheetIndex">
+            <summary>
+            页序号
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelSheet.Rows">
+            <summary>
+            单元格集合
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelSheet.RowIndexs">
+            <summary>
+            单元格行数索引
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelSheet.MinY">
+            <summary>
+            最小列序号
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelSheet.MaxY">
+            <summary>
+            最大列序号
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelSheet.MergeCells">
+            <summary>
+            合并单元格集合
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelSheet.Formulas">
+            <summary>
+            下拉集合
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelSheet.ApplyWidth">
+            <summary>
+            是否定义列宽
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelSheet.Widths">
+            <summary>
+            列宽集合
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelSheet.SetHeight(System.Int32,System.Double)">
+            <summary>
+            设置行高
+            </summary>
+            <param name="x"></param>
+            <param name="height"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelSheet.SetWidth(System.Int32,System.Double)">
+            <summary>
+            设置列宽
+            </summary>
+            <param name="y"></param>
+            <param name="width"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelSheet.SetCellStyle(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            设置单元格样式
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <param name="cellFormatId"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelSheet.SetCellValue(System.Int32,System.Int32,System.Object,System.Int32)">
+            <summary>
+            设置单元格值
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <param name="value"></param>
+            <param name="cellFormatId"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelSheet.ClearRows">
+            <summary>
+            写完清除缓存
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelSheet.SetMergeCell(System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            设置合并单元格
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <param name="endX"></param>
+            <param name="endY"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelSheet.SetCellValue(System.Int32,System.Int32,System.Object,System.Collections.Generic.List{System.String},System.Int32)">
+            <summary>
+            设置单元格值
+            带下拉信息
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <param name="value"></param>
+            <param name="values"></param>
+            <param name="cellFormatId"></param>
+        </member>
+        <member name="T:OfficeReport.Writer.ExcelStyle">
+            <summary>
+            样式
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelStyle.ExcelFonts">
+            <summary>
+            字体表
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelStyle.ExcelFills">
+            <summary>
+            背景表
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelStyle.ExcelBorders">
+            <summary>
+            边框表
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelStyle.ExcelCellFormats">
+            <summary>
+            关联样式表
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelStyle.SetExcelStyle(System.Object[])">
+            <summary>
+            设置样式
+            </summary>
+            <param name="styles"></param>
+            <returns></returns>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelStyle.SetExcelFont(OfficeReport.Writer.ExcelFont)">
+            <summary>
+            设置字体
+            </summary>
+            <param name="newFont"></param>
+            <returns></returns>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelStyle.SetExcelFill(OfficeReport.Writer.ExcelFill)">
+            <summary>
+            设置填充
+            </summary>
+            <param name="newFill"></param>
+            <returns></returns>
+        </member>
+        <member name="M:OfficeReport.Writer.ExcelStyle.SetExcelBorder(OfficeReport.Writer.ExcelBorder)">
+            <summary>
+            设置边框
+            </summary>
+            <param name="newBorder"></param>
+            <returns></returns>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelHorizontalAlignment.None">
+            <summary>
+            无
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelHorizontalAlignment.Left">
+            <summary>
+            靠左
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelHorizontalAlignment.Right">
+            <summary>
+            靠右
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelHorizontalAlignment.Center">
+            <summary>
+            居中
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelVerticalAlignment.None">
+            <summary>
+            无
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelVerticalAlignment.Top">
+            <summary>
+            靠上
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelVerticalAlignment.Bottom">
+            <summary>
+            靠下
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelVerticalAlignment.Center">
+            <summary>
+            居中
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Writer.ExcelAlignment">
+            <summary>
+            布局排版
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelAlignment.CCAlignment">
+            <summary>
+            居中
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelAlignment.LCAlignment">
+            <summary>
+            靠左居中
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelAlignment.ExcelHorizontal">
+            <summary>
+            横向布局
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelAlignment.ExcelVertical">
+            <summary>
+            纵向布局
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelAlignment.WrapText">
+            <summary>
+            自动换行
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelBorderDefine.None">
+            <summary>
+            无
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelBorderDefine.Left">
+            <summary>
+            左
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelBorderDefine.Right">
+            <summary>
+            右
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelBorderDefine.Top">
+            <summary>
+            上
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelBorderDefine.Bottom">
+            <summary>
+            下
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelBorderDefine.DiagonalUp">
+            <summary>
+            /
+            </summary>
+        </member>
+        <member name="F:OfficeReport.Writer.ExcelBorderDefine.DiagonalDown">
+            <summary>
+            \
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelBorder.LRTBBorder">
+            <summary>
+            全边框
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelBorder.BorderId">
+            <summary>
+            边框id
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelBorder.IsInnerBorder">
+            <summary>
+            是否内部边框
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelBorder.BorderStyle">
+            <summary>
+            边框类型
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCellFormat.CellFormatId">
+            <summary>
+            样式格式id
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCellFormat.ApplyNumberFormat">
+            <summary>
+            是否允许格式
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCellFormat.NumberFormatId">
+            <summary>
+            格式id
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCellFormat.ApplyFont">
+            <summary>
+            是否允许字体
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCellFormat.FontId">
+            <summary>
+            字体id
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCellFormat.ApplyFill">
+            <summary>
+            是否允许填充
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCellFormat.FillId">
+            <summary>
+            填充id
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCellFormat.ApplyBorder">
+            <summary>
+            是否允许边框
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCellFormat.BorderId">
+            <summary>
+            边框id
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCellFormat.ApplyXf">
+            <summary>
+            是否允许样式
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCellFormat.XfId">
+            <summary>
+            样式id
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCellFormat.ApplyExcelAlignment">
+            <summary>
+            是否允许布局排版
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelCellFormat.ExcelAlignment">
+            <summary>
+            布局排版
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelFill.FillId">
+            <summary>
+            填充id
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelFill.Color">
+            <summary>
+            Argb颜色
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelFont.S10Font">
+            <summary>
+            字体大小10
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelFont.FontId">
+            <summary>
+            字体id
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelFont.Bold">
+            <summary>
+            加粗
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelFont.Size">
+            <summary>
+            大小
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelFont.Name">
+            <summary>
+            字体
+            </summary>
+        </member>
+        <member name="P:OfficeReport.Writer.ExcelFont.Color">
+            <summary>
+            Argb颜色
+            </summary>
+        </member>
+        <member name="T:OfficeReport.Writer.WorkbookStylesPartFactory">
+            <summary>
+            文件工作薄样式生成工厂
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookStylesPartFactory.BeginCreate(DocumentFormat.OpenXml.Packaging.WorkbookPart,System.String)">
+            <summary>
+            开始进行建造（最初步骤）
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookStylesPartFactory.AddNamespaceDeclaration(System.String,System.String)">
+            <summary>
+            添加命名空间声明
+            </summary>
+            <param name="prefix"></param>
+            <param name="uri"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookStylesPartFactory.AddNumberingFormats(DocumentFormat.OpenXml.Spreadsheet.NumberingFormats)">
+            <summary>
+            添加数字格式
+            </summary>
+            <param name="formats"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookStylesPartFactory.AddFonts(DocumentFormat.OpenXml.Spreadsheet.Fonts)">
+            <summary>
+            添加字体
+            </summary>
+            <param name="fonts"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookStylesPartFactory.AddFills(DocumentFormat.OpenXml.Spreadsheet.Fills)">
+            <summary>
+            添加填充色
+            </summary>
+            <param name="fills"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookStylesPartFactory.AddBorders(DocumentFormat.OpenXml.Spreadsheet.Borders)">
+            <summary>
+            添加边框
+            </summary>
+            <param name="borders"></param>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookStylesPartFactory.AddCellStyleFormats(DocumentFormat.OpenXml.Spreadsheet.CellStyleFormats)">
+            <summary>
+            添加单元格样式格式
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookStylesPartFactory.AddCellFormats(DocumentFormat.OpenXml.Spreadsheet.CellFormats)">
+            <summary>
+            添加单元格格式
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookStylesPartFactory.AddCellStyles(DocumentFormat.OpenXml.Spreadsheet.CellStyles)">
+            <summary>
+            添加单元格样式
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookStylesPartFactory.AddDifferentialFormats(DocumentFormat.OpenXml.Spreadsheet.DifferentialFormats)">
+            <summary>
+            添加DifferentialFormats
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookStylesPartFactory.AddTableStyles(DocumentFormat.OpenXml.Spreadsheet.TableStyles)">
+            <summary>
+            添加表格样式
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookStylesPartFactory.AddStylesheetExtensionList(DocumentFormat.OpenXml.Spreadsheet.StylesheetExtensionList)">
+            <summary>
+            添加样式表单扩展信息
+            </summary>
+        </member>
+        <member name="M:OfficeReport.Writer.WorkbookStylesPartFactory.FinishedCreate">
+            <summary>
+            结束建造（最后步骤）
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:OfficeReport.NumberFormatter">
+            <summary>
+            数字格式化
+            </summary>
+        </member>
+        <member name="M:OfficeReport.NumberFormatter.ToNumberSystem26(System.Int32)">
+            <summary>
+            将指定的自然数转换为26进制表示。映射关系：[1-26] ->[A-Z]。
+            </summary>
+            <param name="n">自然数（如果无效，则返回空字符串）。</param>
+            <returns>26进制表示。</returns>
+        </member>
+        <member name="M:OfficeReport.NumberFormatter.FromNumberSystem26(System.String)">
+            <summary>
+            将指定的26进制表示转换为自然数。映射关系：[A-Z] ->[1-26]。
+            </summary>
+            <param name="s">26进制表示（如果无效，则返回0）。</param>
+            <returns>自然数。</returns>
+        </member>
+        <member name="M:OfficeReport.NumberFormatter.GetLocation(System.Int32,System.Int32)">
+            <summary>
+            获取坐标
+            </summary>
+            <param name="x"></param>
+            <param name="y"></param>
+            <returns></returns>
+        </member>
+        <member name="M:OfficeReport.CommonExport.IsOpen(System.String)">
+            <summary>
+            判断文件是否打开，假设文件已经具有读写的权限
+            </summary>
+        </member>
+        <member name="M:OfficeReport.EIdNewFileHelper.SaveEId(System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{System.String}}}},System.Collections.Generic.List{System.String},System.String,System.Boolean)">
+            <summary>
+            保存EID
+            </summary>
+            <param name="dicEIDValues">键值是EID，值是所有参数的当前值和可选列表组成的一个集合</param>
+            <param name="lstColumnName">所有列的名称</param>
+            <param name="fileName">文件名</param>
+            <param name="isSaveInfo">true 保存其余列的Header和值；false 仅保存第一列EID号</param>
+            <returns></returns>
+        </member>
+        <member name="M:OfficeReport.EIdNewFileHelper.LoadEId(System.String,System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{System.String}}@,System.Collections.Generic.List{System.String}@,System.Boolean)">
+            <summary>
+            加载EID
+            </summary>
+            <param name="fileName">文件名</param>
+            <param name="dicEIDValues">键值是EID,值是该EID下所有参数的值组成的集合</param>
+            <param name="lstColumnName">所有列名称</param>
+            <param name="bNeedEidValue">EID管理需要第一列EID的值，其余导入EID不需要EID</param>
+            <returns></returns>
+        </member>
+        <member name="T:OfficeReport.ParamExcel">
+            <summary>
+            excel参数保存加载
+            </summary>
+        </member>
+        <member name="M:OfficeReport.ParamExcel.LoadParamFromExcel(System.String,System.Func{System.String,System.Boolean})">
+            <summary>
+            加载excel参数
+            </summary>
+        </member>
+        <member name="M:OfficeReport.ParamExcel.SaveParamToExcel(System.String,System.Collections.Generic.Dictionary{System.Int32,DHGlobal.MeasureParam})">
+            <summary>
+            保存excel参数
+            </summary>
+        </member>
+        <member name="T:OfficeReport.OpenXmlHelper">
+            <summary>
+            其于OpenXml SDK写的帮助类
+            </summary>
+        </member>
+        <member name="P:OfficeReport.OpenXmlHelper.CellStyleIndex">
+            <summary>
+            单元格样式
+            </summary>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.GetWorksheet(DocumentFormat.OpenXml.Packaging.SpreadsheetDocument,System.String)">
+            <summary>
+            获取Worksheet
+            </summary>
+            <param name="document">document对象</param>
+            <param name="sheetName">sheetName可空</param>
+            <returns>Worksheet对象</returns>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.GetWorksheets(DocumentFormat.OpenXml.Packaging.SpreadsheetDocument)">
+            <summary>
+            获取Worksheet
+            </summary>
+            <param name="document">document对象</param>
+            <param name="sheetName">sheetName可空</param>
+            <returns>Worksheet对象</returns>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.GetFirstSheetData(DocumentFormat.OpenXml.Packaging.SpreadsheetDocument,System.String)">
+            <summary>
+            获取第一个SheetData
+            </summary>
+            <param name="document">SpreadsheetDocument对象</param>
+            <param name="sheetName">sheetName可为空</param>
+            <returns>SheetData对象</returns>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.GetFirstSheetData(DocumentFormat.OpenXml.Spreadsheet.Worksheet)">
+            <summary>
+            获取第一个SheetData
+            </summary>
+            <param name="worksheet">Worksheet对象</param>
+            <returns>SheetData对象</returns>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.GetSharedStringTable(DocumentFormat.OpenXml.Packaging.SpreadsheetDocument)">
+            <summary>
+            获了共享字符的表格对象
+            </summary>
+            <param name="document">SpreadsheetDocument</param>
+            <returns>SharedStringTablePart对角</returns>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.UpdateCellText(DocumentFormat.OpenXml.Spreadsheet.SheetData,System.String,System.String)">
+            <summary>
+            修改单元格的内容.
+            </summary>
+            <param name="sheetData">
+            The sheet data.
+            </param>
+            <param name="cellName">
+            The cell name.
+            </param>
+            <param name="cellText">
+            The cell text.
+            </param>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.SetCellValue(DocumentFormat.OpenXml.Spreadsheet.SheetData,System.String,System.Object)">
+            <summary>
+            设置单元格的值.
+            </summary>
+            <param name="sheetData">
+            The sheet data.
+            </param>
+            <param name="cellName">
+            The cell name.
+            </param>
+            <param name="cellText">
+            The cell text.
+            </param>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.CreateCell(DocumentFormat.OpenXml.Spreadsheet.Row,System.String,System.Object,System.UInt32)">
+            <summary>
+            添加一个单元格
+            </summary>
+            <param name="row">Row对象</param>
+            <param name="cellName">单元格名称</param>
+            <param name="cellText">单元格文本</param>
+            <param name="cellStyleIndex">样式</param>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.SetCellValue(DocumentFormat.OpenXml.Spreadsheet.SheetData,System.String,System.Object,System.UInt32)">
+            <summary>
+            设置单元格的值.
+            </summary>
+            <param name="sheetData">
+            The sheet data.
+            </param>
+            <param name="cellName">
+            The cell name.
+            </param>
+            <param name="cellText">
+            The cell text.
+            </param>
+            <param name="cellStyleIndex">
+            The cell style index.
+            </param>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.GetRowsCount(System.Collections.Generic.IEnumerable{DocumentFormat.OpenXml.Spreadsheet.Row})">
+            <summary>
+            The get rows count.
+            </summary>
+            <param name="rows">
+            The rows.
+            </param>
+            <returns>
+            The <see cref="T:System.Int32"/>.
+            </returns>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.GetCells(System.Collections.Generic.IEnumerable{DocumentFormat.OpenXml.Spreadsheet.Row},System.Int32)">
+            <summary>
+            根据行索引获取单元
+            </summary>
+            <param name="rows">
+            The rows.
+            </param>
+            <param name="rowIndex">
+            The row index.
+            </param>
+            <returns>
+            Cell集合
+            </returns>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.GetCellValue(System.Collections.Generic.IEnumerable{DocumentFormat.OpenXml.Spreadsheet.Cell},System.String,DocumentFormat.OpenXml.Packaging.SharedStringTablePart)">
+            <summary>
+            获取单元格值
+            </summary>
+            <param name="cells">
+            The cells.
+            </param>
+            <param name="cellName">
+            The cell name.
+            </param>
+            <param name="stringTablePart">
+            The string table part.
+            </param>
+            <returns>
+            The <see cref="T:System.String"/>.
+            </returns>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.ValidateDocument(DocumentFormat.OpenXml.Packaging.SpreadsheetDocument)">
+            <summary>
+            验证文档
+            </summary>
+            <param name="document">
+            The document.
+            </param>
+            <returns>
+            The <see cref="T:System.String"/>.
+            </returns>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.GetRowIndex(System.String)">
+            <summary>
+            根据单元格名称获取行索引.
+            </summary>
+            <param name="cellName">
+            The cell name.
+            </param>
+            <returns>
+            The <see cref="T:System.UInt32"/>.
+            </returns>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.GetCellDataType(System.Object)">
+            <summary>
+            The get cell data type.
+            </summary>
+            <param name="cellText">
+            The cell text.
+            </param>
+            <returns>
+            The <see cref="T:DocumentFormat.OpenXml.Spreadsheet.CellValues"/>.
+            </returns>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.UpdateCell(DocumentFormat.OpenXml.Spreadsheet.Cell,System.Object,System.UInt32)">
+            <summary>
+            修改单元格内容（文本、样式）                                                                                                                                                                                                                                            
+            </summary>
+            <param name="cell">
+            The cell.
+            </param>
+            <param name="cellText">
+            The cell text.
+            </param>
+            <param name="cellStyleIndex">
+            The cell style index.
+            </param>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.UpdateCellText(DocumentFormat.OpenXml.Spreadsheet.Cell,System.Object)">
+            <summary>
+            修改单元格的文本
+            </summary>
+            <param name="cell">Cell对象</param>
+            <param name="cellText">文本字符串</param>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.GetRow(DocumentFormat.OpenXml.Spreadsheet.SheetData,System.Int64)">
+            <summary>
+            获取行
+            </summary>
+            <param name="sheetData">
+            The sheet data.
+            </param>
+            <param name="rowIndex">
+            The row index.
+            </param>
+            <returns>
+            The <see cref="T:DocumentFormat.OpenXml.Spreadsheet.Row"/>.
+            </returns>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.GetCell(DocumentFormat.OpenXml.Spreadsheet.Row,System.String)">
+            <summary>
+            获取单元格
+            </summary>
+            <param name="row">
+            The row.
+            </param>
+            <param name="cellName">
+            The cell name.
+            </param>
+            <returns>
+            The <see cref="T:DocumentFormat.OpenXml.Spreadsheet.Cell"/>.
+            </returns>
+        </member>
+        <member name="M:OfficeReport.OpenXmlHelper.GetCell(DocumentFormat.OpenXml.Spreadsheet.SheetData,System.String)">
+            <summary>
+            获取单元格
+            </summary>
+            <param name="sheetData">
+            The sheet data.
+            </param>
+            <param name="cellName">
+            The cell name.
+            </param>
+            <returns>
+            The <see cref="T:DocumentFormat.OpenXml.Spreadsheet.Cell"/>.
+            </returns>
+        </member>
+        <member name="T:OfficeReport.SheetEx">
+            <summary>
+            工作区
+            </summary>
+        </member>
+        <member name="P:OfficeReport.SheetEx.SheetId">
+            <summary>
+            工作区所属的Sheet的ID
+            </summary>
+        </member>
+        <member name="P:OfficeReport.SheetEx.SheetName">
+            <summary>
+            工作区所属的Sheet的名称
+            </summary>
+        </member>
+        <member name="P:OfficeReport.SheetEx.RowIndex">
+            <summary>
+            工作区起始行
+            </summary>
+        </member>
+        <member name="P:OfficeReport.SheetEx.Worksheet">
+            <summary>
+            工作区
+            </summary>
+        </member>
+        <member name="T:OfficeReport.OpenXmlImportImages">
+            <summary>
+            导入
+            </summary>
+        </member>
+        <member name="P:OfficeReport.OpenXmlImportImages.FromRow">
+            <summary>
+            列
+            </summary>
+        </member>
+        <member name="P:OfficeReport.OpenXmlImportImages.FromCol">
+            <summary>
+            行
+            </summary>
+        </member>
+        <member name="T:OfficeReport.OpenXmlExportImages">
+            <summary>
+            导出
+            </summary>
+        </member>
+        <member name="P:OfficeReport.OpenXmlExportImages.X">
+            <summary>
+            X坐标
+            </summary>
+        </member>
+        <member name="P:OfficeReport.OpenXmlExportImages.Y">
+            <summary>
+            Y坐标
+            </summary>
+        </member>
+        <member name="P:OfficeReport.OpenXmlExportImages.Width">
+            <summary>
+            宽度
+            </summary>
+        </member>
+        <member name="P:OfficeReport.OpenXmlExportImages.Height">
+            <summary>
+            高度
+            </summary>
+        </member>
+        <member name="P:OfficeReport.OpenXmlExportImages.ImagePath">
+            <summary>
+            图片路径如c:\eee.png
+            </summary>
+        </member>
+    </members>
+</doc>

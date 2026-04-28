@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DHTest>
+	<!--通道设置-->
+	<Module type ="ChnSetupModule" id ="ChnSetupModuleAnalysis">
+		<menu id ="ChnSetupModuleAnalysis" analysis ="0">
+			<toolbar>
+				<Control id="SaveParamFunc"/>
+				<Control id="SaveToParamFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="AnalogParamModuleAnalysis" UserControl ="1"/>
+				<Control id="TachoParamModuleAnalysis" UserControl ="1"/>
+			</toolbar>
+		</menu>
+	</Module>
+	<!--算法设置-->
+	<Module type ="MathSetupModule" id ="SeaOrderMathModuleAnalysis">
+		<menu id ="SeaOrderMathModuleAnalysis" analysis ="0">
+			<toolbar>
+				<Control id="SaveParamFunc"/>
+				<Control id="SaveToParamFunc"/>
+			</toolbar>
+		</menu>
+	</Module>
+	<!--测量-->
+	<Module type ="MeasureModule" id ="MeasureModuleAnalysis">
+		<menu id ="MeasureModuleAnalysis" analysis ="0">
+			<toolbar>
+				<Control id="MeasureStoreFunc"/>
+				<Control id="MeasurePauseFunc"/>
+				<Control id="MeasureContinueFunc"/>
+				<Control id="MeasureStopFunc"/>
+				<Control id="MeasureShiBoFunc"/>
+				<Control id="MeasureTrigFunc"/>
+				<Control id="MeasureFreezeFunc"/>
+				<Control id="MeasureTagFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="LayoutRecorderFunc" layout="1"/>
+				<Control id="Layout2DFunc" layout="1"/>
+			</toolbar>
+			<toolbar>
+				<Control id="RunInfoFunc"/>
+			</toolbar>
+		</menu>
+		<menu id ="MeasureChatDesignModuleAnalysis" analysis ="0">
+			<toolbar>
+				<Control id="DelAllChatFunc"/>
+				<Control id="DelChatFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="ChatHorizFunc"/>
+				<Control id="ChatVertFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="MultiScreenFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="ChatRecordModuleAnalysis"/>
+				<Control id="Chat2DModuleAnalysis"/>
+				<Control id="ChatDigitalModuleAnalysis"/>
+			</toolbar>
+		</menu>
+	</Module>
+	<!--切换定义-->
+	<Switch>
+		<SwitchItem id="SwitchMeasurePath" path="MeasureModule|MeasureModuleAnalysis"></SwitchItem>
+    <SwitchItem id="SwitchChnAnalogPath" path="MeasureModule|ChnSetupModuleAnalysis|AnalogParamModuleAnalysis"></SwitchItem>
+	</Switch>
+</DHTest>

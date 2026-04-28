@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Commands>
+	<!--匀速-->
+	<Command id="0">
+		<Aruguments>
+			<FloatArg id="目标值(tu)" value="0"/>
+			<FloatArg id="接近速率(tu/s)" value="0"/>
+			<FloatArg id="加速率限制(tu/s²)" value="0"/>
+			<FloatArg id="减速率限制(tu/s²)" value="0"/>
+			<ComboArg id="加减速模式" value="0" choices="梯形加速 S平稳加速"/>
+ 		</Aruguments>
+		<Axes>
+		</Axes>
+	</Command>
+	<!--正弦-->
+	<Command id="1">
+		<Aruguments>
+			<IntArg id="周期数" value="0"/>
+			<FloatArg id="幅值(tu)" value="0"/>
+			<FloatArg id="初相位(°)" value="0"/>
+			<FloatArg id="频率(Hz)" value="0"/>
+		</Aruguments>
+		<Axes>
+		</Axes>
+	</Command>
+	<!--多项式-->
+	<Command id="2">
+		<Aruguments>
+			<FloatArg id="过渡时间(s)" value="0"/>
+			<FloatArg id="目标值(tu)" value="0"/>
+			<FloatArg id="启动速率(tu/s)" value="0"/>
+			<FloatArg id="到达速率(tu/s)" value="0"/>
+			<FloatArg id="启动加速率值(tu/s²)" value="0"/>
+			<FloatArg id="到达加速率值(tu/s²)" value="0"/>
+		</Aruguments>
+		<Axes>
+		</Axes>
+	</Command>
+	<!--保持原值-->
+	<Command id="3">
+		<Aruguments>
+			<FloatArg id="保持时间(s)" value="0"/>
+			<FloatArg id="目标值(tu)" value="0"/>
+		</Aruguments>
+		<Axes>
+		</Axes>
+	</Command>
+</Commands>

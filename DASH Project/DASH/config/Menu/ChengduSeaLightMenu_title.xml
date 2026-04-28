@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DHTest>
+	<!--工程管理-->
+	<Module type ="ProjectModule" id ="ProjectModuleAnalysis" Default="1">
+		<menu id ="ProjectModuleAnalysis" analysis="1">
+			<toolbar>
+				<Control id="NewPrjFunc" switch="MeasureModule|ChnSetupModuleAnalysis"/>
+			</toolbar>
+			<toolbar>
+				<Control id="OpenPrjFunc" switch="AnalysisModule|AnalysisModuleAnalysis"/>
+				<Control id="RenamePrjFunc"/>
+				<Control id="DelPrjFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="AnalysisViewFunc"/>
+				<Control id="DatabaseManageFunc"/>
+				<Control id="CalibrationSettingFunc"/>
+			</toolbar>
+		</menu>
+	</Module>
+	<!--通道设置-->
+	<Module type ="ChnSetupModule" id ="ChnSetupModuleAnalysis">
+		<!--通道设置-->
+		<menu id ="ChnSetupModuleAnalysis" analysis ="0">
+			<toolbar>
+				<Control id="SaveParamFunc"/>
+				<Control id="SaveToParamFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="LoadParamFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="AnalogParamModuleAnalysis" UserControl ="1"/>
+				<Control id="SignalParamModuleAnalysis" UserControl ="1"/>
+			</toolbar>
+		</menu>
+	</Module>
+	<!--测量-->
+	<Module type ="SoundMeasureModule" id ="PressureSetup">
+		<menu id ="PressureSetup" analysis="1">
+			<toolbar>
+				<Control id="MeasureStoreFunc"/>
+			</toolbar>
+		</menu>
+		<menu id ="PressureCalibrate" analysis="1">
+			<toolbar>
+				<Control id="MeasureStoreFunc"/>
+				<Control id="MeasureStopFunc"/>
+				<Control id="MeasureBalanceZero"/>
+			</toolbar>
+		</menu>
+		<menu id ="SurfaceWaveSetup" analysis="1">
+			<toolbar>
+				<Control id="MeasureStoreFunc"/>
+			</toolbar>
+		</menu>
+		<menu id ="SurfaceWaveCalibrate" analysis="1">
+			<toolbar>
+				<Control id="MeasureStoreFunc"/>
+				<Control id="MeasureStopFunc"/>
+				<Control id="MeasureBalanceZero"/>
+			</toolbar>
+		</menu>
+		<menu id ="LongitudinalSetup" analysis="1">
+			<toolbar>
+				<Control id="MeasureStoreFunc"/>
+			</toolbar>
+		</menu>
+		<menu id ="LongitudinalCalibrate" analysis="1">
+			<toolbar>
+				<Control id="MeasureStoreFunc"/>
+				<Control id="MeasureStopFunc"/>
+				<Control id="MeasureBalanceZero"/>
+			</toolbar>
+		</menu>
+	</Module>
+	<!--分析-->
+	<Module type ="SoundAnalysisModule">
+		<menu id ="DataOutput" analysis="1">
+			<toolbar>
+				<Control id="MeasureStoreFunc"/>
+			</toolbar>
+		</menu>
+		<menu id ="ReportOutpput" analysis="1">
+			<toolbar>
+				<Control id="MeasureStoreFunc"/>
+			</toolbar>
+		</menu>
+	</Module>
+</DHTest>

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DHTest>
+  <MeasureModule>
+    <Layout>
+      <Control id="LayoutRecorderFunc" hidden="0"/>
+      <Control id="Layout2DFunc" hidden="1"/>
+    </Layout>
+    <Chart>
+      <Control id="ChatRecordModuleAnalysis" hidden="0"/>
+      <Control id="Chat2DModuleAnalysis" hidden="0"/>
+      <Control id="ChatDigitalModuleAnalysis" hidden="0"/>
+    </Chart>
+  </MeasureModule>
+</DHTest>

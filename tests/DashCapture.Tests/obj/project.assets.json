@@ -1,0 +1,148 @@
+{
+  "version": 3,
+  "targets": {
+    "net6.0": {
+      "DashCapture.Core/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "DashCapture.Native": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/DashCapture.Core.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/DashCapture.Core.dll": {}
+        }
+      },
+      "DashCapture.Display/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "dependencies": {
+          "DashCapture.Core": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/DashCapture.Display.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/DashCapture.Display.dll": {}
+        }
+      },
+      "DashCapture.Native/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v6.0",
+        "compile": {
+          "bin/placeholder/DashCapture.Native.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/DashCapture.Native.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "DashCapture.Core/1.0.0": {
+      "type": "project",
+      "path": "../../src/DashCapture.Core/DashCapture.Core.csproj",
+      "msbuildProject": "../../src/DashCapture.Core/DashCapture.Core.csproj"
+    },
+    "DashCapture.Display/1.0.0": {
+      "type": "project",
+      "path": "../../src/DashCapture.Display/DashCapture.Display.csproj",
+      "msbuildProject": "../../src/DashCapture.Display/DashCapture.Display.csproj"
+    },
+    "DashCapture.Native/1.0.0": {
+      "type": "project",
+      "path": "../../src/DashCapture.Native/DashCapture.Native.csproj",
+      "msbuildProject": "../../src/DashCapture.Native/DashCapture.Native.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net6.0": [
+      "DashCapture.Display >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Destiny\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "E:\\NEW-DH\\tests\\DashCapture.Tests\\DashCapture.Tests.csproj",
+      "projectName": "DashCapture.Tests",
+      "projectPath": "E:\\NEW-DH\\tests\\DashCapture.Tests\\DashCapture.Tests.csproj",
+      "packagesPath": "C:\\Users\\Destiny\\.nuget\\packages\\",
+      "outputPath": "E:\\NEW-DH\\tests\\DashCapture.Tests\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\Destiny\\AppData\\Roaming\\NuGet\\NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "net6.0"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "projectReferences": {
+            "E:\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj": {
+              "projectPath": "E:\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      }
+    },
+    "frameworks": {
+      "net6.0": {
+        "targetAlias": "net6.0",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[6.0.36, 6.0.36]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.win-x64",
+            "version": "[6.0.36, 6.0.36]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[6.0.36, 6.0.36]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[6.0.36, 6.0.36]"
+          }
+        ],
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.416\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

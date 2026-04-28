@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DHTest>
+  <MeasureModule>
+    <Layout>
+      <Control id="LayoutStaticFunc" hidden="0"/>
+      <Control id="LayoutRecorderFunc" hidden="1"/>
+      <Control id="LayoutDigitalFunc" hidden="1"/>
+    </Layout>
+    <Chart>
+      <Control id="ChatRecordModuleAnalysis" hidden="0"/>
+      <Control id="ChatXYRecordModuleAnalysis" hidden="0"/>
+      <Control id="ChatFFTModuleAnalysis" hidden="0"/>
+      <Control id="ChatOctaveModuleAnalysis" hidden="0"/>
+      <Control id="Chat2DModuleAnalysis" hidden="0"/>
+      <Control id="Chat3DModuleAnalysis" hidden="1"/>
+      <Control id="ChatDigitalModuleAnalysis" hidden="1"/>
+      <Control id="ChatBarModuleAnalysis" hidden="1"/>
+      <Control id="ChatTableModuleAnalysis" hidden="1"/>
+      <Control id="ChatStaticModuleAnalysis" hidden="1"/>
+    </Chart>
+  </MeasureModule>
+  <AnalysisModule>
+    <Layout>
+      <Control id="LayoutStaticFunc" hidden="0"/>
+      <Control id="LayoutRecorderFunc" hidden="1"/>
+      <Control id="LayoutDigitalFunc" hidden="1"/>
+    </Layout>
+    <Chart>
+      <Control id="ChatRecordModuleAnalysis" hidden="0"/>
+      <Control id="ChatXYRecordModuleAnalysis" hidden="0"/>
+      <Control id="ChatFFTModuleAnalysis" hidden="0"/>
+      <Control id="ChatOctaveModuleAnalysis" hidden="0"/>
+      <Control id="Chat2DModuleAnalysis" hidden="0"/>
+      <Control id="Chat3DModuleAnalysis" hidden="1"/>
+      <Control id="ChatDigitalModuleAnalysis" hidden="1"/>
+      <Control id="ChatBarModuleAnalysis" hidden="1"/>
+      <Control id="ChatTableModuleAnalysis" hidden="1"/>
+      <Control id="ChatStaticModuleAnalysis" hidden="1"/>
+    </Chart>
+  </AnalysisModule>
+</DHTest>

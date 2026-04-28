@@ -1,0 +1,33 @@
+<LogicControl>
+  <TrigParam IsTrig="1" TrigMachineID="0" TrigChannelID="0" TrigLevel="20" />
+  <SampleSpan>10</SampleSpan>
+  <DIChannel DIMachineID="0" DIChannelID="0" DIDataIndex="0" />
+  <Condition>
+    <JudgeTime>4.5</JudgeTime>
+    <JudgeType>
+      <Formula Describe="P1" MachineID="0" ChannelID="0" ChannelType="0" ChannelName="AI1-01" SignalSerialNumber="6caeb54a-5164-4f66-bc1f-61b7129e97a1_00-0-0_AI" Judge="0" JudgeValue="0.9" />
+    </JudgeType>
+  </Condition>
+  <Condition>
+    <JudgeTime>5</JudgeTime>
+    <JudgeType>
+      <Formula Describe="P2" MachineID="0" ChannelID="0" ChannelType="0" ChannelName="AI1-01" SignalSerialNumber="6caeb54a-5164-4f66-bc1f-61b7129e97a1_00-0-0_AI" Judge="0" JudgeValue="5" />
+      <Formula Describe="P3" MachineID="0" ChannelID="0" ChannelType="0" ChannelName="AI1-01" SignalSerialNumber="6caeb54a-5164-4f66-bc1f-61b7129e97a1_00-0-0_AI" Judge="0" JudgeValue="6.5" />
+    </JudgeType>
+    <JudgeType>
+      <Formula Describe="P4" MachineID="0" ChannelID="0" ChannelType="0" ChannelName="AI1-01" SignalSerialNumber="6caeb54a-5164-4f66-bc1f-61b7129e97a1_00-0-0_AI" Judge="2" JudgeValue="7500" />
+      <Formula Describe="P5" MachineID="0" ChannelID="0" ChannelType="0" ChannelName="AI1-01" SignalSerialNumber="6caeb54a-5164-4f66-bc1f-61b7129e97a1_00-0-0_AI" Judge="0" JudgeValue="6.5" />
+      <Formula Describe="P6" MachineID="0" ChannelID="0" ChannelType="0" ChannelName="AI1-01" SignalSerialNumber="6caeb54a-5164-4f66-bc1f-61b7129e97a1_00-0-0_AI" Judge="0" JudgeValue="11.5" />
+    </JudgeType>
+  </Condition>
+  <Condition>
+    <JudgeTime>10</JudgeTime>
+    <JudgeType>
+      <Formula Describe="P1" MachineID="0" ChannelID="0" ChannelType="0" ChannelName="AI1-01" SignalSerialNumber="6caeb54a-5164-4f66-bc1f-61b7129e97a1_00-0-0_AI" Judge="0" JudgeValue="6000" />
+    </JudgeType>
+    <JudgeType>
+      <Formula Describe="P1" MachineID="0" ChannelID="0" ChannelType="0" ChannelName="AI1-01" SignalSerialNumber="6caeb54a-5164-4f66-bc1f-61b7129e97a1_00-0-0_AI" Judge="0" JudgeValue="9500" />
+      <Formula Describe="P1" MachineID="0" ChannelID="0" ChannelType="0" ChannelName="AI1-01" SignalSerialNumber="6caeb54a-5164-4f66-bc1f-61b7129e97a1_00-0-0_AI" Judge="0" JudgeValue="20" />
+    </JudgeType>
+  </Condition>
+</LogicControl>

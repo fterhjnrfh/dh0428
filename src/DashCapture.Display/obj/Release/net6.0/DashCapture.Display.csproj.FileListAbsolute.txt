@@ -1,0 +1,17 @@
+E:\NEW-DH\src\DashCapture.Display\bin\Release\net6.0\DashCapture.Display.deps.json
+E:\NEW-DH\src\DashCapture.Display\bin\Release\net6.0\DashCapture.Display.dll
+E:\NEW-DH\src\DashCapture.Display\bin\Release\net6.0\DashCapture.Display.pdb
+E:\NEW-DH\src\DashCapture.Display\bin\Release\net6.0\DashCapture.Core.dll
+E:\NEW-DH\src\DashCapture.Display\bin\Release\net6.0\DashCapture.Native.dll
+E:\NEW-DH\src\DashCapture.Display\bin\Release\net6.0\DashCapture.Core.pdb
+E:\NEW-DH\src\DashCapture.Display\bin\Release\net6.0\DashCapture.Native.pdb
+E:\NEW-DH\src\DashCapture.Display\obj\Release\net6.0\DashCapture.Display.csproj.AssemblyReference.cache
+E:\NEW-DH\src\DashCapture.Display\obj\Release\net6.0\DashCapture.Display.GeneratedMSBuildEditorConfig.editorconfig
+E:\NEW-DH\src\DashCapture.Display\obj\Release\net6.0\DashCapture.Display.AssemblyInfoInputs.cache
+E:\NEW-DH\src\DashCapture.Display\obj\Release\net6.0\DashCapture.Display.AssemblyInfo.cs
+E:\NEW-DH\src\DashCapture.Display\obj\Release\net6.0\DashCapture.Display.csproj.CoreCompileInputs.cache
+E:\NEW-DH\src\DashCapture.Display\obj\Release\net6.0\DashCapt.A5EE5D6A.Up2Date
+E:\NEW-DH\src\DashCapture.Display\obj\Release\net6.0\DashCapture.Display.dll
+E:\NEW-DH\src\DashCapture.Display\obj\Release\net6.0\refint\DashCapture.Display.dll
+E:\NEW-DH\src\DashCapture.Display\obj\Release\net6.0\DashCapture.Display.pdb
+E:\NEW-DH\src\DashCapture.Display\obj\Release\net6.0\ref\DashCapture.Display.dll

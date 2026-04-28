@@ -1,0 +1,1 @@
+﻿2026-03-19 20:07:10.315 INFO  [16008] [LogCollection@136] HardWareConfig.cpp[1273]: Init plog success log level 4 log_size 5242880 log_number 10 log path C:\DASH Project\DASH\config\Logs\plog.txt

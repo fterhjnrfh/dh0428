@@ -1,0 +1,57 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0/win-x64",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {},
+    ".NETCoreApp,Version=v6.0/win-x64": {
+      "DashCapture.Storage/1.0.0": {
+        "dependencies": {
+          "DashCapture.Core": "1.0.0",
+          "DashCapture.Native": "1.0.0"
+        },
+        "runtime": {
+          "DashCapture.Storage.dll": {}
+        }
+      },
+      "DashCapture.Core/1.0.0": {
+        "dependencies": {
+          "DashCapture.Native": "1.0.0"
+        },
+        "runtime": {
+          "DashCapture.Core.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "DashCapture.Native/1.0.0": {
+        "runtime": {
+          "DashCapture.Native.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "DashCapture.Storage/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "DashCapture.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "DashCapture.Native/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

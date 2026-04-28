@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DHTest>
+	<!--测量-->
+  <!--双旋翼测试系统 用户与数据管理 WingUserMgr-->
+  <Module type ="ManageModule" id ="AccountAndFilesManage">
+    <menu id ="AdminLoginManage" analysis="1">
+      <toolbar>
+        <Control id="CheckInfoFunc" />
+      </toolbar>
+    </menu>
+    
+    <menu id ="AccountAndFilesManage" analysis="1">
+      <toolbar>
+        <Control id="CheckInfoFunc"/>
+      </toolbar>
+    </menu>
+    <menu id ="BackupAndRevertManage" analysis="1">
+      <toolbar>
+        <Control id="CheckInfoFunc"/>
+      </toolbar>
+    </menu>
+    <menu id ="LogManage" analysis="1">
+      <toolbar>
+        <Control id="CheckInfoFunc"/>
+      </toolbar>
+    </menu>
+
+     <menu id ="LogoutUserManage" analysis="1">
+      <toolbar>
+        <Control id="CheckInfoFunc" />
+      </toolbar>
+    </menu>
+  </Module>
+
+  <!--双旋翼测试系统 数据备份 WingUserMgr-->
+  
+  <!--<Module type ="ManageModule" id ="BackupAndRevertManage">
+
+    <menu id ="BackupAndRevertManage" analysis="1">
+      <toolbar>
+        <Control id="CheckInfoFunc"/>
+      </toolbar>
+    </menu>
+
+  </Module>-->
+</DHTest>

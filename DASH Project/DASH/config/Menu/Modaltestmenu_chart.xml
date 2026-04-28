@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DHTest>
+  <MeasureModule>
+    <Layout>
+      <Control id="LayoutModelFunc" hidden="0"/>
+      <Control id="LayoutFFTFunc" hidden="1"/>
+    </Layout>
+    <Chart>
+      <Control id="ChatRecordModuleAnalysis" hidden="0"/>
+      <Control id="ChatXYRecordModuleAnalysis" hidden="0"/>
+      <Control id="ChatFFTModuleAnalysis" hidden="0"/>
+      <Control id="ChatOctaveModuleAnalysis" hidden="0"/>
+      <Control id="Chat2DModuleAnalysis" hidden="0"/>
+      <Control id="Chat3DModuleAnalysis" hidden="1"/>
+      <Control id="ChatDigitalModuleAnalysis" hidden="1"/>
+      <Control id="ChatBarModuleAnalysis" hidden="1"/>
+      <Control id="ChatTableModuleAnalysis" hidden="1"/>
+      <Control id="ChatModalModuleAnalysis" hidden="1"/>
+    </Chart>
+  </MeasureModule>
+</DHTest>

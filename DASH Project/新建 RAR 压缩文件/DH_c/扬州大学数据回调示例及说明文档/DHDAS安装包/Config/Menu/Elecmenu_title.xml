@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DHTest>
+	<!--测量-->
+	<Module type ="MeasureModule" id ="MeasureModuleAnalysis">
+		<!--通道设置-->
+		<menu id ="ChnSetupModuleAnalysis" analysis ="0">
+			<toolbar>
+				<Control id="SaveParamFunc"/>
+				<Control id="SaveToParamFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="AnalogParamModuleAnalysis" UserControl ="1"/>
+				<Control id="TachoParamModuleAnalysis" UserControl ="1"/>
+				<Control id="SignalParamModuleAnalysis" UserControl ="1"/>
+				<Control id="GPSParamModuleAnalysis" UserControl ="1"/>
+				<Control id="CANParamModuleAnalysis" UserControl ="1"/>
+				<Control id="OutDataParamModuleAnalysis" UserControl ="1"/>
+				<Control id="VideoParamModuleAnalysis" UserControl ="1"/>
+				<Control id="AudioParamModuleAnalysis" UserControl ="1"/>
+				<Control id="DigitalParamModuleAnalysis" UserControl ="1"/>
+				<Control id="CounterParamModuleAnalysis" UserControl ="1"/>
+				<Control id="CalibrateParamModuleAnalysis" UserControl ="1"/>
+				<Control id="MicParamModuleAnalysis" UserControl ="1"/>
+				<Control id="PCI1553ParamModuleAnalysis" UserControl ="1"/>
+				<Control id="MoogParamModuleAnalysis" UserControl ="1"/>
+				<Control id="DIOParamModuleAnalysis" UserControl ="1"/>
+				<Control id="AxisParamModuleAnalysis" UserControl="1"/>
+				<Control id="RS485ModuleAnalysis" UserControl="1"/>
+				<Control id="ScaleCliqueParamModuleAnalysis" UserControl="1"/>
+				<Control id="RS422ParamModuleAnalysis" UserControl="1"/>
+				<Control id="PFIParamModuleAnalysis" UserControl="1"/>
+				<Control id="NIParamModuleAnalysis" UserControl="1"/>
+				<Control id="VibrationWireParamModuleAnalysis" UserControl="1"/>
+			</toolbar>
+		</menu>
+		<menu id ="MeasureModuleAnalysis" analysis ="0">
+			<toolbar>
+        <Control id="MeasureNewExperimentFunc"/>
+				<Control id="MeasureStoreFunc"/>
+				<Control id="MeasurePauseFunc"/>
+				<Control id="MeasureRebackDataFunc"/>
+				<Control id="MeasureContinueFunc"/>
+				<Control id="MeasureStopFunc"/>
+				<Control id="MeasureShiBoFunc"/>
+				<Control id="MeasureFreezeFunc"/>
+				<Control id="MeasureBalanceZero"/>
+				<Control id="MeasureDemarcateExportFunc"/>
+				<Control id="MeasureSnapFunc"/>
+				<Control id="MeasureMoogContinueFunc"/>
+				<Control id="MeasureHighStoreFunc"/>
+				<Control id="MeasureSurveyFunc"/>
+				<Control id="MeasureMoogZeroFunc"/>
+				<Control id="MeasureMoogStoreFunc"/>
+				<Control id="MeasureAudioFunc"/>
+				<Control id="MeasureMultiStoreFunc"/>
+				<Control id="MeasureDemarcateExportExtraFunc"/>
+				<Control id="MeasureIOFire"/>
+				<Control id="MeasureBridgeVlt"/>
+				<Control id="MeasureTachoPhaseTrig"/>
+				<Control id="MeasureHighLowSampleFunc"/>
+        <Control id="MeasureDH5981EFunc"/>
+			</toolbar>
+      <toolbar>
+        <Control id="MeasureElectronicLoad"/>
+		<Control id="MeasureElecLoadThirdPartExe"/>
+	  </toolbar>
+			<toolbar>
+				<Control id="MeasureSignalSourceFunc"/>
+				<Control id="MeasureDemarcateFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="DelAllChatFunc"/>
+				<Control id="DelChatFunc"/>
+				<Control id="ChatHorizFunc"/>
+				<Control id="ChatVertFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="MultiScreenFunc"/>
+				<Control id="MultiScreenLayOutMgrFunc"/>
+			</toolbar>
+			<toolbar>
+        <Control id="MeasureShowOpenCircuitTableChart"/>
+        <Control id="MeasureShowEISTableChart"/>
+        <Control id="MeasureShowEISXYChart"/>
+        <Control id="MeasureShowEISXYChart2"/>
+        <Control id="Measure_L_Time_Chart"/>
+      </toolbar>
+			<toolbar>
+				<Control id="ChartGroupbuttonAnalysis" chartMenu="Elecmenu_chart.xml" type="Chart"/>
+			</toolbar>
+		</menu>
+	</Module>
+	<!--分析-->
+	<Module type ="AnalysisModule" id ="AnalysisModuleAnalysis">
+    <!--通道-->
+    <menu id ="ChannelModuleAnalysis" analysis ="1">
+      <toolbar>
+        <Control id="EditChannelFunc"/>
+      </toolbar>
+    </menu>
+		<menu id ="AnalysisModuleAnalysis" analysis ="1" Default="1">
+			<toolbar>
+        <Control id="AnalysisOpenPrjFunc"/>
+				<Control id="AnalysisExportTestFunc"/>
+        <Control id="AnalysisEISDataExport"/>
+			</toolbar>
+			<!--<toolbar>
+				<Control id="AnalysisHandCalFunc"/>
+				<Control id="AnalysisAutoCalFunc"/>
+			</toolbar>-->
+			<toolbar>
+				<Control id="DelAllChatFunc"/>
+				<Control id="DelChatFunc"/>
+				<Control id="ChatHorizFunc"/>
+				<Control id="ChatVertFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="MultiScreenFunc"/>
+				<Control id="MultiScreenLayOutMgrFunc"/>
+			</toolbar>
+			<toolbar>
+        <Control id="AnalysisShowOpenCircuitTableChart"/>
+        <Control id="AnalysisShowEISTableChart"/>
+        <Control id="AnalysisShowEISXYChart"/>
+        <Control id="AnalysisShowEISXYChart2"/>
+        <Control id="Analysis_L_Time_Chart"/>
+      </toolbar>
+			<toolbar>
+				<Control id="ChartGroupbuttonAnalysis" chartMenu="Elecmenu_chart.xml" type="Chart"/>
+			</toolbar>
+		</menu>
+		<!--输出-->
+		<menu id ="OutputModuleAnalysis" analysis="1">
+			<toolbar>
+				<Control id="ExcelOutputModuleAnalysis" UserControl ="1"/>
+				<Control id="TxtOutputModuleAnalysis" UserControl ="1"/>
+        <Control id="ZViewOutputModuleAnalysis" UserControl ="1"/>
+      </toolbar>
+			<toolbar>
+				<Control id="OutOutputFunc"/>
+			</toolbar>
+		</menu>
+  </Module>
+
+	<!--5859A校准-->
+	<!--<Module type ="AMPCalibrationModule">
+	</Module>-->
+
+	<!--切换定义-->
+	<Switch>
+		<SwitchItem id="SwitchMeasurePath" path="MeasureModule|MeasureModuleAnalysis"></SwitchItem>
+		<SwitchItem id="SwitchAnalysisPath" path="AnalysisModule|AnalysisModuleAnalysis"></SwitchItem>
+		<SwitchItem id="SwitchChnAnalogPath" path="MeasureModule|ChnSetupModuleAnalysis|AnalogParamModuleAnalysis"></SwitchItem>
+	</Switch>
+</DHTest>

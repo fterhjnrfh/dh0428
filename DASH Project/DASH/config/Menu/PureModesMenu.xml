@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DHTest>
+  <!--工程管理-->
+  <Module type ="ProjectModule" id ="ProjectModuleAnalysis" Default="1">
+    <menu id ="ProjectModuleAnalysis" analysis="1">
+      <toolbar>
+        <Control id="NewPrjFunc" switch="SpiritModule"/>
+      </toolbar>
+      <toolbar>
+        <Control id="OpenPrjFunc" switch="SpiritModule"/>
+        <Control id="RenamePrjFunc"/>
+        <Control id="DelPrjFunc"/>
+      </toolbar>
+    </menu>
+  </Module>
+
+  <!--激励方案-->
+  <Module type ="SpiritModule">
+  </Module>
+
+  <!--通道设置-->
+  <Module type ="ChnSetupModule" id ="ChnSetupModuleAnalysis">
+    <menu id ="ChnSetupModuleAnalysis" analysis ="0">
+      <toolbar>
+        <Control id="SaveParamFunc"/>
+        <Control id="SaveToParamFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="AnalogParamModuleAnalysis" UserControl ="1"/>
+      </toolbar>
+    </menu>
+  </Module>
+
+  <!--测量-->
+  <Module type ="MeasureModule" id ="MeasureModuleAnalysis">
+    <menu id ="MeasureModuleAnalysis" analysis ="0">
+      <toolbar>
+        <Control id="MeasureStoreFunc"/>
+        <Control id="MeasurePauseFunc"/>
+        <Control id="MeasureRebackDataFunc"/>
+        <Control id="MeasureContinueFunc"/>
+        <Control id="MeasureStopFunc"/>
+        <Control id="MeasureShiBoFunc"/>
+        <Control id="MeasureTrigFunc"/>
+        <Control id="MeasureFreezeFunc"/>
+        <Control id="MeasureBalanceZero"/>
+      </toolbar>
+      <toolbar>
+        <Control id="RunInfoFunc"/>
+      </toolbar>
+    </menu>
+    <menu id ="MeasureChatDesignModuleAnalysis" analysis ="0">
+      <toolbar>
+        <Control id="DelAllChatFunc"/>
+        <Control id="DelChatFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatHorizFunc"/>
+        <Control id="ChatVertFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="MultiScreenFunc"/>
+        <Control id="MultiScreenLayOutMgrFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatRecordModuleAnalysis"/>
+        <Control id="ChatXYRecordModuleAnalysis"/>
+        <Control id="ChatFFTModuleAnalysis"/>
+        <Control id="Chat2DModuleAnalysis"/>
+        <Control id="ChatModalModuleAnalysis"/>
+      </toolbar>
+    </menu>
+    <!--振型-->
+    <menu id ="TuneAnalysisModuleAnalysis" analysis ="1">
+      <toolbar>
+        <Control id="ShowModelFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ModalVibFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ModalVibControlFunc"/>
+      </toolbar>
+    </menu>
+  </Module>  
+
+  <!--参数识别-->
+  <Module type ="IdentifyModule">
+  </Module>
+
+  <!--振型显示-->
+  <Module type ="AnalysisModule" id ="AnalysisModuleAnalysis">
+    <menu id ="ModalVibModelModuleAnalysis" analysis ="1">
+      <toolbar>
+        <Control id="ShowModelFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ModalVibShapeCollateFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ModalVibFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ModalVibControlFunc"/>
+      </toolbar>
+    </menu>
+  </Module>
+  
+  <!--切换定义-->
+  <Switch>
+    <SwitchItem id="SwitchTuneAnalysisPath" path="MeasureModule|TuneAnalysisModuleAnalysis"></SwitchItem>
+    <SwitchItem id="SwitchUnacceptRecalForce" path="MeasureModule|MeasureModuleAnalysis"></SwitchItem>
+    <SwitchItem id="SwitchUnacceptReset" path="SpiritModule"></SwitchItem>
+    <SwitchItem id="SwitchAcceptResult" path="IdentifyModule"></SwitchItem>
+  </Switch>
+</DHTest>

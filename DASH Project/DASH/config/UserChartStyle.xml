@@ -1,0 +1,169 @@
+﻿<ChartStyle>
+	<DefaultChartStyle>
+		<ValueRefSpecColor Value="-256"/>
+		<ValueOriLineColor Value="-256"/>
+		<ClrContainerPanel Value="-5192482"/>
+		<ClrChartPanel Value="-9404272"/>
+		<FontTitle FontName="Microsoft YaHei" Size="10"/>
+		<ClrTitle Value="-926365496"/>
+		<ClrGrid Value="-926365496"/>
+		<LineStyleGrid Value="5"/>
+		<BoldGrid Value="1"/>
+		<FontXAxis FontName="Microsoft YaHei" Size="8"/>
+    <FontXUnit FontName="Microsoft YaHei" Size="8"/>
+    <ClrXAxis Value="-1"/>
+    <FontYAxis FontName="Microsoft YaHei" Size="8"/>
+    <FontYUnit FontName="Microsoft YaHei" Size="8"/>
+		<ClrYAxis Value="-1"/>
+		<FontChannel FontName="Microsoft YaHei" Size="10"/>
+		<ClrAxis Value="-16760704"/>
+		<LineStyleAxis Value="0"/>
+		<BoldAxis Value="1"/>
+		<ClrCoord Value="-926365496"/>
+		<BoldCoord Value="1"/>
+		<ClrInfoTitleBack Value="-8355712"/>
+		<FontInfoTitle FontName="Microsoft YaHei" Size="10"/>
+		<ClrInfoTitle Value="-16777216"/>
+		<ClrInfoBack Value="-2147483648"/>
+		<FontInfo FontName="Microsoft YaHei" Size="10"/>
+		<ClrInfo Value="-1"/>
+		<ClrCursor1 Value="-65536"/>
+		<LineStyleCursor1 Value="0"/>
+		<BoldCursor1 Value="1"/>
+		<ClrCursor2 Value="-16776961"/>
+		<LineStyleCursor2 Value="0"/>
+		<BoldCursor2 Value="1"/>
+		<ClrNote Value="-16777216"/>
+		<ClrNoteBack Value="-16760704"/>
+		<FontNote FontName="Microsoft YaHei" Size="10"/>
+    <SharpColor Value="-256"/>
+    <SharpFigure Value="1"/>
+    <SharpStyle Value="1"/>
+	</DefaultChartStyle>
+
+	<BlackChartStyle>
+		<ValueRefSpecColor Value="-256"/>
+		<ValueOriLineColor Value="-256"/>
+		<ClrContainerPanel Value="-14934486"/>
+		<ClrChartPanel Value="-16777216"/>
+		<FontTitle FontName="Microsoft YaHei" Size="10"/>
+		<ClrTitle Value="-922746881"/>
+		<ClrGrid Value="-931102592"/>
+		<LineStyleGrid Value="5"/>
+		<BoldGrid Value="1"/>
+		<FontXAxis FontName="Microsoft YaHei" Size="8"/>
+    <FontXUnit FontName="Microsoft YaHei" Size="8"/>
+		<ClrXAxis Value="-922746881"/>
+		<FontYAxis FontName="Microsoft YaHei" Size="8"/>
+    <FontYUnit FontName="Microsoft YaHei" Size="8"/>
+		<ClrYAxis Value="-922746881"/>
+		<FontChannel FontName="Microsoft YaHei" Size="10"/>
+		<ClrAxis Value="-1"/>
+		<LineStyleAxis Value="0"/>
+		<BoldAxis Value="1"/>
+		<ClrCoord Value="-926365496"/>
+		<BoldCoord Value="1"/>
+		<ClrInfoTitleBack Value="-8355712"/>
+		<FontInfoTitle FontName="Microsoft YaHei" Size="10"/>
+		<ClrInfoTitle Value="-16777216"/>
+		<ClrInfoBack Value="-2139062144"/>
+		<FontInfo FontName="Microsoft YaHei" Size="10"/>
+		<ClrInfo Value="-16777216"/>
+		<ClrCursor1 Value="-1"/>
+		<LineStyleCursor1 Value="0"/>
+		<BoldCursor1 Value="1"/>
+		<ClrCursor2 Value="-256"/>
+		<LineStyleCursor2 Value="0"/>
+		<BoldCursor2 Value="1"/>
+		<ClrNote Value="-16777216"/>
+		<ClrNoteBack Value="-1"/>
+		<FontNote FontName="Microsoft YaHei" Size="10"/>
+    <SharpColor Value="-256"/>
+    <SharpFigure Value="1"/>
+    <SharpStyle Value="1"/>
+	</BlackChartStyle>
+
+	<WhiteChartStyle>
+		<ValueRefSpecColor Value="-256"/>
+		<ValueOriLineColor Value="-256"/>
+		<ClrContainerPanel Value="-1"/>
+		<ClrChartPanel Value="-1"/>
+		<FontTitle FontName="Microsoft YaHei" Size="10"/>
+		<ClrTitle Value="-16777216"/>
+		<ClrGrid Value="-5526613"/>
+		<LineStyleGrid Value="5"/>
+		<BoldGrid Value="1"/>
+		<FontXAxis FontName="Microsoft YaHei" Size="8"/>
+    <FontXUnit FontName="Microsoft YaHei" Size="8"/>
+		<ClrXAxis Value="-939524096"/>
+		<FontYAxis FontName="Microsoft YaHei" Size="8"/>
+    <FontYUnit FontName="Microsoft YaHei" Size="8"/>
+		<ClrYAxis Value="-939524096"/>
+		<FontChannel FontName="Microsoft YaHei" Size="10"/>
+		<ClrAxis Value="-8947849"/>
+		<LineStyleAxis Value="0"/>
+		<BoldAxis Value="1"/>
+		<ClrCoord Value="-939524096"/>
+		<BoldCoord Value="1"/>
+		<ClrInfoTitleBack Value="218103808"/>
+		<FontInfoTitle FontName="Microsoft YaHei" Size="10"/>
+		<ClrInfoTitle Value="-16777216"/>
+		<ClrInfoBack Value="218103808"/>
+		<FontInfo FontName="Microsoft YaHei" Size="10"/>
+		<ClrInfo Value="-16777216"/>
+		<ClrCursor1 Value="-16777216"/>
+		<LineStyleCursor1 Value="0"/>
+		<BoldCursor1 Value="1"/>
+		<ClrCursor2 Value="-16777216"/>
+		<LineStyleCursor2 Value="0"/>
+		<BoldCursor2 Value="1"/>
+		<ClrNote Value="-16777216"/>
+		<ClrNoteBack Value="218103808"/>
+		<FontNote FontName="Microsoft YaHei" Size="10"/>
+    <SharpColor Value="-256"/>
+    <SharpFigure Value="1"/>
+    <SharpStyle Value="1"/>
+	</WhiteChartStyle>
+
+	<CustomChartStyle>
+		<ValueRefSpecColor Value="-256"/>
+		<ValueOriLineColor Value="-256"/>
+		<ClrContainerPanel Value="-5192482"/>
+		<ClrChartPanel Value="-9404272"/>
+		<FontTitle FontName="Microsoft YaHei" Size="10"/>
+		<ClrTitle Value="-926365496"/>
+		<ClrGrid Value="-926365496"/>
+		<LineStyleGrid Value="5"/>
+		<BoldGrid Value="1"/>
+		<FontXAxis FontName="Microsoft YaHei" Size="8"/>
+    <FontXUnit FontName="Microsoft YaHei" Size="8"/>
+		<ClrXAxis Value="-1"/>
+		<FontYAxis FontName="Microsoft YaHei" Size="8"/>
+    <FontYUnit FontName="Microsoft YaHei" Size="8"/>
+		<ClrYAxis Value="-1"/>
+		<FontChannel FontName="Microsoft YaHei" Size="10"/>
+		<ClrAxis Value="-16760704"/>
+		<LineStyleAxis Value="0"/>
+		<BoldAxis Value="1"/>
+		<ClrCoord Value="-926365496"/>
+		<BoldCoord Value="1"/>
+		<ClrInfoTitleBack Value="-8355712"/>
+		<FontInfoTitle FontName="Microsoft YaHei" Size="10"/>
+		<ClrInfoTitle Value="-16777216"/>
+		<ClrInfoBack Value="-2147483648"/>
+		<FontInfo FontName="Microsoft YaHei" Size="10"/>
+		<ClrInfo Value="-1"/>
+		<ClrCursor1 Value="-65536"/>
+		<LineStyleCursor1 Value="0"/>
+		<BoldCursor1 Value="1"/>
+		<ClrCursor2 Value="-16776961"/>
+		<LineStyleCursor2 Value="0"/>
+		<BoldCursor2 Value="1"/>
+		<ClrNote Value="-16777216"/>
+		<ClrNoteBack Value="-16760704"/>
+		<FontNote FontName="Microsoft YaHei" Size="10"/>
+    <SharpColor Value="-256"/>
+    <SharpFigure Value="1"/>
+    <SharpStyle Value="1"/>
+	</CustomChartStyle>
+</ChartStyle>

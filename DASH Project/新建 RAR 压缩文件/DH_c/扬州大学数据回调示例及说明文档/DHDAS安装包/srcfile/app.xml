@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DHTEST>
+	<AppSetting>
+		<item key="IsPluginMgm" value="1" /><!--是否启用插件管理-->
+		<item key="IsShowMA" value="1" /><!--是否启用实验模态-->
+		<item key="IsCalPhase" value="0" /><!--模态相位验证开头-->
+		<item key="ModelValidationParam" value="1,5,2,10" /><!--模态验证参数: 频率比(%),阻尼比(%),模态参与因子(%),最大阻尼比(%)-->
+		<item key="IsAutoMA" value="1"/>
+	</AppSetting>
+</DHTEST>

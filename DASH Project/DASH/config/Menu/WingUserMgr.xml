@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DHTest>
+  <!--双旋翼测试系统 用户与数据管理 WingUserMgr-->
+  <Module type ="ManageModule" id ="AccountAndFilesManage">
+    <menu id ="AccountAndFilesManage" analysis="1">
+      <toolbar>
+        <Control id="ExitFunc" />
+        <Control id="CheckInfoFunc"/>
+      </toolbar>
+    </menu>
+
+    <menu id ="LogManage" analysis="1">
+      <toolbar>
+        <Control id="ExitFunc"/>
+        <Control id="CheckInfoFunc"/>
+      </toolbar>
+    </menu>
+
+  </Module>
+</DHTest>

@@ -1,0 +1,1265 @@
+﻿<DH>
+	<ThreeDShowSignal id="11"/>
+	<ThreeDShowSignal id="12"/>
+	<ThreeDShowSignal id="39"/>
+	<ThreeDShowSignal id="51"/>
+	<ThreeDShowSignal id="110"/>
+	<ThreeDShowSignal id="111"/>
+	<!--阶次算法整周期FFT信号-->
+	<ThreeDShowSignal id="184"/>
+
+	<!--DX113D-->
+	<ThreeDEngineShowSignal id="11"/>
+	<ThreeDEngineShowSignal id="12"/>
+	<ThreeDEngineShowSignal id="39"/>
+	<ThreeDEngineShowSignal id="51"/>
+	<ThreeDEngineShowSignal id="110"/>
+	<ThreeDEngineShowSignal id="111"/>
+	<ThreeDEngineShowSignal id="176"/>
+	<ThreeDEngineShowSignal id="184"/>
+	<ThreeDSpeedShowSignal id="11"/>
+	<ThreeDSpeedShowSignal id="12"/>
+	<ThreeDSpeedShowSignal id="39"/>
+	<ThreeDSpeedShowSignal id="51"/>
+	<ThreeDSpeedShowSignal id="110"/>
+	<ThreeDSpeedShowSignal id="111"/>
+	<ThreeDSpeedShowSignal id="176"/>
+	<ThreeDSpeedShowSignal id="184"/>
+
+	<!--棒图-->
+	<BarShowSignal id="1"/>
+	<BarShowSignal id="2"/>
+	<BarShowSignal id="3"/>
+	<BarShowSignal id="5"/>
+	<BarShowSignal id="6"/>
+	<BarShowSignal id="7"/>
+	<BarShowSignal id="8"/>
+	<BarShowSignal id="9"/>
+	<BarShowSignal id="10"/>
+	<BarShowSignal id="16"/>
+	<BarShowSignal id="17"/>
+	<BarShowSignal id="18"/>
+	<BarShowSignal id="29"/>
+	<BarShowSignal id="31"/>
+	<BarShowSignal id="32"/>
+	<BarShowSignal id="33"/>
+	<BarShowSignal id="35"/>
+	<BarShowSignal id="37"/>
+	<BarShowSignal id="52"/>
+	<BarShowSignal id="53"/>
+	<BarShowSignal id="54"/>
+	<BarShowSignal id="55"/>
+	<BarShowSignal id="58"/>
+	<BarShowSignal id="59"/>
+	<BarShowSignal id="63"/>
+	<BarShowSignal id="65"/>
+	<BarShowSignal id="74"/>
+	<BarShowSignal id="82"/>
+	<BarShowSignal id="83"/>
+	<BarShowSignal id="84"/>
+	<BarShowSignal id="85"/>
+	<BarShowSignal id="96"/>
+	<BarShowSignal id="98"/>
+	<BarShowSignal id="99"/>
+	<BarShowSignal id="132"/>
+	<BarShowSignal id="133"/>
+	<BarShowSignal id="134"/>
+	<BarShowSignal id="150"/>
+	<BarShowSignal id="157"/>
+	<BarShowSignal id="174"/>
+	<BarShowSignal id="101"/>
+	<BarShowSignal id="181"/>
+	<BarShowSignal id="183"/>
+	<BarShowSignal id="202"/>
+	<BarShowSignal id="222"/>
+	<BarShowSignal id="259"/>
+	<BarShowSignal id="295"/>
+	<BarShowSignal id="297"/>
+	<BarShowSignal id="40"/>
+	<BarShowSignal id="330"/>
+
+	<!--阻值表-->
+	<ResistanceTableShowSignal id="1"/>
+	<ResistanceTableShowSignal id="2"/>
+	<ResistanceTableShowSignal id="3"/>
+	<ResistanceTableShowSignal id="5"/>
+	<ResistanceTableShowSignal id="6"/>
+	<ResistanceTableShowSignal id="7"/>
+	<ResistanceTableShowSignal id="8"/>
+
+	<!--趋势图-->
+	<TrendShowSignal id="1"/>
+	<TrendShowSignal id="2"/>
+	<TrendShowSignal id="3"/>
+	<TrendShowSignal id="5"/>
+	<TrendShowSignal id="6"/>
+	<TrendShowSignal id="7"/>
+	<TrendShowSignal id="8"/>
+
+	<!--柱状图-->
+	<HistogramShowSignal id="1"/>
+	<HistogramShowSignal id="2"/>
+	<HistogramShowSignal id="3"/>
+	<HistogramShowSignal id="5"/>
+	<HistogramShowSignal id="6"/>
+	<HistogramShowSignal id="7"/>
+	<HistogramShowSignal id="8"/>
+	<HistogramShowSignal id="9"/>
+	<HistogramShowSignal id="10"/>
+	<HistogramShowSignal id="16"/>
+	<HistogramShowSignal id="17"/>
+	<HistogramShowSignal id="18"/>
+	<HistogramShowSignal id="29"/>
+	<HistogramShowSignal id="31"/>
+	<HistogramShowSignal id="32"/>
+	<HistogramShowSignal id="33"/>
+	<HistogramShowSignal id="35"/>
+	<HistogramShowSignal id="37"/>
+	<HistogramShowSignal id="52"/>
+	<HistogramShowSignal id="53"/>
+	<HistogramShowSignal id="54"/>
+	<HistogramShowSignal id="55"/>
+	<HistogramShowSignal id="58"/>
+	<HistogramShowSignal id="59"/>
+	<HistogramShowSignal id="63"/>
+	<HistogramShowSignal id="65"/>
+	<HistogramShowSignal id="74"/>
+	<HistogramShowSignal id="82"/>
+	<HistogramShowSignal id="83"/>
+	<HistogramShowSignal id="84"/>
+	<HistogramShowSignal id="85"/>
+	<HistogramShowSignal id="96"/>
+	<HistogramShowSignal id="98"/>
+	<HistogramShowSignal id="99"/>
+	<HistogramShowSignal id="132"/>
+	<HistogramShowSignal id="133"/>
+	<HistogramShowSignal id="134"/>
+	<HistogramShowSignal id="150"/>
+	<HistogramShowSignal id="157"/>
+	<HistogramShowSignal id="174"/>
+	<HistogramShowSignal id="101"/>
+	<HistogramShowSignal id="181"/>
+	<HistogramShowSignal id="183"/>
+	<HistogramShowSignal id="202"/>
+	<HistogramShowSignal id="222"/>
+	<HistogramShowSignal id="259"/>
+	<HistogramShowSignal id="295"/>
+	<HistogramShowSignal id="297"/>
+	<HistogramShowSignal id="40"/>
+	<HistogramShowSignal id="330"/>
+
+	<TwoDShowSignal id="11"/>
+	<TwoDShowSignal id="12"/>
+	<TwoDShowSignal id="14"/>
+	<TwoDShowSignal id="100"/>
+	<TwoDShowSignal id="15"/>
+	<TwoDShowSignal id="20"/>
+	<TwoDShowSignal id="21"/>
+	<TwoDShowSignal id="22"/>
+	<TwoDShowSignal id="23"/>
+	<TwoDShowSignal id="24"/>
+	<TwoDShowSignal id="25"/>
+	<TwoDShowSignal id="26"/>
+	<TwoDShowSignal id="27"/>
+	<TwoDShowSignal id="28"/>
+	<TwoDShowSignal id="34"/>
+	<TwoDShowSignal id="38"/>
+	<TwoDShowSignal id="39"/>
+	<TwoDShowSignal id="40"/>
+	<TwoDShowSignal id="45"/>
+	<TwoDShowSignal id="46"/>
+	<TwoDShowSignal id="47"/>
+	<TwoDShowSignal id="48"/>
+	<TwoDShowSignal id="49"/>
+	<TwoDShowSignal id="104"/>
+	<TwoDShowSignal id="105"/>
+	<TwoDShowSignal id="2"/>
+	<!--雨流变程信号-->
+	<TwoDShowSignal id="60"/>
+	<!--雨流均值信号-->
+	<TwoDShowSignal id="61"/>
+	<TwoDShowSignal id="62"/>
+	<!--自功率-->
+	<TwoDShowSignal id="75"/>
+	<TwoDShowSignal id="76"/>
+	<TwoDShowSignal id="131"/>
+	<!--声功率倍频程 112-->
+	<TwoDShowSignal id="112"/>
+	<!--背景噪声K1 - 113-->
+	<TwoDShowSignal id="113"/>
+	<!--环境声场修正值K2 - 114-->
+	<TwoDShowSignal id="114"/>
+	<TwoDShowSignal id="115"/>
+	<TwoDShowSignal id="135"/>
+	<!--应力环-->
+	<TwoDShowSignal id="139"/>
+	<!--状态线-->
+	<TwoDShowSignal id="142"/>
+	<!--PeakValue FFT-->
+	<TwoDShowSignal id="145"/>
+	<!--扫频-->
+	<TwoDShowSignal id="151"/>
+	<TwoDShowSignal id="152"/>
+	<TwoDShowSignal id="153"/>
+	<TwoDShowSignal id="154"/>
+	<TwoDShowSignal id="155"/>
+	<TwoDShowSignal id="156"/>
+	<!--吸声系数-->
+	<TwoDShowSignal id="159"/>
+	<TwoDShowSignal id="160"/>
+	<TwoDShowSignal id="161"/>
+	<TwoDShowSignal id="162"/>
+	<TwoDShowSignal id="163"/>
+	<!--汽车平顺性-->
+	<TwoDShowSignal id="164"/>
+	<!--包络分析-->
+	<TwoDShowSignal id="168"/>
+	<TwoDShowSignal id="169"/>
+	<!--频域积分-->
+	<TwoDShowSignal id="172"/>
+	<!--AE存储设置-->
+	<TwoDShowSignal id="173"/>
+	<!--ZoomFFT-->
+	<TwoDShowSignal id="176"/>
+	<!--阶次算法整周期FFT信号-->
+	<TwoDShowSignal id="184"/>
+	<!--频域微分-->
+	<TwoDShowSignal id="192"/>
+	<TwoDShowSignal id="205"/>
+	<TwoDShowSignal id="206"/>
+	<TwoDShowSignal id="208"/>
+	<TwoDShowSignal id="209"/>
+	<TwoDShowSignal id="227"/>
+	<TwoDShowSignal id="231"/>
+	<TwoDShowSignal id="340"/>
+	<!--人机环测试振动-->
+	<TwoDShowSignal id="236"/>
+	<TwoDShowSignal id="237"/>
+	<TwoDShowSignal id="255"/>
+	<TwoDShowSignal id="276"/>
+	<TwoDShowSignal id="287"/>
+	<TwoDShowSignal id="288"/>
+	<TwoDShowSignal id="291"/>
+	<TwoDShowSignal id="318"/>
+	<TwoDShowSignal id="319"/>
+	<TwoDShowSignal id="320"/>
+	<TwoDShowSignal id="334"/>
+	<TwoDShowSignal id="341"/>
+	<TwoDShowSignal id="355"/>
+	<TwoDShowSignal id="357"/>
+	<TwoDShowSignal id="373"/>
+	<TwoDShowSignal id="380"/>
+	<TwoDShowSignal id="382"/>
+	<TwoDShowSignal id="383"/>
+
+	<FFTShowSignal id="1"/>
+	<FFTShowSignal id="2"/>
+	<FFTShowSignal id="3"/>
+	<FFTShowSignal id="5"/>
+	<FFTShowSignal id="6"/>
+	<FFTShowSignal id="7"/>
+	<FFTShowSignal id="8"/>
+	<FFTShowSignal id="9"/>
+	<FFTShowSignal id="10"/>
+	<FFTShowSignal id="63"/>
+	<FFTShowSignal id="65"/>
+	<FFTShowSignal id="74"/>
+	<FFTShowSignal id="96"/>
+	<FFTShowSignal id="132"/>
+	<FFTShowSignal id="183"/>
+	<FFTShowSignal id="201"/>
+	<FFTShowSignal id="222"/>
+	<FFTShowSignal id="330"/>
+
+	<FFTStatShowSignal id="1"/>
+	<FFTStatShowSignal id="2"/>
+	<FFTStatShowSignal id="3"/>
+	<FFTStatShowSignal id="5"/>
+	<FFTStatShowSignal id="6"/>
+	<FFTStatShowSignal id="7"/>
+	<FFTStatShowSignal id="8"/>
+	<FFTStatShowSignal id="9"/>
+	<FFTStatShowSignal id="10"/>
+	<FFTStatShowSignal id="63"/>
+	<FFTStatShowSignal id="65"/>
+	<FFTStatShowSignal id="74"/>
+	<FFTStatShowSignal id="96"/>
+	<FFTStatShowSignal id="132"/>
+	<FFTStatShowSignal id="183"/>
+	<FFTStatShowSignal id="201"/>
+	<FFTStatShowSignal id="222"/>
+	<FFTStatShowSignal id="330"/>
+
+	<!--此处为新FFT视图信号-->
+	<FFTAlgorithmShowSignal id="1"/>
+	<FFTAlgorithmShowSignal id="2"/>
+	<FFTAlgorithmShowSignal id="3"/>
+	<FFTAlgorithmShowSignal id="5"/>
+	<FFTAlgorithmShowSignal id="6"/>
+	<FFTAlgorithmShowSignal id="7"/>
+	<FFTAlgorithmShowSignal id="8"/>
+	<FFTAlgorithmShowSignal id="9"/>
+	<FFTAlgorithmShowSignal id="10"/>
+	<FFTAlgorithmShowSignal id="63"/>
+	<FFTAlgorithmShowSignal id="65"/>
+	<FFTAlgorithmShowSignal id="74"/>
+	<FFTAlgorithmShowSignal id="96"/>
+	<FFTAlgorithmShowSignal id="132"/>
+	<FFTAlgorithmShowSignal id="183"/>
+	<FFTAlgorithmShowSignal id="201"/>
+	<FFTAlgorithmShowSignal id="222"/>
+	<FFTAlgorithmShowSignal id="330"/>
+
+	<OctaveShowSignal id="1"/>
+	<OctaveShowSignal id="2"/>
+	<OctaveShowSignal id="3"/>
+	<OctaveShowSignal id="5"/>
+	<OctaveShowSignal id="6"/>
+	<OctaveShowSignal id="7"/>
+	<OctaveShowSignal id="8"/>
+	<OctaveShowSignal id="9"/>
+	<OctaveShowSignal id="10"/>
+	<OctaveShowSignal id="63"/>
+	<OctaveShowSignal id="65"/>
+	<OctaveShowSignal id="74"/>
+	<OctaveShowSignal id="96"/>
+	<OctaveShowSignal id="132"/>
+	<OctaveShowSignal id="183"/>
+	<OctaveShowSignal id="222"/>
+	<OctaveShowSignal id="330"/>
+
+	<!--此处为新倍频程视图信号-->
+	<OctaveAlgorithmShowSignal id="1"/>
+	<OctaveAlgorithmShowSignal id="2"/>
+	<OctaveAlgorithmShowSignal id="3"/>
+	<OctaveAlgorithmShowSignal id="5"/>
+	<OctaveAlgorithmShowSignal id="6"/>
+	<OctaveAlgorithmShowSignal id="7"/>
+	<OctaveAlgorithmShowSignal id="8"/>
+	<OctaveAlgorithmShowSignal id="9"/>
+	<OctaveAlgorithmShowSignal id="10"/>
+	<OctaveAlgorithmShowSignal id="63"/>
+	<OctaveAlgorithmShowSignal id="65"/>
+	<OctaveAlgorithmShowSignal id="74"/>
+	<OctaveAlgorithmShowSignal id="96"/>
+	<OctaveAlgorithmShowSignal id="132"/>
+	<OctaveAlgorithmShowSignal id="183"/>
+	<OctaveAlgorithmShowSignal id="222"/>
+	<OctaveAlgorithmShowSignal id="330"/>
+
+	<RecorderShowSignal id="1"/>
+	<RecorderShowSignal id="2"/>
+	<RecorderShowSignal id="3"/>
+	<RecorderShowSignal id="5"/>
+	<RecorderShowSignal id="6"/>
+	<RecorderShowSignal id="7"/>
+	<RecorderShowSignal id="8"/>
+	<RecorderShowSignal id="9"/>
+	<RecorderShowSignal id="10"/>
+	<RecorderShowSignal id="16"/>
+	<RecorderShowSignal id="17"/>
+	<RecorderShowSignal id="18"/>
+	<RecorderShowSignal id="31"/>
+	<RecorderShowSignal id="32"/>
+	<RecorderShowSignal id="33"/>
+	<RecorderShowSignal id="40"/>
+	<RecorderShowSignal id="50"/>
+	<RecorderShowSignal id="52"/>
+	<RecorderShowSignal id="53"/>
+	<RecorderShowSignal id="54"/>
+	<RecorderShowSignal id="55"/>
+	<RecorderShowSignal id="58"/>
+	<RecorderShowSignal id="63"/>
+	<RecorderShowSignal id="64"/>
+	<RecorderShowSignal id="65"/>
+	<RecorderShowSignal id="74"/>
+	<RecorderShowSignal id="82"/>
+	<RecorderShowSignal id="83"/>
+	<RecorderShowSignal id="84"/>
+	<RecorderShowSignal id="85"/>
+	<RecorderShowSignal id="96"/>
+	<RecorderShowSignal id="98"/>
+	<RecorderShowSignal id="99"/>
+	<RecorderShowSignal id="101"/>
+	<RecorderShowSignal id="102"/>
+	<RecorderShowSignal id="103"/>
+	<RecorderShowSignal id="108"/>
+	<RecorderShowSignal id="109"/>
+	<RecorderShowSignal id="116"/>
+	<RecorderShowSignal id="132"/>
+	<RecorderShowSignal id="133"/>
+	<RecorderShowSignal id="134"/>
+	<RecorderShowSignal id="136"/>
+	<RecorderShowSignal id="137"/>
+	<RecorderShowSignal id="143"/>
+	<RecorderShowSignal id="144"/>
+	<RecorderShowSignal id="146"/>
+	<RecorderShowSignal id="147"/>
+	<RecorderShowSignal id="150"/>
+	<RecorderShowSignal id="157"/>
+	<RecorderShowSignal id="174"/>
+	<RecorderShowSignal id="356"/>
+	<!--平滑滤波信号-->
+	<RecorderShowSignal id="175"/>
+	<RecorderShowSignal id="177"/>
+	<RecorderShowSignal id="178"/>
+	<RecorderShowSignal id="180"/>
+	<RecorderShowSignal id="181"/>
+	<RecorderShowSignal id="182"/>
+	<!--扭振角度（暂时不作显示）-->
+	<RecorderShowSignal id="183"/>
+	<!--计数器轴功率信号-->
+	<RecorderShowSignal id="185"/>
+	<RecorderShowSignal id="186"/>
+	<!--应变数据处理-->
+	<RecorderShowSignal id="187"/>
+	<!--频点消除-->
+	<RecorderShowSignal id="201"/>
+	<!--倍频程统计信号-->
+	<RecorderShowSignal id="202"/>
+	<RecorderShowSignal id="203"/>
+	<!--拆补信号-->
+	<RecorderShowSignal id="204"/>
+	<RecorderShowSignal id="210"/>
+	<RecorderShowSignal id="211"/>
+	<RecorderShowSignal id="212"/>
+	<RecorderShowSignal id="213"/>
+	<RecorderShowSignal id="215"/>
+	<RecorderShowSignal id="218"/>
+	<RecorderShowSignal id="219"/>
+	<RecorderShowSignal id="220"/>
+	<RecorderShowSignal id="221"/>
+	<RecorderShowSignal id="222"/>
+	<RecorderShowSignal id="225"/>
+	<RecorderShowSignal id="226"/>
+	<RecorderShowSignal id="229"/>
+	<RecorderShowSignal id="232"/>
+	<RecorderShowSignal id="233"/>
+	<RecorderShowSignal id="234"/>
+	<RecorderShowSignal id="235"/>
+	<RecorderShowSignal id="238"/>
+	<!--泰州计量院风速校准-->
+	<RecorderShowSignal id="239"/>
+	<!--振动评估值算法-->
+	<RecorderShowSignal id="240"/>
+	<!--横向比-->
+	<RecorderShowSignal id="241"/>
+	<!--小波降噪-->
+	<RecorderShowSignal id="243"/>
+	<RecorderShowSignal id="242"/>
+	<RecorderShowSignal id="244"/>
+	<RecorderShowSignal id="245"/>
+	<RecorderShowSignal id="249"/>
+	<RecorderShowSignal id="253"/>
+	<RecorderShowSignal id="256"/>
+	<RecorderShowSignal id="258"/>
+	<RecorderShowSignal id="259"/>
+	<RecorderShowSignal id="260"/>
+	<RecorderShowSignal id="261"/>
+	<RecorderShowSignal id="262"/>
+	<RecorderShowSignal id="263"/>
+	<RecorderShowSignal id="265"/>
+	<RecorderShowSignal id="266"/>
+	<RecorderShowSignal id="267"/>
+	<RecorderShowSignal id="268"/>
+	<RecorderShowSignal id="269"/>
+	<RecorderShowSignal id="270"/>
+	<RecorderShowSignal id="271"/>
+	<RecorderShowSignal id="272"/>
+	<RecorderShowSignal id="275"/>
+	<RecorderShowSignal id="277"/>
+	<RecorderShowSignal id="278"/>
+	<RecorderShowSignal id="279"/>
+	<RecorderShowSignal id="280"/>
+	<RecorderShowSignal id="283"/>
+	<RecorderShowSignal id="285"/>
+	<RecorderShowSignal id="286"/>
+	<RecorderShowSignal id="289"/>
+	<RecorderShowSignal id="290"/>
+	<RecorderShowSignal id="292"/>
+	<RecorderShowSignal id="293"/>
+	<RecorderShowSignal id="294"/>
+	<RecorderShowSignal id="295"/>
+	<RecorderShowSignal id="296"/>
+	<RecorderShowSignal id="297"/>
+	<RecorderShowSignal id="298"/>
+	<RecorderShowSignal id="299"/>
+	<RecorderShowSignal id="303"/>
+	<RecorderShowSignal id="304"/>
+	<RecorderShowSignal id="305"/>
+	<RecorderShowSignal id="306"/>
+	<RecorderShowSignal id="307"/>
+	<RecorderShowSignal id="308"/>
+	<RecorderShowSignal id="309"/>
+	<RecorderShowSignal id="310"/>
+	<RecorderShowSignal id="311"/>
+	<RecorderShowSignal id="312"/>
+	<RecorderShowSignal id="313"/>
+	<RecorderShowSignal id="314"/>
+	<RecorderShowSignal id="315"/>
+	<RecorderShowSignal id="194"/>
+	<RecorderShowSignal id="317"/>
+	<RecorderShowSignal id="320"/>
+	<RecorderShowSignal id="321"/>
+	<RecorderShowSignal id="322"/>
+	<RecorderShowSignal id="323"/>
+	<RecorderShowSignal id="324"/>
+	<RecorderShowSignal id="329"/>
+	<RecorderShowSignal id="330"/>
+	<RecorderShowSignal id="331"/>
+	<RecorderShowSignal id="332"/>
+	<RecorderShowSignal id="333"/>
+	<RecorderShowSignal id="335"/>
+	<RecorderShowSignal id="337"/>
+	<RecorderShowSignal id="338"/>
+	<RecorderShowSignal id="342"/>
+	<RecorderShowSignal id="344"/>
+	<RecorderShowSignal id="346"/>
+	<RecorderShowSignal id="348"/>
+	<RecorderShowSignal id="349"/>
+	<RecorderShowSignal id="350"/>
+	<RecorderShowSignal id="354"/>
+	<RecorderShowSignal id="359"/>
+	<RecorderShowSignal id="360"/>
+	<RecorderShowSignal id="361"/>
+	<RecorderShowSignal id="362"/>
+	<RecorderShowSignal id="364"/>
+	<RecorderShowSignal id="365"/>
+	<RecorderShowSignal id="366"/>
+	<RecorderShowSignal id="367"/>
+	<RecorderShowSignal id="368"/>
+	<RecorderShowSignal id="369"/>
+	<RecorderShowSignal id="372"/>
+	<RecorderShowSignal id="375"/>
+	<RecorderShowSignal id="376"/>
+	<RecorderShowSignal id="377"/>
+	<RecorderShowSignal id="378"/>
+	<RecorderShowSignal id="379"/>
+
+	<!--示波图-->
+	<OscilloscopeShowSignal id="1"/>
+	<OscilloscopeShowSignal id="2"/>
+	<OscilloscopeShowSignal id="3"/>
+	<OscilloscopeShowSignal id="5"/>
+	<OscilloscopeShowSignal id="6"/>
+	<OscilloscopeShowSignal id="7"/>
+	<OscilloscopeShowSignal id="8"/>
+	<OscilloscopeShowSignal id="9"/>
+	<OscilloscopeShowSignal id="10"/>
+	<OscilloscopeShowSignal id="16"/>
+	<OscilloscopeShowSignal id="17"/>
+	<OscilloscopeShowSignal id="18"/>
+	<OscilloscopeShowSignal id="31"/>
+	<OscilloscopeShowSignal id="32"/>
+	<OscilloscopeShowSignal id="33"/>
+	<OscilloscopeShowSignal id="52"/>
+	<OscilloscopeShowSignal id="53"/>
+	<OscilloscopeShowSignal id="54"/>
+	<OscilloscopeShowSignal id="55"/>
+	<OscilloscopeShowSignal id="58"/>
+	<OscilloscopeShowSignal id="63"/>
+	<OscilloscopeShowSignal id="64"/>
+	<OscilloscopeShowSignal id="65"/>
+	<OscilloscopeShowSignal id="74"/>
+	<OscilloscopeShowSignal id="96"/>
+	<OscilloscopeShowSignal id="132"/>
+	<OscilloscopeShowSignal id="222"/>
+	<OscilloscopeShowSignal id="330"/>
+
+	<XYRecorderShowSignal id="1"/>
+	<XYRecorderShowSignal id="2"/>
+	<XYRecorderShowSignal id="3"/>
+	<XYRecorderShowSignal id="5"/>
+	<XYRecorderShowSignal id="6"/>
+	<XYRecorderShowSignal id="7"/>
+	<XYRecorderShowSignal id="9"/>
+	<XYRecorderShowSignal id="17"/>
+	<XYRecorderShowSignal id="18"/>
+	<XYRecorderShowSignal id="25"/>
+	<XYRecorderShowSignal id="26"/>
+	<XYRecorderShowSignal id="33"/>
+	<XYRecorderShowSignal id="38"/>
+	<XYRecorderShowSignal id="53"/>
+	<XYRecorderShowSignal id="54"/>
+	<XYRecorderShowSignal id="63"/>
+	<XYRecorderShowSignal id="65"/>
+	<XYRecorderShowSignal id="74"/>
+	<XYRecorderShowSignal id="96"/>
+	<XYRecorderShowSignal id="132"/>
+	<XYRecorderShowSignal id="157"/>
+	<XYRecorderShowSignal id="183"/>
+	<XYRecorderShowSignal id="211"/>
+	<XYRecorderShowSignal id="212"/>
+	<XYRecorderShowSignal id="174"/>
+	<XYRecorderShowSignal id="82"/>
+	<XYRecorderShowSignal id="83"/>
+	<XYRecorderShowSignal id="84"/>
+	<XYRecorderShowSignal id="222"/>
+	<XYRecorderShowSignal id="225"/>
+	<XYRecorderShowSignal id="226"/>
+	<XYRecorderShowSignal id="274"/>
+	<XYRecorderShowSignal id="213"/>
+	<XYRecorderShowSignal id="278"/>
+	<XYRecorderShowSignal id="298"/>
+	<XYRecorderShowSignal id="295"/>
+	<XYRecorderShowSignal id="330"/>
+	<XYRecorderShowSignal id="357"/>
+	<XYRecorderShowSignal id="367"/>
+	<XYRecorderShowSignal id="372"/>
+
+	<XYPackageShowSignal id="1"/>
+	<XYPackageShowSignal id="17"/>
+	<XYPackageShowSignal id="53"/>
+	<XYPackageShowSignal id="54"/>
+
+	<!--冲击波形检测-->
+	<StockWaveShowSignal id="1"/>
+	<StockWaveShowSignal id="2"/>
+	<StockWaveShowSignal id="3"/>
+	<StockWaveShowSignal id="5"/>
+	<StockWaveShowSignal id="6"/>
+	<StockWaveShowSignal id="7"/>
+	<StockWaveShowSignal id="9"/>
+	<StockWaveShowSignal id="74"/>
+	<StockWaveShowSignal id="96"/>
+	<StockWaveShowSignal id="132"/>
+	<StockWaveShowSignal id="330"/>
+
+	<!--数字表-->
+	<DigitalShowSignal id="1"/>
+	<DigitalShowSignal id="2"/>
+	<DigitalShowSignal id="3"/>
+	<DigitalShowSignal id="5"/>
+	<DigitalShowSignal id="6"/>
+	<DigitalShowSignal id="7"/>
+	<DigitalShowSignal id="8"/>
+	<DigitalShowSignal id="9"/>
+	<DigitalShowSignal id="10"/>
+	<DigitalShowSignal id="16"/>
+	<DigitalShowSignal id="17"/>
+	<DigitalShowSignal id="18"/>
+	<DigitalShowSignal id="29"/>
+	<DigitalShowSignal id="31"/>
+	<DigitalShowSignal id="32"/>
+	<DigitalShowSignal id="33"/>
+	<DigitalShowSignal id="35"/>
+	<DigitalShowSignal id="37"/>
+	<DigitalShowSignal id="40"/>
+	<DigitalShowSignal id="52"/>
+	<DigitalShowSignal id="53"/>
+	<DigitalShowSignal id="54"/>
+	<DigitalShowSignal id="55"/>
+	<DigitalShowSignal id="58"/>
+	<DigitalShowSignal id="59"/>
+	<DigitalShowSignal id="63"/>
+	<DigitalShowSignal id="65"/>
+	<DigitalShowSignal id="74"/>
+	<DigitalShowSignal id="82"/>
+	<DigitalShowSignal id="83"/>
+	<DigitalShowSignal id="84"/>
+	<DigitalShowSignal id="85"/>
+	<DigitalShowSignal id="96"/>
+	<DigitalShowSignal id="98"/>
+	<DigitalShowSignal id="99"/>
+	<DigitalShowSignal id="132"/>
+	<DigitalShowSignal id="133"/>
+	<DigitalShowSignal id="134"/>
+	<DigitalShowSignal id="140"/>
+	<DigitalShowSignal id="141"/>
+	<DigitalShowSignal id="138"/>
+	<DigitalShowSignal id="150"/>
+	<DigitalShowSignal id="157"/>
+	<DigitalShowSignal id="158"/>
+	<DigitalShowSignal id="228"/>
+	<DigitalShowSignal id="40"/>
+	<!--汽车平顺性-->
+	<DigitalShowSignal id="165"/>
+	<DigitalShowSignal id="166"/>
+	<DigitalShowSignal id="167"/>
+	<DigitalShowSignal id="174"/>
+	<DigitalShowSignal id="101"/>
+	<!--铁科院定制-->
+	<DigitalShowSignal id="177"/>
+	<DigitalShowSignal id="178"/>
+	<DigitalShowSignal id="181"/>
+	<DigitalShowSignal id="183"/>
+	<!--计数器轴功率-->
+	<DigitalShowSignal id="185"/>
+	<DigitalShowSignal id="186"/>
+	<!--剪切波速测量-->
+	<DigitalShowSignal id="193"/>
+	<!--倍频程统计信号-->
+	<DigitalShowSignal id="202"/>
+	<DigitalShowSignal id="207"/>
+	<DigitalShowSignal id="211"/>
+	<DigitalShowSignal id="220"/>
+	<DigitalShowSignal id="222"/>
+	<DigitalShowSignal id="232"/>
+	<DigitalShowSignal id="233"/>
+	<DigitalShowSignal id="234"/>
+	<DigitalShowSignal id="235"/>
+	<DigitalShowSignal id="244"/>
+	<DigitalShowSignal id="246"/>
+	<DigitalShowSignal id="247"/>
+	<DigitalShowSignal id="253"/>
+	<DigitalShowSignal id="259"/>
+	<!--人机环测试-->
+	<DigitalShowSignal id="238"/>
+	<!--振动评估值算法-->
+	<DigitalShowSignal id="240"/>
+	<DigitalShowSignal id="251"/>
+	<DigitalShowSignal id="256"/>
+	<DigitalShowSignal id="245"/>
+	<DigitalShowSignal id="273"/>
+	<DigitalShowSignal id="279"/>
+	<DigitalShowSignal id="281"/>
+	<DigitalShowSignal id="282"/>
+	<DigitalShowSignal id="284"/>
+	<DigitalShowSignal id="289"/>
+	<DigitalShowSignal id="290"/>
+	<DigitalShowSignal id="295"/>
+	<DigitalShowSignal id="297"/>
+	<DigitalShowSignal id="305"/>
+	<DigitalShowSignal id="309"/>
+	<DigitalShowSignal id="317"/>
+	<DigitalShowSignal id="321"/>
+	<DigitalShowSignal id="322"/>
+	<DigitalShowSignal id="327"/>
+	<DigitalShowSignal id="329"/>
+	<DigitalShowSignal id="320"/>
+	<DigitalShowSignal id="330"/>
+	<DigitalShowSignal id="337"/>
+	<DigitalShowSignal id="343"/>
+	<DigitalShowSignal id="344"/>
+	<DigitalShowSignal id="346"/>
+	<DigitalShowSignal id="348"/>
+	<DigitalShowSignal id="349"/>
+	<DigitalShowSignal id="359"/>
+	<DigitalShowSignal id="361"/>
+	<DigitalShowSignal id="362"/>
+	<DigitalShowSignal id="363"/>
+	<DigitalShowSignal id="365"/>
+	<DigitalShowSignal id="367"/>
+	<DigitalShowSignal id="368"/>
+	<DigitalShowSignal id="378"/>
+	<DigitalShowSignal id="379"/>
+	<DigitalShowSignal id="381"/>
+
+	<!--贵阳所数字表-->
+	<DigitalTableShowSignal id="1"/>
+	<DigitalTableShowSignal id="2"/>
+	<DigitalTableShowSignal id="3"/>
+	<DigitalTableShowSignal id="5"/>
+	<DigitalTableShowSignal id="6"/>
+	<DigitalTableShowSignal id="7"/>
+	<DigitalTableShowSignal id="8"/>
+	<DigitalTableShowSignal id="9"/>
+	<DigitalTableShowSignal id="10"/>
+	<DigitalTableShowSignal id="16"/>
+	<DigitalTableShowSignal id="17"/>
+	<DigitalTableShowSignal id="18"/>
+	<DigitalTableShowSignal id="29"/>
+	<DigitalTableShowSignal id="31"/>
+	<DigitalTableShowSignal id="32"/>
+	<DigitalTableShowSignal id="33"/>
+	<DigitalTableShowSignal id="35"/>
+	<DigitalTableShowSignal id="37"/>
+	<DigitalTableShowSignal id="40"/>
+	<DigitalTableShowSignal id="52"/>
+	<DigitalTableShowSignal id="53"/>
+	<DigitalTableShowSignal id="54"/>
+	<DigitalTableShowSignal id="58"/>
+	<DigitalTableShowSignal id="59"/>
+	<DigitalTableShowSignal id="63"/>
+	<DigitalTableShowSignal id="65"/>
+	<DigitalTableShowSignal id="74"/>
+	<DigitalTableShowSignal id="82"/>
+	<DigitalTableShowSignal id="83"/>
+	<DigitalTableShowSignal id="84"/>
+	<DigitalTableShowSignal id="85"/>
+	<DigitalTableShowSignal id="96"/>
+	<DigitalTableShowSignal id="98"/>
+	<DigitalTableShowSignal id="99"/>
+	<DigitalTableShowSignal id="132"/>
+	<DigitalTableShowSignal id="133"/>
+	<DigitalTableShowSignal id="134"/>
+	<DigitalTableShowSignal id="140"/>
+	<DigitalTableShowSignal id="141"/>
+	<DigitalTableShowSignal id="138"/>
+	<DigitalTableShowSignal id="150"/>
+	<DigitalTableShowSignal id="157"/>
+	<DigitalTableShowSignal id="158"/>
+	<DigitalTableShowSignal id="228"/>
+	<DigitalTableShowSignal id="40"/>
+	<!--倍频程统计信号-->
+	<DigitalTableShowSignal id="202"/>
+	<DigitalTableShowSignal id="207"/>
+	<DigitalTableShowSignal id="211"/>
+	<DigitalTableShowSignal id="220"/>
+	<DigitalTableShowSignal id="222"/>
+	<DigitalTableShowSignal id="232"/>
+	<DigitalTableShowSignal id="233"/>
+	<DigitalTableShowSignal id="234"/>
+	<DigitalTableShowSignal id="235"/>
+	<DigitalTableShowSignal id="244"/>
+	<DigitalTableShowSignal id="247"/>
+	<DigitalTableShowSignal id="253"/>
+	<DigitalTableShowSignal id="259"/>
+
+	<!--仪表盘-->
+	<MeterShowSignal id="1"/>
+	<MeterShowSignal id="2"/>
+	<MeterShowSignal id="3"/>
+	<MeterShowSignal id="5"/>
+	<MeterShowSignal id="6"/>
+	<MeterShowSignal id="7"/>
+	<MeterShowSignal id="8"/>
+	<MeterShowSignal id="9"/>
+	<MeterShowSignal id="10"/>
+	<MeterShowSignal id="16"/>
+	<MeterShowSignal id="17"/>
+	<MeterShowSignal id="18"/>
+	<MeterShowSignal id="29"/>
+	<MeterShowSignal id="31"/>
+	<MeterShowSignal id="32"/>
+	<MeterShowSignal id="33"/>
+	<MeterShowSignal id="35"/>
+	<MeterShowSignal id="37"/>
+	<MeterShowSignal id="52"/>
+	<MeterShowSignal id="53"/>
+	<MeterShowSignal id="54"/>
+	<MeterShowSignal id="55"/>
+	<MeterShowSignal id="58"/>
+	<MeterShowSignal id="63"/>
+	<MeterShowSignal id="65"/>
+	<MeterShowSignal id="74"/>
+	<MeterShowSignal id="82"/>
+	<MeterShowSignal id="83"/>
+	<MeterShowSignal id="84"/>
+	<MeterShowSignal id="85"/>
+	<MeterShowSignal id="96"/>
+	<MeterShowSignal id="98"/>
+	<MeterShowSignal id="99"/>
+	<MeterShowSignal id="132"/>
+	<MeterShowSignal id="150"/>
+	<MeterShowSignal id="181"/>
+	<MeterShowSignal id="183"/>
+	<MeterShowSignal id="202"/>
+	<MeterShowSignal id="222"/>
+	<MeterShowSignal id="259"/>
+	<MeterShowSignal id="256"/>
+	<MeterShowSignal id="40"/>
+	<MeterShowSignal id="330"/>
+	<MeterShowSignal id="174"/>
+
+	<!--时域阻尼比-->
+	<TimeDumpShowSignal id="1"/>
+	<TimeDumpShowSignal id="2"/>
+	<TimeDumpShowSignal id="3"/>
+	<TimeDumpShowSignal id="5"/>
+	<TimeDumpShowSignal id="6"/>
+	<TimeDumpShowSignal id="7"/>
+	<TimeDumpShowSignal id="9"/>
+	<TimeDumpShowSignal id="16"/>
+	<TimeDumpShowSignal id="17"/>
+	<TimeDumpShowSignal id="18"/>
+	<TimeDumpShowSignal id="31"/>
+	<TimeDumpShowSignal id="32"/>
+	<TimeDumpShowSignal id="33"/>
+	<TimeDumpShowSignal id="52"/>
+	<TimeDumpShowSignal id="53"/>
+	<TimeDumpShowSignal id="54"/>
+	<TimeDumpShowSignal id="55"/>
+	<TimeDumpShowSignal id="74"/>
+	<TimeDumpShowSignal id="96"/>
+	<TimeDumpShowSignal id="132"/>
+	<TimeDumpShowSignal id="330"/>
+
+	<!--表格-->
+	<TableShowSignal id ="1"/>
+	<TableShowSignal id ="2"/>
+	<TableShowSignal id ="3"/>
+	<TableShowSignal id ="5"/>
+	<TableShowSignal id ="6"/>
+	<TableShowSignal id ="7"/>
+	<TableShowSignal id ="8"/>
+	<TableShowSignal id ="9"/>
+	<TableShowSignal id ="10"/>
+	<TableShowSignal id ="17"/>
+	<TableShowSignal id ="30"/>
+	<TableShowSignal id ="40"/>
+	<TableShowSignal id ="58"/>
+	<TableShowSignal id ="63"/>
+	<TableShowSignal id ="65"/>
+	<TableShowSignal id ="74"/>
+	<TableShowSignal id="82"/>
+	<TableShowSignal id="83"/>
+	<TableShowSignal id="84"/>
+	<TableShowSignal id ="96"/>
+	<TableShowSignal id ="132"/>
+	<TableShowSignal id="111"/>
+	<TableShowSignal id="143"/>
+	<TableShowSignal id="147"/>
+	<TableShowSignal id="150"/>
+	<TableShowSignal id="157"/>
+	<TableShowSignal id="175"/>
+	<TableShowSignal id="230"/>
+	<!--汽车平顺性-->
+	<TableShowSignal id="165"/>
+	<TableShowSignal id="166"/>
+	<TableShowSignal id="167"/>
+	<TableShowSignal id="183"/>
+	<!--剪切波速测量-->
+	<TableShowSignal id="193"/>
+	<!--倍频程统计信号-->
+	<TableShowSignal id="202"/>
+	<TableShowSignal id="222"/>
+	<!--电化学的交流阻抗信号和MottSchottky信号-->
+	<TableShowSignal id="225"/>
+	<TableShowSignal id="226"/>
+	<!--振动评估值算法-->
+	<TableShowSignal id="240"/>
+	<TableShowSignal id="256"/>
+	<TableShowSignal id="257"/>
+	<TableShowSignal id="264"/>
+	<TableShowSignal id="295"/>
+	<TableShowSignal id="296"/>
+	<TableShowSignal id="174"/>
+	<TableShowSignal id="330"/>
+	<TableShowSignal id ="32"/>
+
+	<OveloadShowSignal id="1" />
+	<!--极坐标-->
+	<PolarShowSignal id="40" />
+	<!--视频-->
+	<MediaShowSignal id="56" />
+	<!--空调检测-->
+	<DetectairconditionShowSignal id="1"/>
+	<DetectairconditionShowSignal id="9"/>
+	<!--液压阀测试-->
+	<HydrovalveShowSignal id="1" />
+	<HydrovalveShowSignal id="26" />
+
+	<CableProjectShowSignal id="12" />
+	<!--小波分析-->
+	<WaveletShowSignal id="1"/>
+	<WaveletShowSignal id="9"/>
+	<WaveletShowSignal id="330"/>
+
+	<!--霍普金森杆：时间曲线、积分曲线、微分曲线、滤波曲线、虚拟信号、应变花-->
+	<HopkinsonBarShowSignal id="1"/>
+	<HopkinsonBarShowSignal id="2"/>
+	<HopkinsonBarShowSignal id="3"/>
+	<HopkinsonBarShowSignal id="6"/>
+	<HopkinsonBarShowSignal id="7"/>
+	<HopkinsonBarShowSignal id="9"/>
+	<HopkinsonBarShowSignal id="96"/>
+	<HopkinsonBarShowSignal id="132"/>
+	<HopkinsonBarShowSignal id="330"/>
+	<!--音频-->
+	<AudioShowSignal id="57"/>
+
+	<GongliBiaoShowSignal id="18"/>
+	<GongliBiaoShowSignal id="33"/>
+	<!--运行平稳性表-->
+	<StableShowSignal id="70"/>
+	<!--散点图-->
+	<ScatterShowSignal id="70"/>
+	<!--阶次表格-->
+	<OrderShowSignal id="40"/>
+	<OrderTableShowSignal id="40"/>
+	<NewOrderTableShowSignal id="40"/>
+	<!--幅值频次统计表-->
+	<StatTableShowSignal id="1"/>
+	<!--划斜率-->
+	<SlopeShowSignal id="1"/>
+	<SlopeShowSignal id="53"/>
+	<SlopeShowSignal id="54"/>
+
+	<ExampleShowSignal id="1001"/>
+	<ExampleShowSignal id="1002"/>
+	<ExampleShowSignal id="1003"/>
+	<!--静载-->
+	<StaticShowSignal id="1"/>
+	<StaticShowSignal id="2"/>
+	<StaticShowSignal id="3"/>
+	<StaticShowSignal id="40"/>
+	<StaticShowSignal id="74"/>
+	<StaticShowSignal id="82"/>
+	<StaticShowSignal id="83"/>
+	<StaticShowSignal id="84"/>
+	<StaticShowSignal id="321"/>
+	<StaticShowSignal id="322"/>
+	<!--远景能源-->
+	<StaticStatusCycleShowSignal id="1"/>
+	<StaticStatusCycleShowSignal id="2"/>
+
+	<!--成飞静载-->
+	<ChengfeiStaticShowSignal id="1"/>
+	<ChengfeiStaticShowSignal id="74"/>
+	<!--上海交大静载-->
+	<StaticJiaoDaShowSignal id="1"/>
+	<StaticJiaoDaShowSignal id="40"/>
+	<StaticJiaoDaShowSignal id="74"/>
+	<StaticJiaoDaShowSignal id="82"/>
+	<StaticJiaoDaShowSignal id="83"/>
+	<StaticJiaoDaShowSignal id="84"/>
+	<StaticJiaoDaShowSignal id="321"/>
+	<StaticJiaoDaShowSignal id="322"/>
+	<!--试验台-->
+	<TrialShowSignal id="1"/>
+	<TrialShowSignal id="17"/>
+	<TrialShowSignal id="18"/>
+	<TrialShowSignal id="32"/>
+	<!--3D轴心轨迹-->
+	<PathTrack3DShowSignal id="38"/>
+	<!--扭振分析-->
+	<WrestShakeShowSignal id="1"/>
+
+	<!--声源定位-->
+	<Cloud3DShowSignal id="110"/>
+	<Cloud3DShowSignal id="111"/>
+
+	<!--设备状态图-->
+	<MachineStatusShowSignal id="1"/>
+	<MachineStatusShowSignal id="2"/>
+	<MachineStatusShowSignal id="3"/>
+	<MachineStatusShowSignal id="5"/>
+	<MachineStatusShowSignal id="6"/>
+	<MachineStatusShowSignal id="7"/>
+	<MachineStatusShowSignal id="8"/>
+	<MachineStatusShowSignal id="9"/>
+	<MachineStatusShowSignal id="10"/>
+	<MachineStatusShowSignal id="16"/>
+	<MachineStatusShowSignal id="17"/>
+	<MachineStatusShowSignal id="18"/>
+	<MachineStatusShowSignal id="29"/>
+	<MachineStatusShowSignal id="31"/>
+	<MachineStatusShowSignal id="32"/>
+	<MachineStatusShowSignal id="33"/>
+	<MachineStatusShowSignal id="35"/>
+	<MachineStatusShowSignal id="37"/>
+	<MachineStatusShowSignal id="52"/>
+	<MachineStatusShowSignal id="53"/>
+	<MachineStatusShowSignal id="54"/>
+	<MachineStatusShowSignal id="55"/>
+	<MachineStatusShowSignal id="58"/>
+	<MachineStatusShowSignal id="59"/>
+	<MachineStatusShowSignal id="63"/>
+	<MachineStatusShowSignal id="65"/>
+	<MachineStatusShowSignal id="74"/>
+	<MachineStatusShowSignal id="96"/>
+	<MachineStatusShowSignal id="98"/>
+	<MachineStatusShowSignal id="99"/>
+	<MachineStatusShowSignal id="132"/>
+	<MachineStatusShowSignal id="133"/>
+	<MachineStatusShowSignal id="134"/>
+	<MachineStatusShowSignal id="140"/>
+	<MachineStatusShowSignal id="141"/>
+	<MachineStatusShowSignal id="138"/>
+	<MachineStatusShowSignal id="150"/>
+	<MachineStatusShowSignal id="157"/>
+	<MachineStatusShowSignal id="158"/>
+	<MachineStatusShowSignal id="273"/>
+	<MachineStatusShowSignal id="330"/>
+
+	<!--多棒图-->
+	<MultiBarShowSignal id="1"/>
+
+	<!--模型-->
+	<ModelShowSignal id="1"/>
+
+	<!--Light-->
+	<LightShowSignal id="55"/>
+
+	<!--贵阳所指示灯-->
+	<IndicatorLightShowSignal id="55"/>
+	<IndicatorLightShowSignal id="74"/>
+
+	<!--手动控制DO功能-->
+	<CtlBtnShowSignal id="55"/>
+	<!--GPS轨迹图-->
+	<GpsRouteShowSignal id="33"/>
+	<!--<GpsRouteShowSignal id="174"/>-->
+
+	<!--坎贝尔图-->
+	<CampbellShowSignal id="39"/>
+
+	<!--静态表格-->
+	<StaticStatusShowSignal id="1"/>
+	<StaticStatusShowSignal id="3"/>
+
+	<!--频域阻尼比计算-->
+	<FreqDumpProjectShowSignal id="11" />
+	<FreqDumpProjectShowSignal id="12" />
+	<FreqDumpProjectShowSignal id="26" />
+
+	<!--频谱分析图-->
+	<FFTAnalysisShowSignal id="184" />
+	<NewFFTAnalysisShowSignal id="184" />
+	<NewFFTAnalysisShowSignal id="39" />
+	<!--极坐标分析图-->
+	<XYPolarShowSignal id="40" />
+	<!--极坐标分析图-->
+	<PolarAnalysisShowSignal id="40" />
+	<NewPolarAnalysisShowSignal id="40" />
+	<!--轴心位置-->
+	<NewAxesPositionShowSignal id="1" />
+
+	<!--振动变化趋势图-->
+	<VibratorTrendShowSignal id="40"/>
+	<VibratorTrendShowSignal id="213"/>
+
+	<!--轴心轨迹-->
+	<PathTrackShowSignal id="38"/>
+
+	<!--时域信号图-->
+	<TimeTerritoryShowSignal id="38"/>
+	<NewTimeTerritoryShowSignal id="38"/>
+	<!--波德图-->
+	<BorderShowSignal id="40"/>
+	<NewBorderShowSignal id="26"/>
+	<NewBorderShowSignal id="11"/>
+	<NewBorderShowSignal id="12"/>
+
+	<!--冲击波分析-->
+	<ShockAnalysisShowSignal id="1"/>
+
+	<!--Moog数据标定-->
+	<MoogPhotoShowSignal id="1"/>
+
+	<!--装甲车测试-->
+	<ArmoredCarTestShowSignal id="1"/>
+	<ArmoredCarTestShowSignal id="174"/>
+
+	<!-- 应变计系数 -->
+	<StrainGaugeTableShowSignal id="1"/>
+
+	<!--5925N旋转机械应用模块-->
+	<!--新的轴心轨迹-->
+	<NewPathTrackShowSignal id="38"/>
+	<!--振动变化趋势图-->
+	<NewVibratorTrendShowSignal id="40"/>
+	<NewVibratorTrendShowSignal id="213"/>
+
+	<NewThreeDShowSignal id="39"/>
+	<NewThreeDShowSignal id="184"/>
+
+	<NewCascadeShowSignal id="39"/>
+	<NewCascadeShowSignal id="184"/>
+
+	<!--人机环测试—噪声-->
+	<NoiseAnalysisShowSignal id="1"/>
+	<!--人机环测试—振动-->
+	<ShockShowTimeShowSignal id="236"/>
+	<ShockShowTimeShowSignal id="237"/>
+	<!--人机环测试—振动(舒适)-->
+	<ShockComfortShowSignal id="236"/>
+	<ShockComfortShowSignal id="237"/>
+	<!--人机环测试—振动(1/1)-->
+	<ShockOctaveShowSignal id="14"/>
+
+	<DataRecordTableShowSignal id="1"/>
+	<DataRecordTableShowSignal id="55"/>
+
+	<SweptPhaseShowSignal id="11"/>
+
+	<OffsetMeasureShowSignal id="1"/>
+
+	<OilEquipShowSignal id ="1"/>
+
+	<AutoFreqShowSignal id="1"/>
+	<AutoFreqShowSignal id="6"/>
+
+	<!--昌河飞机弯矩拟合-->
+	<CurvatureFittingShowSignal id="1"/>
+	<CurvatureFittingShowSignal id="2"/>
+
+	<!--623所静载-->
+	<DataDistributeShowSignal id="1"/>
+
+	<FuelOilFlowAnalysisSignal id="1"/>
+
+	<DistanceTimeShowSignal id="1"/>
+
+	<HospitalReportShowSignal id="1"/>
+	<HospitalReportShowSignal id="9"/>
+
+	<MTSTrigTableShowSignal id="1"/>
+
+	<ZMKGRecorderShowSignal id="1"/>
+	<ZMKGRecorderShowSignal id="74"/>
+
+	<BrokenLineShowSignal id="296"/>
+
+	<PIDCtrlTargetEditShowSignal id="301"/>
+	<PIDCtrlTargetEditShowSignal id="303"/>
+	<PIDCtrlTargetEditShowSignal id="326"/>
+
+	<TorsionalVibrationShowSignal id="267"/>
+
+	<CutMessageShowSignal id="1"/>
+
+	<!--7950 定制状态字视图-->
+	<EngineStatusShowSignal id="173"/>
+
+	<IOControlShowSignal id="55"/>
+	<IOControlEMOShowSignal id="55"/>
+	<InfiniteKnobShowSignal id="1"/>
+	<ActionCtrlTargetEditShowSignal id="55"/>
+
+	<EffluentControlShowSignal id="1"/>
+
+	<OscilloscopeChat id="1"/>
+
+	<PresetCommandShowSignal id="55"/>
+
+	<SPMShowSignal id="336"/>
+	<BinaryCANShowSignal id="32"/>
+
+	<TestShowSignal id="1"/>
+
+	<TJYAccShowSignal id="1"/>
+	<TJYAccShowSignal id="9"/>
+
+	<TJYConstraintShowSignal id="1"/>
+	<TJYConstraintShowSignal id="9"/>
+
+	<ControlCommandShowSignal id="1"/>
+
+	<CANDigitalShowSignal id="1"/>
+	<CANDigitalShowSignal id="32"/>
+	<EngineSimationShowSignal id="1"/>
+
+	<HFOrderShowSignal id="351"/>
+
+	<ScatterPlotShowSignal id="2"/>
+	<ATZFJDShowSignal id="374"/>
+
+	<FFTDigitalShowSignal id="1"/>
+	<FFTDigitalShowSignal id="2"/>
+	<FFTDigitalShowSignal id="3"/>
+	<FFTDigitalShowSignal id="5"/>
+	<FFTDigitalShowSignal id="6"/>
+	<FFTDigitalShowSignal id="7"/>
+	<FFTDigitalShowSignal id="8"/>
+	<FFTDigitalShowSignal id="9"/>
+	<FFTDigitalShowSignal id="10"/>
+	<FFTDigitalShowSignal id="63"/>
+	<FFTDigitalShowSignal id="65"/>
+	<FFTDigitalShowSignal id="74"/>
+	<FFTDigitalShowSignal id="96"/>
+	<FFTDigitalShowSignal id="132"/>
+	<FFTDigitalShowSignal id="183"/>
+	<FFTDigitalShowSignal id="201"/>
+	<FFTDigitalShowSignal id="222"/>
+	<FFTDigitalShowSignal id="330"/>
+
+	<SineAreaShowSignal id="1"/>
+
+	<PhaseDiffShowSignal id="1"/>
+	<MechanicalStatShowSignal id="1"/>
+
+	<GWAveCalShowSignal id="74"/>
+	<DataViewShowSignal id="0"/>
+</DH>

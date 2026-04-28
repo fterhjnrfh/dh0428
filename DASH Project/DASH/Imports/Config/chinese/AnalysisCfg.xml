@@ -1,0 +1,2164 @@
+﻿<DH>
+	<AnalysisTime name="时域分析">
+		<Signal id="1" name="AI" />
+		<Signal id="18" name="SPEED" />
+		<Signal id="36" name="AO" />
+		<Signal id="50" name="keyphase" />
+		<Signal id="52" name="pulseDirec" />
+		<Signal id="53" name="pulsecounter" />
+		<Signal id="54" name="pulsepos" />
+		<Signal id="55" name="IO" />
+		<Signal id="56" name="Video" />
+		<Signal id="57" name="Audio" />
+		<Signal id="65" name="Dig" />
+		<Signal id="74" name="OutData" />
+		<Signal id="81" name="WiFi" />
+		<Signal id="85" name="Freq" />
+		<Signal id="157" name="OutData" />
+		<Signal id="174" name="RS485" />
+		<Signal id="179" name="PWM" />
+		<Group id="0" name="模拟通道" />
+		<Group id="1" name="转速" />
+		<Group id="2" name="CAN" />
+		<Group id="3" name="GPS" />
+		<Group id="4" name="信号源" />
+		<Group id="5" name="计数器" />
+		<Group id="6" name="IO" />
+		<Group id="7" name="视频" />
+		<Group id="8" name="音频" />
+		<Group id="9" name="DHC测试系统" />
+		<Group id="10" name="数字量" />
+		<Group id="11" name="WiFi强度" />
+		<Group id="12" name="Moog加载系统" />
+		<Group id="13" name="合力通道" />
+		<Group id="16" name="Moog IO" />
+		<Group id="17" name="外部系统" />
+		<Group id="18" name="COM" />
+		<Group id="19" name="PWM" />
+		<Group id="20" name="扭振" />
+		<Group id="21" name="FlexRay" />
+		<Group id="22" name="NI系统" />
+		<Group id="23" name="振弦应变" />
+		<Group id="24" name="频率" />
+		<Group id="26" name="MTS加载系统" />
+		<Group id="27" name="PT补偿通道" />
+		<Group id="28" name="外部系统" />
+	</AnalysisTime>
+
+	<UpdateDataSupportSignal>
+		<SignalType id="1"/>
+		<SignalType id="2"/>
+		<SignalType id="3"/>
+		<SignalType id="5"/>
+		<SignalType id="6"/>
+		<SignalType id="7"/>
+		<SignalType id="9"/>
+		<SignalType id="11"/>
+		<SignalType id="12"/>
+		<SignalType id="18"/>
+	</UpdateDataSupportSignal>
+
+	<AnalysisExample name="演示算法">
+		<Group id="0" name="频谱分析">
+			<ShowGroupName0>频谱分析</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="3" />
+			<input id ="4" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="10" />
+		</Group>
+		<Group id="1" name="统计分析">
+			<ShowGroupName0>统计分析组</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="2" name="扭矩测量">
+			<ShowGroupName0>扭矩测量组</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisExample>
+
+	<HammerHitTest name="锤击测试">
+		<Group id="0" name="锤击测试分析">
+			<ShowGroupName0>锤击测试分析</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</HammerHitTest>
+	<AnalysisData name="数据分析">
+		<Group id="0" name="数据分析">
+			<ShowGroupName0>数据分析</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisData>
+	<AnalysisFatigue name="疲劳分析">
+		<Group id="0" name="疲劳分析">
+			<ShowGroupName0>疲劳分析</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="3" />
+			<input id ="9" />
+		</Group>
+	</AnalysisFatigue>
+	<AnalysisMath name="信号处理">
+		<Signal id="2" name="VirChn" />
+		<Signal id="3" name="应变花" />
+		<Signal id="5" name="Resample" />
+		<Signal id="6" name="Integral" />
+		<Signal id="7" name="Diff" />
+		<Signal id="8" name="Impersonate" />
+		<Signal id="9" name="Filter" />
+		<Signal id="11" name="实时谱" />
+		<Signal id="12" name="平均谱" />
+		<Signal id="13" name="细化谱" />
+		<Signal id="14" name="Octave" />
+		<Signal id="51" name="RainFlow" />
+		<Signal id="58" name="HeatFlow" />
+		<Signal id="96" name="RemainStress" />
+		<Signal id="158" name="平均次数" />
+		<Signal id="176" name="细化谱" />
+		<Signal id="187" name="拉力分析"/>
+		<Signal id="321" name="峰值统计"/>
+		<Signal id="322" name="相位差"/>
+		<Signal id="323" name="温度补偿"/>
+		<Group id="0" name="虚拟通道" SerialNumber="849a6689-ab0c-4591-9d91-fb4a2d8de139">
+			<ShowGroupName0>虚拟通道</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="3" />
+			<input id ="4" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="10" />
+			<input id ="17" />
+			<input id ="18" />
+			<input id ="32" />
+			<input id ="53" />
+			<input id ="54" />
+			<input id ="63" />
+			<input id ="74" />
+			<input id ="132" />
+			<!--虚拟通道新增频谱信号-->
+			<input id ="11" />
+			<input id ="12" />
+			<input id ="222" />
+			<input id ="244" />
+			<input id ="332" />
+			<input id ="295" />
+			<input id ="361" />
+		</Group>
+		<Group id="1" name ="积分" SerialNumber="38b2e9c7-2b46-4ada-858d-5e0f0a1378c9">
+			<ShowGroupNameCount>2</ShowGroupNameCount>
+			<ShowGroupName0>一次积分</ShowGroupName0>
+			<ShowGroupName1>二次积分</ShowGroupName1>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="3" />
+			<input id ="4" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="10" />
+			<input id ="18" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="222" />
+			<input id ="332" />
+		</Group>
+		<Group id="2" name ="微分" SerialNumber="d7b8c8d3-f742-4a43-adc9-8be826f4bb39">
+			<ShowGroupNameCount>2</ShowGroupNameCount>
+			<ShowGroupName0>一次微分</ShowGroupName0>
+			<ShowGroupName1>二次微分</ShowGroupName1>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="3" />
+			<input id ="4" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="10" />
+			<input id ="18" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="222" />
+			<input id ="332" />
+		</Group>
+		<Group id="3" name="应变花分析" SerialNumber="5ac96e7e-f5df-4c16-b46c-52eb229bc7b9">
+			<ShowGroupName0>应变花</ShowGroupName0>
+			<input id ="1" />
+			<input id ="9" />
+			<input id ="222" />
+			<input id ="175" />
+			<input id ="332" />
+		</Group>
+		<Group id="4" name="频谱分析" SerialNumber="722274ec-9710-4d5a-a888-ca660cbe3669">
+			<ShowGroupName0>频谱分析</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="3" />
+			<input id ="4" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="10" />
+			<input id ="18" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="201" />
+			<input id ="182" />
+			<input id ="183" />
+			<input id ="210" />
+			<input id ="222" />
+			<input id ="243" />
+			<input id ="267" />
+			<input id ="175" />
+			<input id ="332" />
+			<input id ="333" />
+		</Group>
+		<Group id="5" name="倍频程分析" SerialNumber="5b7da958-4493-438e-95c5-05fa1c227159">
+			<ShowGroupNameCount>2</ShowGroupNameCount>
+			<ShowGroupName0>倍频程分析</ShowGroupName0>
+			<ShowGroupName1>Z振级测试</ShowGroupName1>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="3" />
+			<input id ="4" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="10" />
+			<input id ="18" />
+			<input id="26" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="222" />
+			<input id ="332" />
+		</Group>
+		<Group id="6" name="幅值分析" SerialNumber="942a9bbe-f7c0-42a9-8d77-5816520dacc9">
+			<ShowGroupName0>幅值分析</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="3" />
+			<input id ="4" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="10" />
+			<input id ="18" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="222" />
+			<input id ="332" />
+		</Group>
+		<Group id="7" name="雨流分析" SerialNumber="26417d6a-d5a6-4370-9450-0315b8998609">
+			<ShowGroupName0>雨流分析</ShowGroupName0>
+			<input id ="1" />
+			<input id ="3" />
+			<input id ="9" />
+			<input id ="332" />
+		</Group>
+		<Group id="8" name="滤波" SerialNumber="3ce1b318-f70d-4ebd-a6c1-eb86828a5a79">
+			<ShowGroupNameCount>4</ShowGroupNameCount>
+			<ShowGroupName0>FIR滤波器</ShowGroupName0>
+			<ShowGroupName1>IIR滤波器</ShowGroupName1>
+			<ShowGroupName2>平均滤波器</ShowGroupName2>
+			<ShowGroupName3>漂移数据处理</ShowGroupName3>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="18" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="222" />
+			<input id ="293" />
+			<input id ="299" />
+			<input id ="332" />
+		</Group>
+		<Group id="9" name="统计分析" SerialNumber="978afc74-92c2-4cca-a305-5408aeae3479">
+			<ShowGroupName0>统计信息</ShowGroupName0>
+			<InputCount>2</InputCount>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="3" />
+			<input id ="4" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="9" />
+			<input id ="10" />
+			<input1 id ="11" />
+			<input1 id ="12" />
+			<input1 id ="14" />
+			<input1 id ="15" />
+			<input1 id ="16" />
+			<input id ="52" />
+			<input id ="53" />
+			<input id ="54" />
+			<input id ="63" />
+			<input id ="74" />
+			<input id ="132"/>
+			<input1 id ="172"/>
+			<input id ="174"/>
+			<input id ="222" />
+			<input id ="18" />
+			<input id ="180" />
+			<input id ="181" />
+			<input id ="182" />
+			<input id ="183" />
+			<input id ="31" />
+			<input id ="174" />
+			<input id ="332" />
+			<input id ="295" />
+		</Group>
+		<Group id="10" name="相关分析" SerialNumber="aaa0656e-7747-4239-b851-2f1bd6b95ae9">
+			<ShowGroupName0>相关分析</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="10" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="222" />
+			<input id ="332" />
+		</Group>
+		<Group id="11" name="倒谱分析" SerialNumber="39033cd2-74ff-4ebd-a3fb-934e979ceb39">
+			<ShowGroupName0>倒谱分析</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="10" />
+			<input id ="18" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="222" />
+			<input id ="332" />
+		</Group>
+		<Group id="12" name="四光标计算" SerialNumber="720fb6fa-d941-4faa-ac32-db12f026fa29">
+			<ShowGroupName0>四光标计算</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="10" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="222" />
+			<input id ="332" />
+		</Group>
+		<Group id="13" name="扫频分析" SerialNumber="0ea92cae-fd54-4019-8afd-1e27f9e1d1b9">
+			<ShowGroupName0>扫频分析</ShowGroupName0>
+			<input id ="1" />
+			<input id ="332" />
+		</Group>
+		<Group id="14" name="冲击响应谱" SerialNumber="f3da880b-e423-4b00-92b1-df38abf5e279">
+			<ShowGroupName0>冲击响应</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="10" />
+			<input id ="18" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="222" />
+			<input id ="332" />
+		</Group>
+		<Group id="15" name="拟合组" SerialNumber="ACEE4D87-BE12-40E8-A999-4FCFDF2AB469">
+			<ShowGroupName0>拟合</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="3" />
+			<input id ="4" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="9" />
+			<input id ="10" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="222" />
+			<input id ="332" />
+		</Group>
+		<Group id="16" name="热流组" SerialNumber="3B810AA7-D7CD-4CAE-A58C-8D155FF8C0DA">
+			<ShowGroupName0>热流</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="10" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="222" />
+			<input id ="332" />
+		</Group>
+		<Group id="17" name="失真组" SerialNumber="4b0ced28-42bb-4824-9489-3d83972bfbe8">
+			<ShowGroupName0>失真</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="3" />
+			<input id ="4" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="10" />
+			<input id ="11" />
+			<input id ="12" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="222" />
+			<input id ="332" />
+		</Group>
+
+		<Group id="18" name="扭矩测量组" SerialNumber="24175ee7-f1fc-4dbb-803d-618c50a64165">
+			<ShowGroupName0>扭矩测量</ShowGroupName0>
+			<input id ="1" />
+			<input id ="9" />
+			<input id ="203" />
+			<input id ="222" />
+		</Group>
+
+		<Group id="19" name="轴功率组" SerialNumber="b043e718-d213-491c-a4d2-608feecf8ad1">
+			<ShowGroupName0>轴功率</ShowGroupName0>
+			<input id ="63" />
+		</Group>
+		<Group id="20" name="重采样组" SerialNumber="f57e3280-1754-4a01-8086-24800202c7ea">
+			<ShowGroupName0>重采样</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="9" />
+			<input id ="132" />
+			<input id ="222" />
+			<input id ="332" />
+		</Group>
+		<Group id="21" name="残余应力组" SerialNumber="1fe89102-016a-43c7-977a-e8c4d2a0fa1f">
+			<ShowGroupName0>残余应力</ShowGroupName0>
+			<input id ="1" />
+			<input id ="332" />
+		</Group>
+		<Group id="22" name="应力合成组" SerialNumber="03DB4828-F0A2-45AC-945F-68BAAA006835">
+			<ShowGroupName0>应力合成</ShowGroupName0>
+			<input id ="1" />
+			<input id ="332" />
+		</Group>
+		<Group id="23" name="逆傅立叶变换" SerialNumber="b3179a18-fec8-4a4b-b4dd-d9ab6e03741b">
+			<ShowGroupName0>逆傅立叶变换</ShowGroupName0>
+			<input id ="11" />
+			<input id ="12" />
+		</Group>
+		<Group id="24" name="三向合成组" SerialNumber="f99714b4-bcc3-4a03-aec0-d27aacca7730">
+			<ShowGroupName0>三向合成</ShowGroupName0>
+			<input id ="1" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="9" />
+		</Group>
+		<Group id="25" name="周期计数" SerialNumber="ea0751f6-783c-4c4d-ac87-f62e5c23124a">
+			<ShowGroupName0>周期计数</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="26" name="状态线" SerialNumber="141F120C-C589-4925-8CCF-673026685AB8">
+			<ShowGroupName0>状态线</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="27" name="整周期采样" SerialNumber="11B39D8A-9BD3-4E0B-A14E-528D968F9174">
+			<ShowGroupName0>整周期采样</ShowGroupName0>
+			<input id ="1" />
+			<input id ="332" />
+		</Group>
+		<Group id="28" name="动态值超限提示" SerialNumber="7AC7062E-3838-4309-AEEC-2896ED33CD49">
+			<ShowGroupName0>动态值超限提示</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="29" name="PeakValue" SerialNumber="2CB1A0E4-4E57-47D9-8EFA-98FB67AD9315">
+			<ShowGroupName0>PeakValue</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="30" name="报警" SerialNumber="49AF2DD6-D6D0-4A3F-9D93-177577ED98C0">
+			<ShowGroupName0>报警</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="9" />
+			<input id ="332" />
+		</Group>
+		<Group id="31" name="国电扫频分析" SerialNumber="95843B40-1386-4BD0-AFDA-CD9E7998E2CF">
+			<ShowGroupName0>国电扫频分析</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="32" name="互谱" SerialNumber="03F82952-EA80-4D4D-9183-82753960432D">
+			<ShowGroupName0>互谱</ShowGroupName0>
+			<input id ="1" />
+			<input id ="332" />
+		</Group>
+		<Group id="33" name="模拟转速" SerialNumber="EFB2BFBF-7C85-444A-866E-D3ED45351758">
+			<ShowGroupName0>模拟转速</ShowGroupName0>
+			<input id ="1" />
+			<input id ="332" />
+		</Group>
+		<Group id="34" name="包络分析" SerialNumber="3C28075D-3B54-446F-8374-6BA67050FDA4">
+			<ShowGroupName0>包络分析</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="35" name="应变数据处理" SerialNumber="EFCE44C9-334E-4AEA-A39A-3CFF69F27A39">
+			<ShowGroupName0>应变数据处理</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="9" />
+		</Group>
+		<Group id="36" name="滑动平均滤波" SerialNumber="8C7F2D0F-254D-4E5B-BEEA-6F3145ACC2BE">
+			<ShowGroupName0>滑动平均滤波</ShowGroupName0>
+			<input id ="1" />
+			<input id ="332" />
+		</Group>
+		<Group id="37" name ="频域积分" SerialNumber="2C88B472-8983-4935-A96B-A81B64C0697D">
+			<ShowGroupNameCount>2</ShowGroupNameCount>
+			<ShowGroupName0>频域一次积分</ShowGroupName0>
+			<ShowGroupName1>频域二次积分</ShowGroupName1>
+			<input id ="11" />
+			<input id ="12" />
+		</Group>
+		<Group id="38" name="AE存储设置" SerialNumber="B6A8AEFA-A99D-40AC-9D9A-9CA4AAB09B8C">
+			<ShowGroupName0>AE存储设置</ShowGroupName0>
+			<input id ="1" />
+			<input id ="9" />
+		</Group>
+		<Group id="39" name="平滑滤波" SerialNumber="505AD53C-88C0-46FF-8A3A-5C345F70D185">
+			<ShowGroupName0>平滑滤波</ShowGroupName0>
+			<input id ="1" />
+			<input id ="332" />
+		</Group>
+		<Group id="40" name="速度与里程统计" SerialNumber="E4FFDD2A-E622-4B96-81F8-B6A6E4B63A1E">
+			<ShowGroupName0>速度与里程统计</ShowGroupName0>
+			<input id ="18" />
+		</Group>
+		<Group id="41" name="计数器轴功率组" SerialNumber="DBD7B14E-D7A7-4E9D-9596-FB48B949BCDA">
+			<ShowGroupName0>计数器轴功率</ShowGroupName0>
+			<input id ="54" />
+		</Group>
+		<Group id="42" name="计数器轴功率除法组" SerialNumber="B2A06D59-835D-438F-9A75-AECAB1AA3AB1">
+			<ShowGroupName0>计数器轴功率除法</ShowGroupName0>
+			<input id ="185" />
+		</Group>
+		<Group id="43" name ="频域微分" SerialNumber="70B21C30-B89E-41EA-8D26-EEB68299970E">
+			<ShowGroupNameCount>2</ShowGroupNameCount>
+			<ShowGroupName0>频域一次微分</ShowGroupName0>
+			<ShowGroupName1>频域二次微分</ShowGroupName1>
+			<input id ="11" />
+			<input id ="12" />
+		</Group>
+		<Group id="44" name ="测试算法" SerialNumber="E5E2DD8C-CEFA-49E8-A641-E9601BE4CE2A">
+			<ShowGroupName0>测试算法</ShowGroupName0>
+			<input id ="1" />
+			<input id ="18" />
+		</Group>
+		<Group id="45" name="剪切波速测量" SerialNumber="5237C1B1-991F-46AF-ABCC-AC6E52EB3B3B">
+			<ShowGroupName0>剪切波速测量</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="46" name="安徽公检" SerialNumber="0F57008E-5825-4DB5-A475-C107684EC9BF">
+			<ShowGroupName0>安徽公检</ShowGroupName0>
+			<input id ="1" />
+			<input id ="249" />
+			<input id ="11" />
+			<!--FFT实时谱-->
+			<input id ="12" />
+			<!--FFT平均谱-->
+		</Group>
+		<Group id="47" name="频点消除" SerialNumber="43D430A0-2552-4910-A1F9-AC8166C5A7D8">
+			<ShowGroupName0>"频点消除</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+		</Group>
+		<Group id="48" name="拆补算法" SerialNumber="51D9D651-0EFA-4087-9870-3E1C5C879986">
+			<ShowGroupName0>拆补算法</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="50" name="喷油器特性分析" SerialNumber="49E05B93-5F00-4BBB-9D1E-80EAED59FA83">
+			<ShowGroupName0>喷油器特性分析</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="49" name="陷波滤波器算法" SerialNumber="2E2E556D-C22B-4DB4-A987-1207CD6727E7">
+			<ShowGroupName0>陷波滤波器算法</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="18" />
+			<input id ="332" />
+		</Group>
+		<Group id="51" name="发动机评价参数" SerialNumber="FE8F9C2F-F61C-4B85-9713-5C97CEB8E270">
+			<ShowGroupName0>发动机评价参数</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="52" name="异常点去除" SerialNumber="E1216854-53FD-4A2D-97B5-05727F09AF3C">
+			<ShowGroupName0>异常点去除</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="53" name="串口通讯算法" SerialNumber="C8F51220-B608-4A96-8089-DE6E0D42CA3C">
+			<ShowGroupName0>串口通讯算法</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="54" name="键相触发组" SerialNumber="E35A15B4-30EA-4849-BF37-E2ACA093BFEA">
+			<ShowGroupName0>键相触发</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="55" name="海尔热水器测试" SerialNumber="C44801B0-A164-4E27-95F0-928D70460491">
+			<ShowGroupName0>海尔热水器测试</ShowGroupName0>
+			<input id ="1" />
+			<input id ="9" />
+			<input id ="6" />
+		</Group>
+		<Group id="56" name="自定义滤波" SerialNumber="71A84000-B9F0-4EFA-8630-A11754435D61">
+			<ShowGroupName0>自定义滤波</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="18" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="332" />
+		</Group>
+		<Group id="57" name="天平测力" SerialNumber="7896B2A5-B434-4411-A8B3-16C9C61A1D32">
+			<ShowGroupName0>天平测力</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="58" name="波形检测" SerialNumber="F67D789C-5325-43B1-BD15-40314C2EE22B">
+			<ShowGroupName0>波形检测</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="59" name="合格/不合格" SerialNumber="7922BEC2-A498-4E73-B349-848912E537FE">
+			<ShowGroupName0>合格/不合格</ShowGroupName0>
+			<input id ="1" />
+			<input id ="100" />
+		</Group>
+		<Group id="60" name="声发射" SerialNumber="347222F7-817E-45DF-8ADF-5322C072C1DA">
+			<ShowGroupName0>声发射</ShowGroupName0>
+			<input id ="1" />
+			<input id ="9" />
+		</Group>
+		<Group id="61" name="振动评估值" SerialNumber="5AD566D4-BB24-42DE-A1D4-4799E6548338">
+			<ShowGroupName0>振动评估值</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="62" name="横向比" SerialNumber="7EDCA6E1-8CD5-444C-9CA9-6055CCC8FD9F">
+			<ShowGroupName0>横向比</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="63" name="小波降噪" SerialNumber="8A1B8B26-0D42-409B-9EE7-39ABD1154731">
+			<ShowGroupName0>小波降噪</ShowGroupName0>
+			<input id ="1" />
+			<input id ="332" />
+		</Group>
+		<Group id="64" name="百分比计算" SerialNumber="3EF2C4D6-2CA2-4465-94B7-E490B09A453A">
+			<ShowGroupName0>百分比计算</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="74" />
+			<input id ="332" />
+		</Group>
+		<Group id="65" name="对中姿态计算" SerialNumber="C999F5BA-23EA-4DDD-B357-7891D019C675">
+			<ShowGroupName0>对中姿态计算</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="66" name="挠度值" SerialNumber="E7977146-A530-4E5A-9F1B-8704DF05E0C4">
+			<ShowGroupName0>挠度值</ShowGroupName0>
+			<input id ="174" />
+		</Group>
+		<Group id="67" name="昌飞计数" SerialNumber="808D1CF6-CD21-4A2B-8CF6-08E8C1ED8703">
+			<ShowGroupName0>昌飞计数</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="68" name="频谱统计" SerialNumber="58F01203-0684-48A4-AA72-2251CEDD9524">
+			<ShowGroupName0>频谱统计</ShowGroupName0>
+			<input id ="11" />
+			<input id ="12" />
+		</Group>
+		<Group id="69" name="振动评价" SerialNumber="A2AF261C-EE6D-42A9-BB6B-AE25447168C5">
+			<ShowGroupName0>振动评价</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="70" name="振动平均" SerialNumber="73B332B9-1446-4484-91E8-25CA38C70B6E">
+			<ShowGroupName0>振动平均</ShowGroupName0>
+			<input id ="14" />
+		</Group>
+		<Group id="71" name="置信度峰峰值" SerialNumber="0AE0857B-37F4-4615-A589-7580A80D1E04">
+			<ShowGroupName0>置信度峰峰值</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="72" name="弯矩拟合" SerialNumber="BA04525C-0A73-4949-ACF0-0A7604A72E69">
+			<ShowGroupName0>弯矩拟合</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+		</Group>
+		<Group id="73" name="DO触发" SerialNumber="0A2D1059-ECC1-42BA-B738-C74516E5DF7E">
+			<ShowGroupName0>DO触发</ShowGroupName0>
+			<input id ="1" />
+			<input id ="17" />
+			<input id ="55" />
+			<input id ="150" />
+		</Group>
+		<Group id="74" name="CSV输出" SerialNumber="D74D85AF-BB22-4F27-A259-D18F3811E451">
+			<ShowGroupName0>CSV输出</ShowGroupName0>
+			<input id ="1" />
+			<input id ="32" />
+		</Group>
+		<Group id="75" name="数据抽取" SerialNumber="336B4514-CDED-4320-AAE4-5C1A44326A4B">
+			<ShowGroupName0>数据抽取</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="76" name="报警次数" SerialNumber="6E6B06F3-B7DC-4711-AC9C-F21B42BF7B59">
+			<ShowGroupName0>报警次数</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="77" name="数据填充" SerialNumber="9EC05605-6D11-4667-B6F2-5C9D35D32572">
+			<ShowGroupName0>数据填充</ShowGroupName0>
+			<input id ="174" />
+		</Group>
+		<Group id="78" name="隔振率" SerialNumber="94E56177-51E2-4471-87BD-6EF3EF908F5A">
+			<ShowGroupName0>隔振率</ShowGroupName0>
+			<input id ="11" />
+			<input id ="12" />
+			<input id ="184" />
+		</Group>
+		<Group id="79" name="频域报警次数" SerialNumber="5E1039FE-86C1-4E2F-BD69-50C042B9A96F">
+			<ShowGroupName0>频域报警次数</ShowGroupName0>
+			<input id ="11" />
+			<input id ="172" />
+		</Group>
+		<Group id="80" name="相邻峰谷值统计" SerialNumber="B7AC14F5-65F3-4C39-B2D8-A5180921C7B3">
+			<ShowGroupName0>相邻峰谷值统计</ShowGroupName0>
+			<input id ="1" />
+			<input id ="3" />
+		</Group>
+		<Group id="81" name="小波喘振" SerialNumber="D114E3A0-D084-4471-8AB6-966B4AA707DB">
+			<ShowGroupName0>小波喘振</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="82" name="灵敏度" SerialNumber="5860188E-DBE2-4822-8AC4-FEBF090D7697">
+			<ShowGroupName0>灵敏度</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="83" name="平面夹角" SerialNumber="41E24EAA-81EB-49BC-BA9B-BBD38025CFAC">
+			<ShowGroupName0>平面夹角</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="84" name="正反转判断" SerialNumber="799CF2B6-97BA-406D-AEC0-DB5A93779E25">
+			<ShowGroupName0>正反转判断</ShowGroupName0>
+			<input id ="18" />
+		</Group>
+		<Group id="85" name="异常值处理" SerialNumber="260CCB47-32AD-406A-8679-6BBD4243AE7F">
+			<ShowGroupName0>异常值处理</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="86" name="转速统计" SerialNumber="A4C863FD-038B-469F-B7CD-3D49C0919660">
+			<ShowGroupName0>转速统计</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="87" name="落差谱分析" SerialNumber="5FB3919B-82F7-45A4-85EC-693EDC10A0EC">
+			<ShowGroupName0>落差谱分析</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="88" name="最大熵谱分析" SerialNumber="118205B7-F3F3-48DA-A179-E4F69CE770E0">
+			<ShowGroupName0>最大熵谱分析</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="89" name="倒熵谱分析" SerialNumber="2BBB0F99-9814-48DB-B677-509FE2C4621F">
+			<ShowGroupName0>倒熵谱分析</ShowGroupName0>
+			<input id ="1" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="9" />
+		</Group>
+		<Group id="90" name="UDP发数" SerialNumber="17403B8C-F673-415A-B241-48989522C108">
+			<ShowGroupName0>UDP发数</ShowGroupName0>
+			<input id ="1" />
+			<!--<input id ="2" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="11" />
+			<input id ="12" />
+			<input id ="17" />
+			<input id ="18" />-->
+			<input id ="344" />
+			<input id ="348" />
+		</Group>
+		<Group id="91" name="旋转编码" SerialNumber="67B26409-2AEA-4F5D-906E-E0CD129E9273">
+			<ShowGroupName0>旋转编码</ShowGroupName0>
+			<input id ="53" />
+		</Group>
+		<Group id="92" name="多维力解耦" SerialNumber="DE8AFB3F-9BA5-406C-82AF-714B58EAA36D">
+			<ShowGroupName0>多维力解耦</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="93" name="铁科院滤波" SerialNumber="751AF33A-607B-4F0A-BF92-F4E81D4EDD06">
+			<ShowGroupName0>铁科院滤波</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="3" />
+			<input id ="4" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="10" />
+			<input id ="18" />
+			<input id ="74" />
+		</Group>
+		<Group id="94" name="时变参量分析" SerialNumber="19537CD2-8D97-4E09-922D-C8A597E32284">
+			<ShowGroupName0>时变参量分析</ShowGroupName0>
+			<InputCount>2</InputCount>
+			<input id ="1" />
+			<input id ="2" />
+		</Group>
+		<Group id="95" name="转速解析" SerialNumber="25C1AA96-7262-4B62-9ACE-11EB9B2E4F3F">
+			<ShowGroupName0>转速解析</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="96" name="坐标转换" SerialNumber="F8BF7956-B5DD-4711-8B82-3A818BACBA8E">
+			<ShowGroupName0>坐标转换</ShowGroupName0>
+			<input id ="293" />
+		</Group>
+		<Group id="97" name="离散PID" SerialNumber="82F46E61-E402-4C13-8420-4AF30DD288ED">
+			<ShowGroupName0>离散PID</ShowGroupName0>
+			<input id ="1" />
+			<input id ="306"/>
+			<input id ="307"/>
+		</Group>
+		<Group id="98" name="PID解耦矩阵" SerialNumber="3F77EB9A-5540-48D4-8F02-D4D9583117F0">
+			<ShowGroupName0>PID解耦矩阵</ShowGroupName0>
+			<input id ="301" />
+		</Group>
+		<Group id="99" name="PID控制输出" SerialNumber="B3234387-C440-45B8-BF4F-6F521F5FAED2">
+			<ShowGroupName0>PID控制输出 </ShowGroupName0>
+			<!--<input id ="1" />-->
+			<input id ="301"/>
+			<input id ="302"/>
+		</Group>
+		<Group id="100" name="冲击系数计算" SerialNumber="82588CFA-ED91-4748-8520-F45100CE0106">
+			<ShowGroupName0>冲击系数计算 </ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="101" name="PID被控对象(传递函数)" SerialNumber="95730ED8-7F9B-4A92-91D0-E078D20B0435">
+			<ShowGroupName0>PID被控对象(传递函数)</ShowGroupName0>
+		</Group>
+		<Group id="102" name="复频谱统计" SerialNumber="E6AFF0FF-6BD5-4D3A-B950-41B0F287850B">
+			<ShowGroupName0>复频谱统计信息</ShowGroupName0>
+			<InputCount>2</InputCount>
+			<input1 id ="11" />
+			<input1 id ="12" />
+		</Group>
+		<Group id="103" name="去趋势" SerialNumber="505F4188-1464-4330-B2C3-2E45380B7871">
+			<ShowGroupName0>去趋势</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="104" name="电压统计" SerialNumber="39E1E5C1-31C2-4840-ACF3-1C3B92F8A72D">
+			<ShowGroupName0>电压统计</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="105" name="隔振率-时域" SerialNumber="77CEFF8B-E9B7-4E26-B03C-DC58E963B256">
+			<ShowGroupName0>隔振率-时域</ShowGroupName0>
+			<input id ="1" />
+			<input id ="17" />
+		</Group>
+		<Group id="106" name="TCP发数" SerialNumber="08298D9E-236C-4F8C-A41D-B99537D78771">
+			<ShowGroupName0>TCP发数</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="107" name="朔黄应变统计" SerialNumber="18C35988-8A37-451C-B8BE-6585A3F664E8">
+			<ShowGroupName0>朔黄应变统计</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="108" name="离散PID跨板卡" SerialNumber="EA8AE0C6-79F7-431F-828E-7B22BC067DB7">
+			<ShowGroupName0>离散PID跨板卡</ShowGroupName0>
+			<input id ="1" />
+			<input id ="307"/>
+		</Group>
+		<Group id="109" name="峰值统计" SerialNumber="6B3894E3-03D6-4183-8683-BB81652B619B">
+			<ShowGroupName0>峰值统计</ShowGroupName0>
+			<input id ="1" />
+			<input id ="6" />
+			<input id ="11" />
+			<input id ="12" />
+			<input id ="17" />
+		</Group>
+		<Group id="110" name="相位差" SerialNumber="62DE5674-03BF-4078-B4DC-7101F99E9A7A">
+			<ShowGroupName0>相位差</ShowGroupName0>
+			<input id ="1" />
+			<input id ="321"/>
+		</Group>
+		<Group id="111" name="触发控制" SerialNumber="D50D4FF9-65C9-436E-AC08-62EFBAF050AA">
+			<ShowGroupName0>触发控制</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="112" name="转速平均" SerialNumber="7EEC88BC-3350-43D4-A3A5-483AAC6463FF">
+			<ShowGroupName0>转速平均</ShowGroupName0>
+			<input id ="18" />
+		</Group>
+		<Group id="113" name="温度补偿" SerialNumber="1F06BCE3-8ABF-453C-A53E-23AF0ED807AF">
+			<ShowGroupName0>温度补偿</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="114" name="增强PID" SerialNumber="4D50771B-7C70-4D8C-B826-0440D72DE64B">
+			<ShowGroupName0>增强PID</ShowGroupName0>
+			<input id ="1" />
+			<input id ="306"/>
+			<input id ="307"/>
+		</Group>
+		<Group id="115" name="LQR控制" SerialNumber="D5335EF1-A7DB-43E7-863F-841E524D0CF9">
+			<ShowGroupName0>LQR控制</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="116" name="SMC控制" SerialNumber="A081851F-03EA-45A0-AE2B-A53D7E3AE017">
+			<ShowGroupName0>SMC控制</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="117" name="面积统计" SerialNumber="CA25C7DB-7E0F-499D-A864-FB8A20836474">
+			<ShowGroupName0>面积统计</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="17" />
+		</Group>
+		<Group id="118" name="轴向力" SerialNumber="952F9652-067F-4500-B864-5D0A925210B0">
+			<ShowGroupName0>轴向力</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="119" name="主动隔振" SerialNumber="63E7B8E0-7FF6-4837-99F5-1F8B2874417E">
+			<ShowGroupName0>主动隔振</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="120" name="加速度平均值" SerialNumber="895DDA32-E89D-4518-B20B-F1EA9814C051">
+			<ShowGroupName0>加速度平均值</ShowGroupName0>
+			<input id ="1" />
+			<input id ="9" />
+		</Group>
+		<Group id="121" name="CFC滤波" SerialNumber="ADA4CBE5-6309-4F0B-80CF-FC352B745CF9">
+			<ShowGroupName0>CFC滤波器</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="18" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="222" />
+			<input id ="293" />
+			<input id ="299" />
+		</Group>
+		<Group id="122" name="数字跟踪滤波" SerialNumber="BEBB74C0-D728-49D3-A4D8-31200BA0D00B">
+			<ShowGroupName0>数字跟踪滤波</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+		</Group>
+		<Group id="123" name="HHT分析" SerialNumber="EA2F6F7F-2FEE-4F8B-A993-2F3861FD1260">
+			<ShowGroupName0>HHT分析</ShowGroupName0>
+			<input id ="1" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="9" />
+			<input id ="10" />
+		</Group>
+		<Group id="124" name="HHT信号重构" SerialNumber="EEBBDA82-F591-4B3C-888C-87D618D680CB">
+			<ShowGroupName0>HHT信号重构</ShowGroupName0>
+			<input id ="333" />
+		</Group>
+		<Group id="125" name="SPM滚动轴承早期故障诊断系统" SerialNumber="50DA2CCB-CFCD-4B7D-87FC-C78F3E7DA8CE">
+			<ShowGroupName0>SPM滚动轴承早期故障诊断系统</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="126" name="地震烈度计算" SerialNumber="20794144-35F7-4C64-B2C9-1F6A3EA3AF85">
+			<ShowGroupName0>地震烈度计算</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="127" name="华测计数" SerialNumber="A7FC0FEE-06DB-4178-AEB6-A83895576478">
+			<ShowGroupName0>华测计数</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="128" name="转速积分" SerialNumber="052F8EFC-4EF6-48E1-87C4-6B1BEE93507B">
+			<ShowGroupName0>转速积分</ShowGroupName0>
+			<input id ="18" />
+		</Group>
+		<Group id="129" name="广州比赛" SerialNumber="CCC6A1E9-F11F-4499-96D7-56F46CC4301D">
+			<ShowGroupName0>广州比赛</ShowGroupName0>
+			<input id ="1" />
+			<input id ="9" />
+		</Group>
+		<Group id="130" name="标定频谱" SerialNumber="5CD74CBA-3F16-4D5D-854B-B10A6E134F5E">
+			<ShowGroupName0>标定频谱</ShowGroupName0>
+			<input id ="11" />
+			<input id ="12" />
+		</Group>
+		<Group id="131" name="峰谷取数" SerialNumber="CA3D5E57-C65F-4C80-92F2-1B40CA2A88C9">
+			<ShowGroupName0>峰谷取数</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="132" name="平均峰值" SerialNumber="7193C06B-054D-4F00-B486-A1C8E7373A5B">
+			<ShowGroupName0>平均峰值</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="133" name="西安航峰输出" SerialNumber="F7D6B7A0-BD5B-4B1C-9414-F28BEE0620EA">
+			<ShowGroupName0>西安航峰输出</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="134" name="应变校准" SerialNumber="67003953-26D2-4130-A8BC-FDFE2F0E0059">
+			<ShowGroupName0>应变校准</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="135" name="轮廓包络" SerialNumber="A7F3C4AD-2A2F-4964-A712-4E9C744716F2">
+			<ShowGroupName0>轮廓包络</ShowGroupName0>
+			<input id ="1" />
+			<input id ="9" />
+		</Group>
+		<Group id="136" name="转速跟踪滤波" SerialNumber="A7D6BA7A-E686-43B3-AC21-4E7622722A55">
+			<ShowGroupName0>转速跟踪滤波</ShowGroupName0>
+			<input id ="1" />
+			<input id ="18" />
+		</Group>
+		<Group id="137" name="TCP峰值发数" SerialNumber="9D9F812D-E741-4895-931F-724E0E4D4FF0">
+			<ShowGroupName0>TCP峰值发数</ShowGroupName0>
+			<input id ="11" />
+			<input id ="12" />
+		</Group>
+		<Group id="138" name="赋相位频谱分析" SerialNumber="A5CC1115-04A6-4D82-8FDE-CC40FF3379FE">
+			<ShowGroupName0>赋相位频谱分析</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="3" />
+			<input id ="4" />
+			<input id ="5" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="8" />
+			<input id ="9" />
+			<input id ="10" />
+			<input id ="18" />
+			<input id ="74" />
+			<input id ="132" />
+			<input id ="201" />
+			<input id ="182" />
+			<input id ="183" />
+			<input id ="210" />
+			<input id ="222" />
+			<input id ="243" />
+			<input id ="267" />
+			<input id ="175" />
+			<input id ="332" />
+		</Group>
+
+		<Group id="139" name="PLC绝对值" SerialNumber="FB914D75-D255-4C84-9817-2E7BC7A629A5">
+			<ShowGroupName0>PLC绝对值</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="140" name="下传频谱参数" SerialNumber="8EB08F82-449A-4117-AE93-F2C469D30F61">
+			<ShowGroupName0>下传频谱参数</ShowGroupName0>
+			<input id ="11" />
+		</Group>
+		<Group id="141" name="脉动量测试" SerialNumber="4F3148B8-0B5C-4FF0-858A-B62B560C7065">
+			<ShowGroupName0>脉动量测试</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+		</Group>
+		<Group id="142" name="数据坏点剔除" SerialNumber="97669E4C-D71F-4499-B36C-673CC52C63B9">
+			<ShowGroupName0>数据坏点剔除</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="143" name="实时轴向力" SerialNumber="216A6125-59E8-4083-B6BE-3E3140A07CF2">
+			<ShowGroupName0>实时轴向力</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="144" name="故障诊断" SerialNumber="D9C18C76-1508-4004-9022-AC1D5460DDF4">
+			<ShowGroupName0>故障诊断</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="145" name="剩余寿命预测" SerialNumber="7886E2BF-44AD-41B5-8482-194012ECAC5F">
+			<ShowGroupName0>剩余寿命预测</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="146" name="状态监测" SerialNumber="4B5D30C3-E12B-456D-B411-B9FBF6317B47">
+			<ShowGroupName0>状态监测</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="147" name="平均频率" SerialNumber="50F7A9EB-AA21-46B6-A5F7-C2E6EFBC964D">
+			<ShowGroupName0>平均频率</ShowGroupName0>
+			<input id ="12" />
+		</Group>
+		<Group id="148" name="倾角计算" SerialNumber="B328AF1C-5FD0-4AE6-85F6-85DBD9B2EF55">
+			<ShowGroupName0>倾角计算</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="149" name="沃飞长空TCP发数" SerialNumber="F42DE72D-1CAA-41ED-BBC2-83BF84449ED1">
+			<ShowGroupName0>沃飞长空TCP发数</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="150" name="扭角计算" SerialNumber="68D915F8-7B89-4492-B802-587586EDBA34">
+			<ShowGroupName0>扭角计算</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="151" name="置信度滤波" SerialNumber="6E00AA59-AA6C-48B2-BFBC-6A1DCECE2828">
+			<ShowGroupName0>置信度滤波</ShowGroupName0>
+			<input id ="1" />
+			<input id ="9" />
+		</Group>
+		<Group id="152" name="频率法转速" SerialNumber="E1F571AB-C9E8-4AA1-AC7F-8E8CD55CA945">
+			<ShowGroupName0>频率法转速</ShowGroupName0>
+			<input id ="11" />
+		</Group>
+		<Group id="153" name="卷积计算" SerialNumber="765CD08B-FA68-40CC-A5B9-C1384EF2C080">
+			<ShowGroupName0>卷积计算</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="154" name="脉动压力系数计算" SerialNumber="DB9ADFDB-03CC-499F-8C1F-31F95519A38D">
+			<ShowGroupName0>脉动压力系数计算</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="155" name="MR应用" SerialNumber="F1563CF3-F54B-4619-8DF2-AF774DF44326">
+			<ShowGroupName0>MR应用</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="156" name="数据对齐" SerialNumber="199D03E8-F6A8-4A43-8113-C346F25944F588888">
+			<ShowGroupName0>数据对齐</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisMath>
+	<AnalysisFRF name="频响分析">
+		<Signal id="25" name="源信号" />
+		<Signal id="26" name="频响" />
+		<Signal id="27" name="相干" />
+		<Signal id="28" name="脉冲响应" />
+		<Signal id="29" name="平均次数" />
+		<Signal id="62" name="阻抗" />
+		<Group id="1" name="频响组">
+			<ShowGroupName0>"频响分析"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="6" />
+			<input id ="74" />
+			<input id ="222" />
+		</Group>
+	</AnalysisFRF>
+	<AnalysisALARM name="报警设置">
+		<Group id="1" name="报警组">
+			<ShowGroupName0>"报警分析"</ShowGroupName0>
+			<input id ="7" />
+		</Group>
+	</AnalysisALARM>
+	<AnalysisCable name="索力分析">
+		<Signal id="31" name="Cable" />
+		<Group id="0" name="索力组">
+			<ShowGroupName0>"索力组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisCable>
+	<AnalysisOrder name="阶次分析">
+		<Signal id="38" name="阶次分析" />
+		<Group id="14" name="阶次分析组">
+			<ShowGroupName0>"阶次分析组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisOrder>
+	<!--新阶次分析-->
+	<!--<AnalysisNewOrder name="瀑布分析">
+		<Signal id="38" name="瀑布分析" />
+		<Group id="14" name="瀑布分析组">
+			<ShowGroupName0>"瀑布分析组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisNewOrder>-->
+	<AnalysisNewOrder name="阶次分析(新)">
+		<Signal id="38" name="阶次分析(新)" />
+		<Group id="0" name="阶次分析组(新)">
+			<ShowGroupName0>"阶次分析组(新)"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisNewOrder>
+	<AnalysisShake name="汽车平顺性">
+		<Signal id="164" name="OctaveValue" />
+		<Signal id="165" name="TotalValue" />
+		<Signal id="166" name="ComprehensiveValue" />
+		<Signal id="167" name="Feeling" />
+		<Group id="0" name="汽车平顺性组">
+			<ShowGroupName0>"汽车平顺性组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisShake>
+	<AnalysisFFTAlarm name="频域报警">
+		<Signal id="170" name="FFTAlarm" />
+		<Group id="0" name="频域报警组">
+			<ShowGroupName0>"频域报警"</ShowGroupName0>
+			<input id ="11" />
+			<input id ="172" />
+		</Group>
+	</AnalysisFFTAlarm>
+	<AnalysisStrainAlarmLog name="时域报警">
+		<Signal id="170" name="StrainAlarmLog" />
+		<Group id="0" name="时域报警">
+			<ShowGroupName0>"时域报警"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="17" />
+		</Group>
+	</AnalysisStrainAlarmLog>
+	<AnalysisStrainAlarm name="时域报警">
+		<Group id="0" name="时域报警">
+			<ShowGroupName0>"时域报警"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="9" />
+			<input id ="17" />
+			<input id ="157"/>
+			<input id ="174"/>
+			<input id ="244"/>
+			<input id ="295"/>
+			<input id ="296"/>
+			<input id ="337"/>
+		</Group>
+	</AnalysisStrainAlarm>
+	<AnalysisOrder name="阶次分析扩展">
+		<Signal id="38" name="阶次分析扩展" />
+		<Group id="14" name="阶次分析扩展组">
+			<ShowGroupName0>"阶次分析扩展组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisOrder>
+
+	<AnalysisMaterial name="材料特性计算">
+		<Signal id="37" name="Material" />
+		<Group id="0" name="材料特性">
+			<ShowGroupName0>"材料特性"</ShowGroupName0>
+			<InputCount>2</InputCount>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="6" />
+			<input id ="7" />
+			<input id ="9" />
+			<input1 id ="1" />
+			<input1 id ="6" />
+			<input1 id ="7" />
+			<input1 id ="9" />
+		</Group>
+	</AnalysisMaterial>
+
+	<AnalysisWindTunnel name="风洞计算">
+		<Signal id="30" name="WindTunnel" />
+		<Group id="0" name="风洞计算">
+			<ShowGroupName0>"风洞组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisWindTunnel>
+
+	<AnalysisStable name="运行平稳性分析">
+		<Signal id="70" name="平稳性分析" />
+		<Group id="0" name="平稳性分析组">
+			<ShowGroupName0>"平稳性分析组"</ShowGroupName0>
+			<input id="1"/>
+			<input id="2"/>
+			<input id="9"/>
+		</Group>
+	</AnalysisStable>
+
+	<AnalysisAcoustics name="声学分析">
+		<Group id="1" name="声功率">
+			<ShowGroupName0>声功率</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+
+		<Group id="2" name="声强映射">
+			<ShowGroupName0>声强映射</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+
+		<Group id="3" name="声压组">
+			<ShowGroupName0>声压分析</ShowGroupName0>
+			<input id ="1" />
+			<input id ="9" />
+		</Group>
+		<Group id="4" name="声强组">
+			<ShowGroupName0>声强分析</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="5" name="声评价组">
+			<ShowGroupName0>声评价分析</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+
+		<Group id="6" name="声阵列组">
+			<ShowGroupName0>声阵列分析</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+
+		<Group id="7" name="语言清晰度">
+			<ShowGroupName0>语言清晰度</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+
+		<Group id="8" name="吸声系数">
+			<ShowGroupName0>吸声系数</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisAcoustics>
+
+	<AnalysisElecChemistry name="电化学分析">
+	</AnalysisElecChemistry>
+
+	<AnalysisEIS name="电化学分析">
+		<Group id="0" name="交流阻抗">
+			<ShowGroupName0>交流阻抗</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="1" name="阻抗-时间">
+			<ShowGroupName0>阻抗-时间</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="2" name="电感-时间">
+			<ShowGroupName0>阻抗-时间</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisEIS>
+
+	<AnalysisMultiRun name="MultiRun">
+		<Group id="1" name="声功率">
+			<ShowGroupName0>声功率</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+
+		<Group id="2" name="声强映射">
+			<ShowGroupName0>声强映射</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+
+		<Group id="3" name="疲劳分析">
+			<ShowGroupName0>疲劳分析</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="3" />
+			<input id ="9" />
+		</Group>
+
+		<Group id="4" name="阶梯线性扫描">
+			<ShowGroupName0>阶梯线性扫描</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="5" name="阶跃采样">
+			<ShowGroupName0>阶跃采样</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="6" name="半电压">
+			<ShowGroupName0>半电压</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="7" name="积分">
+			<ShowGroupName0>积分</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="8" name="交流阻抗">
+			<ShowGroupName0>交流阻抗</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="9" name="平滑">
+			<ShowGroupName0>平滑</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="10" name="数采">
+			<ShowGroupName0>数采</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="11" name="有效值">
+			<ShowGroupName0>有效值</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="12" name="交流阻抗(DSP)">
+			<ShowGroupName0>交流阻抗(DSP)</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+
+		<Group id="23" name="工程频响组">
+			<ShowGroupName0>"工程频响分析"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="6" />
+			<input id ="74" />
+			<input id ="222" />
+		</Group>
+	</AnalysisMultiRun>
+
+	<AnalysisPcb name="PCB板设置">
+		<Signal id="136" name="应变花" />
+		<Signal id="137" name="Diff" />
+		<Group id="0" name="PCB板设置">
+			<ShowGroupName0>PCB板设置</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisPcb>
+
+	<AnalysisStrain name="叶片疲劳">
+		<Group id="0" name="叶片疲劳组">
+			<ShowGroupName0>"叶片疲劳组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisStrain>
+
+	<AnalysisMTS name="MTS">
+		<Group id="0" name="MTS组">
+			<ShowGroupName0>"MTS组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisMTS>
+
+	<AnalysisExperimentUDP name="试验机UDP">
+		<Group id="0" name="试验机UDP">
+			<ShowGroupName0>"试验机UDP组"</ShowGroupName0>
+			<input id ="1" />
+			<!--原始转速信号(控制卡转速)-->
+			<input id ="18" />
+			<!--IO信号-->
+			<input id ="55" />
+			<!--rs422-->
+			<input id ="174" />
+		</Group>
+	</AnalysisExperimentUDP>
+
+	<AnalysisTorqueTransRate name="扭矩传递率">
+		<Group id="0" name="扭矩传递率组">
+			<ShowGroupName0>"扭矩传递率组"</ShowGroupName0>
+			<input id ="11" />
+			<input id ="12" />
+		</Group>
+	</AnalysisTorqueTransRate>
+
+	<AnalysisBatchvalCal name="批量数值计算">
+		<Group id="0" name="批量数值计算">
+			<ShowGroupName0>"批量数值计算组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisBatchvalCal>
+
+	<AnalysisBridge name="桥梁健康监测">
+		<Group id="0" name="桥梁健康监测">
+			<ShowGroupName0>"桥梁健康监测组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisBridge>
+
+	<AnalysisRainFlow name="雨流分析">
+		<Group id="0" name="雨流分析组">
+			<ShowGroupName0>"雨流分析组"</ShowGroupName0>
+		</Group>
+	</AnalysisRainFlow>
+
+	<AnalysisDataBase name="数据库存储">
+		<Group id="0" name="数据库存储">
+			<ShowGroupName0>"数据库存储"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisDataBase>
+
+	<AnalysisTXTExport name="TXT文件生成">
+		<Group id="0" name="TXT文件生成">
+			<ShowGroupName0>"TXT文件生成"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisTXTExport>
+
+	<AnalysisDataTransfer name="数据推送">
+		<Group id="0" name="数据推送">
+			<ShowGroupName0>"数据推送"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisDataTransfer>
+
+	<AnalysisETCCurrent name="ETC电流导入">
+		<Group id="0" name="ETC电流导入">
+			<ShowGroupName0>"ETC电流导入"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisETCCurrent>
+
+	<AnalysisTimeOutput name="定时输出">
+		<Group id="0" name="定时输出">
+			<ShowGroupName0>"定时输出组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisTimeOutput>
+
+	<AnalysisRealOut name="实时输出">
+		<Group id="0" name="实时输出">
+			<ShowGroupName0>"实时输出组"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="9" />
+			<input id ="82" />
+			<input id ="83" />
+			<input id ="84" />
+			<input id ="74" />
+			<input id ="157" />
+		</Group>
+	</AnalysisRealOut>
+
+	<AnalysisRealOutSKY name="断丝测试">
+		<Group id="0" name="断丝测试">
+			<ShowGroupName0>"断丝测试组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisRealOutSKY>
+
+	<AnalysisMedicineBurn name="药条燃烧时间">
+		<Group id="0" name="药条燃烧时间">
+			<ShowGroupName0>"药条燃烧时间组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisMedicineBurn>
+
+	<AnalysisShock name="振动">
+		<Group id="0" name="振动组">
+			<ShowGroupName0>"振动组"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="9" />
+		</Group>
+	</AnalysisShock>
+
+	<AnalysisWindSpeed name="风速校准">
+		<Group id="0" name="风速校准组">
+			<ShowGroupName0>"风速校准组"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="74" />
+		</Group>
+	</AnalysisWindSpeed>
+
+	<AnalysisMissile name="航天四院">
+		<Group id="0" name="航天四院组">
+			<ShowGroupName0>"航天四院组"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="174" />
+		</Group>
+	</AnalysisMissile>
+
+	<AnalysisHttp name="HTTP传输">
+		<Group id="0" name="HTTP传输组">
+			<ShowGroupName0>"HTTP传输组"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="31" />
+			<!--索力-->
+		</Group>
+	</AnalysisHttp>
+	<AnalysisOnlineMonitor name="在线监测">
+		<Group id="0" name="在线监测组">
+			<ShowGroupName0>"在线监测组"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="11" />
+			<input id ="82" />
+			<input id ="84" />
+		</Group>
+	</AnalysisOnlineMonitor>
+	<AnalysisSignalDataBase name="信号数据库存储">
+		<Group id="0" name="信号数据库存储组">
+			<ShowGroupName0>"信号数据库存储组"</ShowGroupName0>
+			<input id ="1" />
+			<!--频谱-->
+			<input id ="11" />
+			<input id ="12" />
+			<input id ="158" />
+			<input id ="176" />
+			<!--应变花-->
+			<input id ="3" />
+			<!--阶次-->
+			<input id ="39" />
+			<input id ="38" />
+			<!--虚拟-->
+			<input id ="2" />
+			<!--统计-->
+			<input id ="17" />
+			<!--微积分-->
+			<input id ="6" />
+			<input id ="7" />
+			<!--滤波-->
+			<input id ="9" />
+		</Group>
+	</AnalysisSignalDataBase>
+	<AnalysisMeasure name="测速测温测压">
+		<Group id="0" name="测速测温测压组">
+			<ShowGroupName0>"测速测温测压组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisMeasure>
+	<AnalysisGradeAuxEngine name="辅机评级">
+		<Group id="0" name="辅机评级组">
+			<ShowGroupName0>"辅机评级组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisGradeAuxEngine>
+	<AnalysisGradeEngine name="往复式评级">
+		<Group id="0" name="往复式评级组">
+			<ShowGroupName0>"往复式评级组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisGradeEngine>
+
+	<AnalysisWater name="装置效率测试分析">
+		<Group id="1" name="流速流量测量">
+			<ShowGroupName0>流速流量测量</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+		</Group>
+		<Group id="2" name="水泵振动测量">
+			<ShowGroupName0>水泵振动测量</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="3" name="水泵轴功率计算">
+			<ShowGroupName0>水泵轴功率计算</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="4" name="水泵效率计算">
+			<ShowGroupName0>水泵装置效率计算</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="5" name="装置效率计算">
+			<ShowGroupName0>装置效率计算</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisWater>
+	<AnalysisPLCDataTransfer name="PLC数据推送">
+		<Group id="0" name="PLC数据推送组">
+			<ShowGroupName0>"PLC数据推送组"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="17" />
+			<input id ="18" />
+		</Group>
+	</AnalysisPLCDataTransfer>
+	<AnalysisTCPDataTransfer name="TCP数据推送">
+		<Group id="0" name="TCP数据推送组">
+			<ShowGroupName0>"TCP数据推送组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisTCPDataTransfer>
+	<AnalysisZeroHotFlow name="零点热流计算">
+		<Group id="0" name="零点热流计算组">
+			<ShowGroupName0>"零点热流计算组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisZeroHotFlow>
+	<AnalysisStatusAssess name="状态评估">
+		<Group id="0" name="应力-时间历程峰谷值分析">
+			<ShowGroupName0>"应力-时间历程峰谷值分析"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="1" name="应力演化">
+			<ShowGroupName0>"应力演化"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisStatusAssess>
+	<AnalysisSaveOut name="雷达车数据">
+		<Group id="0" name="雷达车数据组">
+			<ShowGroupName0>"雷达车数据组"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="174" />
+		</Group>
+	</AnalysisSaveOut>
+	<AnalysisRFID name="RFID">
+		<Group id="0" name="RFID">
+			<ShowGroupName0>"RFID"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisRFID>
+	<AnalysisMQTT name="MQTT">
+		<Group id="0" name="MQTT">
+			<ShowGroupName0>"MQTT"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="17" />
+			<input id ="168" />
+		</Group>
+	</AnalysisMQTT>
+	<AnalysisStoreRule name="StoreRule">
+		<Group id="0" name="StoreRule">
+			<ShowGroupName0>"StoreRule"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="9" />
+			<input id ="17" />
+			<input id ="32" />
+			<input id ="157" />
+			<input id ="289" />
+			<input id ="290" />
+			<input id ="53" />
+			<input id ="54" />
+			<input id ="55" />
+			<input id ="18" />
+			<input id ="74" />
+			<input id ="174" />
+		</Group>
+	</AnalysisStoreRule>
+	<AnalysisRailWeb name="RailWeb">
+		<Group id="0" name="RailWeb">
+			<ShowGroupName0>"RailWeb"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+		</Group>
+	</AnalysisRailWeb>
+	<AnalysisSpeedMQTT name="SpeedMQTT">
+		<Group id="0" name="SpeedMQTT">
+			<ShowGroupName0>"SpeedMQTT"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="17" />
+			<!--统计信号-->
+			<input id ="174" />
+			<!--RS422-->
+			<input id ="31" />
+			<!--索力 索力信号&基频信号&索力值信号-->
+			<input id ="11" />
+			<!--实时谱 频谱信号-->
+			<input id ="12" />
+			<!--平均谱 频谱信号-->
+		</Group>
+	</AnalysisSpeedMQTT>
+	<AnalysisTorsionalVibration name="扭振计算">
+		<Group id="0" name="扭振计算组">
+			<ShowGroupName0>"扭振计算组"</ShowGroupName0>
+			<input id ="18" />
+			<input id ="180" />
+		</Group>
+	</AnalysisTorsionalVibration>
+	<AnalysisConstruction name="Construction">
+		<Group id="0" name="Construction">
+			<ShowGroupName0>"Construction"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="174" />
+			<!--RS422-->
+			<input id ="82" />
+			<input id ="83" />
+			<input id ="84" />
+			<input id ="17" />
+		</Group>
+	</AnalysisConstruction>
+	<AnalysisWuhanNanrui name="WuhanNanrui">
+		<Group id="0" name="WuhanNanrui">
+			<ShowGroupName0>"WuhanNanrui"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="33" />
+		</Group>
+	</AnalysisWuhanNanrui>
+	<AnalysisSlopeWarning name="斜率报警">
+		<Group id="0" name="斜率报警">
+			<ShowGroupName0>"斜率报警"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="9" />
+		</Group>
+	</AnalysisSlopeWarning>
+	<AnalysisNucleusPower name="核动力PDA">
+		<Group id="0" name="核动力PDA">
+			<ShowGroupName0>"核动力PDA"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="18" />
+		</Group>
+	</AnalysisNucleusPower>
+	<AnalysisSHMonitorData name="AnalysisSHMonitorData">
+		<Group id="0" name="朔黄监测数据">
+			<ShowGroupName0>"朔黄监测数据"</ShowGroupName0>
+			<input id ="17" />
+			<input id ="315" />
+		</Group>
+	</AnalysisSHMonitorData>
+	<AnalysisCommonMQTT name="CommonMQTT">
+		<Group id="0" name="CommonMQTT">
+			<ShowGroupName0>"CommonMQTT"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="17" />
+			<!--统计信号-->
+			<input id ="174" />
+			<!--RS422-->
+			<input id ="31" />
+			<!--索力 索力信号&基频信号&索力值信号-->
+			<input id ="2" />
+			<input id ="82" />
+			<input id ="83" />
+			<input id ="84" />
+		</Group>
+	</AnalysisCommonMQTT>
+	<AnalysisBuildingUDP name="BuildingUDP">
+		<Group id="0" name="BuildingUDP">
+			<ShowGroupName0>"BuildingUDP"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisBuildingUDP>
+	<AnalysisAirUDP name="转速分析">
+		<Group id="0" name="转速分析组">
+			<ShowGroupName0>"转速分析组"</ShowGroupName0>
+			<input id ="11" />
+			<input id ="12" />
+			<input id ="176" />
+			<input id ="17" />
+			<input id ="2" />
+		</Group>
+	</AnalysisAirUDP>
+	<AnalysisLaunch name="北京机电工程总体设计部(航天四院)">
+		<Group id="0" name="北京机电工程总体设计部(航天四院)组">
+			<ShowGroupName0>"北京机电工程总体设计部(航天四院)组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisLaunch>
+	<AnalysisGuangxiTransMQTT name="广西交科MQTT">
+		<Group id="0" name="广西交科MQTT">
+			<ShowGroupName0>"广西交科MQTT"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisGuangxiTransMQTT>
+	<AnalysisAngleSample name="角度域采集">
+		<Group id="0" name="角度域采集">
+			<ShowGroupName0>"角度域采集"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisAngleSample>
+	<AnalysisStepSine name="步进正弦">
+		<Group id="0" name="步进正弦">
+			<ShowGroupName0>"步进正弦"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisStepSine>
+	<AnalysisFFTStat name="频域统计">
+		<Group id="0" name="频域统计组">
+			<ShowGroupName0>"频域统计组"</ShowGroupName0>
+			<input id ="11" />
+			<input id ="12" />
+			<input id ="39" />
+		</Group>
+	</AnalysisFFTStat>
+	<AnalysisCrackMonitor name="裂纹在线监测">
+		<Group id="0" name="裂纹在线监测">
+			<ShowGroupName0>"裂纹在线监测"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisCrackMonitor>
+	<AnalysisHotIndustrialUDP name="热工院UDP">
+		<Group id="0" name="热工院UDP">
+			<ShowGroupName0>"热工院UDP"</ShowGroupName0>
+			<input id ="2" />
+			<input id ="17" />
+			<input id ="101" />
+			<input id ="295" />
+		</Group>
+	</AnalysisHotIndustrialUDP>
+	<AnalysisTcpLink name="2002TCP">
+		<Group id="0" name="2002TCP">
+			<ShowGroupName0>"2002TCP"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="82" />
+			<input id ="83" />
+			<input id ="84" />
+			<input id ="174" />
+			<!--虚拟通道-->
+			<input id ="2"/>
+			<!--积分-->
+			<input id ="6"/>
+			<!--微分-->
+			<input id ="7"/>
+			<!--曲线拟合-->
+			<input id ="8"/>
+			<!--滤波信号-->
+			<input id ="9"/>
+			<!--模拟转速-->
+			<input id ="18"/>
+			<!--四光标计算-->
+			<input id ="30"/>
+			<!--重采样计算-->
+			<input id ="5"/>
+			<input id ="11"/>
+			<input id ="12"/>
+			<!--统计信息-->
+			<input id ="17"/>
+			<input id ="295"/>
+			<!--倍频程-->
+			<input id ="14"/>
+			<input id ="202"/>
+			<input id ="350"/>
+			<!--相关分析-->
+			<input id ="20"/>
+			<input id ="21"/>
+			<!--倒谱分析-->
+			<input id ="22"/>
+			<input id ="23"/>
+			<input id ="24"/>
+			<!--包络分析-->
+			<input id ="168"/>
+			<input id ="169"/>
+			<!--频响分析-->
+			<input id ="75"/>
+			<input id ="76"/>
+			<input id ="26"/>
+			<input id ="27"/>
+			<input id ="28"/>
+		</Group>
+	</AnalysisTcpLink>
+	<Analysis633UDP name="633UDP">
+		<Group id="0" name="633UDP">
+			<ShowGroupName0>"633UDP"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</Analysis633UDP>
+	<AnalysisEquipMQTT name="二重MQTT">
+		<Group id="0" name="二重MQTT">
+			<ShowGroupName0>"二重MQTT"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="18" />
+			<input id ="63" />
+		</Group>
+	</AnalysisEquipMQTT>
+	<AnalysisHUMS32DataTransfer name="HUMS32发数">
+		<Group id="0" name="HUMS32发数">
+			<ShowGroupName0>"HUMS32发数"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="17" />
+			<input id ="295" />
+		</Group>
+	</AnalysisHUMS32DataTransfer>
+	<AnalysisElectricAnalyse name="电力分析">
+		<Group id="0" name="电力分析组">
+			<ShowGroupName0>"电力分析组"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="9" />
+		</Group>
+	</AnalysisElectricAnalyse>
+	<AnalysisFlexPipe name="柔性管道">
+		<Group id="0" name="柔性管道组">
+			<ShowGroupName0>"柔性管道组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisFlexPipe>
+	<AnalysisSeaNuclear name="空基MQTT">
+		<Group id="0" name="空基MQTT组">
+			<ShowGroupName0>"空基MQTT组"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisSeaNuclear>
+	<AnalysisCycleCount name="周期计数">
+		<Group id="0" name="周期计数组">
+			<ShowGroupName0>"周期计数组"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="55" />
+		</Group>
+	</AnalysisCycleCount>
+	<AnalysisSEUHttp name="SEUHttp">
+		<Group id="0" name="SEUHttp">
+			<ShowGroupName0>"SEUHttp"</ShowGroupName0>
+			<input id ="1" />
+			<!--RS422-->
+			<input id ="174" />
+			<!--振弦温度-->
+			<input id ="82" />
+			<!--振弦频率-->
+			<input id ="83" />
+			<!--振弦应变-->
+			<input id ="84" />
+		</Group>
+	</AnalysisSEUHttp>
+	<AnalysisZZUHttp name="ZZUHttp">
+		<Group id="0" name="ZZUHttp">
+			<ShowGroupName0>"ZZUHttp"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisZZUHttp>
+	<AnalysisTorVib name="扭振分析">
+		<Group id="0" name="扭振分析">
+			<ShowGroupName0>"扭振分析组"</ShowGroupName0>
+			<input id ="272" />
+		</Group>
+	</AnalysisTorVib>
+	<AnalysisZZUHttp name="AnalysisBeehiveTrans">
+		<Group id="0" name="AnalysisBeehiveTrans">
+			<ShowGroupName0>"AnalysisBeehiveTrans"</ShowGroupName0>
+			<input id ="74" />
+			<input id ="157" />
+			<input id ="174" />
+			<input id ="32" />
+		</Group>
+	</AnalysisZZUHttp>
+	<AnalysisCFOutput name="AnalysisCFOutput">
+		<Group id="0" name="AnalysisCFOutput">
+			<ShowGroupName0>"AnalysisCFOutput"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="74" />
+		</Group>
+	</AnalysisCFOutput>
+	<AnalysisOPCTCPTransfer name="OPC_TCP">
+		<Group id="0" name="OPC_TCP">
+			<ShowGroupName0>"OPC_TCP"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="74" />
+		</Group>
+	</AnalysisOPCTCPTransfer>
+	<AnalysisCFHttp name="CFHttp">
+		<Group id="0" name="CFHttp">
+			<ShowGroupName0>"CFHttp"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisCFHttp>
+	<AnalysisCraneTired name="起重机疲劳">
+		<Group id="0" name="起重机疲劳">
+			<ShowGroupName0>"起重机疲劳"</ShowGroupName0>
+			<input id ="60" />
+		</Group>
+	</AnalysisCraneTired>
+	<AnalysisEngineInfo name="贵发所设置">
+		<Group id="0" name="贵发所设置">
+			<ShowGroupName0>"贵发所设置"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="18" />
+		</Group>
+	</AnalysisEngineInfo>
+	<AnalysisZHParam name="天津中核参数设置">
+		<Group id="0" name="天津中核参数设置">
+			<ShowGroupName0>"天津中核参数设置"</ShowGroupName0>
+			<input id ="11" />
+		</Group>
+	</AnalysisZHParam>
+	<AnalysisDMSOutput name="DMSOutput">
+		<Group id="0" name="DMSOutput">
+			<ShowGroupName0>"DMSOutput"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisDMSOutput>
+	<AnalysisDataSave name="AnalysisDataSave">
+		<Group id="0" name="AnalysisDataSave">
+			<ShowGroupName0>"AnalysisDataSave"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="2" />
+			<input id ="74" />
+		</Group>
+	</AnalysisDataSave>
+	<AnalysisDKY name="电科院">
+		<Group id="0" name="积分">
+			<ShowGroupName0>积分组</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="1" name="频率">
+			<ShowGroupName0>频率组</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+		<Group id="2" name="峰值统计">
+			<ShowGroupName0>峰值统计组</ShowGroupName0>
+			<input id ="1" />
+			<input id ="6" />
+			<input id ="7" />
+		</Group>
+		<Group id="3" name="相位差">
+			<ShowGroupName0>相位差组</ShowGroupName0>
+			<input id ="1" />
+			<input id ="6" />
+			<input id ="7" />
+		</Group>
+	</AnalysisDKY>
+
+	<AnalysisWingsUDP name="试验机UDP">
+		<Group id="0" name="试验机UDP">
+			<ShowGroupName0>"试验机UDP组"</ShowGroupName0>
+			<input id ="1" />
+			<!--原始转速信号(控制卡转速)-->
+			<input id ="18" />
+			<!--gps-->
+			<input id ="33" />
+		</Group>
+	</AnalysisWingsUDP>
+	<AnalysisHitachiElevator name="HitachiElevator">
+		<Group id="0" name="HitachiElevator">
+			<ShowGroupName0>"HitachiElevator"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisHitachiElevator>
+	<AnalysisAxialCoeff name="AxialCoeff">
+		<Group id="0" name="AxialCoeff">
+			<ShowGroupName0>"AxialCoeff"</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisAxialCoeff>
+	<AnalysisHFReportTable name="HFReportTable">
+		<Group id="0" name="HFReportTable">
+			<ShowGroupName0>"v"</ShowGroupName0>
+			<input id ="1" />
+			<input id ="18" />
+		</Group>
+	</AnalysisHFReportTable>
+	<AnalysisWaveBeamTailAfter name="波束跟踪">
+		<Group id="0" name="波束跟踪">
+			<ShowGroupName0>波束跟踪</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisWaveBeamTailAfter>
+	<AnalysisAxialTrajectory name="轴心轨迹">
+		<Group id="0" name="轴心轨迹">
+			<ShowGroupName0>轴心轨迹</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisAxialTrajectory>
+	<AnalysisFiveHole name="五孔针角度">
+		<Group id="0" name="五孔针角度">
+			<ShowGroupName0>五孔针角度</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisFiveHole>
+	<AnalysisSuperPressure name="超压处理">
+		<Group id="0" name="超压处理">
+			<ShowGroupName0>超压处理</ShowGroupName0>
+			<input id ="1" />
+		</Group>
+	</AnalysisSuperPressure>
+	<AnalysisFatigueCount name="疲劳计数">
+		<Group id="0" name="疲劳计数">
+			<ShowGroupName0>疲劳计数</ShowGroupName0>
+			<input id ="17" />
+		</Group>
+	</AnalysisFatigueCount>
+</DH>

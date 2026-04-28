@@ -1,0 +1,484 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DHTest>
+  <!--测量-->
+  <Module type ="MeasureModule" id ="MeasureModuleAnalysis">
+    <!--通道设置-->
+    <menu id ="ChnSetupModuleAnalysis" analysis ="0">
+      <toolbar>
+        <Control id="SaveParamFunc"/>
+        <Control id="SaveToParamFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="AnalogParamModuleAnalysis" UserControl ="1"/>
+        <Control id="TachoParamModuleAnalysis" UserControl ="1"/>
+        <Control id="GPSParamModuleAnalysis" UserControl ="1"/>
+        <Control id="CANParamModuleAnalysis" UserControl ="1"/>
+        <Control id="CounterParamModuleAnalysis" UserControl ="1"/>
+        <Control id="CalibrateParamModuleAnalysis" UserControl ="1"/>
+      </toolbar>
+    </menu>
+    <!--算法设置-->
+    <menu id ="MathSetupModuleAnalysis" analysis ="0">
+      <toolbar>
+        <Control id="SaveParamFunc"/>
+        <Control id="SaveToParamFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="MathSelfDefineModuleAnalysis"/>        
+        <Control id="SpectrumMathModuleAnalysis"/>
+        <Control id="CableMathModuleAnalysis"/>
+        <Control id="OrderMathModuleAnalysis"/>
+        <Control id="AcousticsMathModuleAnalysis"/>
+        <Control id="AlarmMathModuleAnalysis"/>
+        <Control id="FFTAlarmMathModuleAnalysis"/>
+        <Control id="StrainAlarmMathModuleAnalysis"/>
+      </toolbar>
+    </menu>
+    <menu id ="MeasureModuleAnalysis" analysis ="0">
+      <toolbar>
+        <Control id="MeasureStoreFunc"/>
+        <Control id="MeasurePauseFunc"/>
+        <Control id="MeasureRebackDataFunc"/>
+        <Control id="MeasureContinueFunc"/>
+        <Control id="MeasureStopFunc"/>
+        <Control id="MeasureShiBoFunc"/>
+        <Control id="MeasureTrigFunc"/>
+        <Control id="MeasureBalanceZero"/>
+        <Control id="MeasureTagFunc"/>
+      </toolbar>
+      <!--<toolbar>
+        <Control id="AnalogChannelWindowFunc"/>
+      </toolbar>-->
+      <toolbar>
+        <Control id="LayoutRecorderFunc" layout="1"/>
+        <Control id="LayoutFFTFunc" layout="1"/>
+        <Control id="Layout2DFunc" layout="1"/>
+        <Control id="LayoutSpectrumFunc" layout="1"/>
+      </toolbar>
+      <toolbar>
+        <Control id="RunInfoFunc"/>
+      </toolbar>
+    </menu>
+    <menu id ="MeasureChatDesignModuleAnalysis" analysis ="0">
+      <toolbar>
+        <Control id="DelAllChatFunc"/>
+        <Control id="DelChatFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatHorizFunc"/>
+        <Control id="ChatVertFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="MultiScreenFunc"/>
+        <Control id="MultiScreenLayOutMgrFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatRecordModuleAnalysis"/>
+        <Control id="ChatXYRecordModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatFFTModuleAnalysis"/>
+        <Control id="ChatOctaveModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <Control id="Chat2DModuleAnalysis"/>
+        <Control id="Chat3DModuleAnalysis"/>
+        <Control id="ChatCloud3DModuleAnalysis"/>
+        <Control id="ChatModalModuleAnalysis"/>
+        <Control id="ChatNormalModeModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatStaticModuleAnalysis"/>
+        <Control id="ChatExperimentModuleAnalysis"/>
+        <Control id="ChatLoadExprtimenetModuleAnalysis"/>
+        <Control id="ChatDemarcateModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatVideoModuleAnalysis"/>
+        <Control id="ChatAudioModuleAnalysis"/>
+        <Control id="ChatMeterModuleAnalysis"/>
+        <Control id="ChatDigitalModuleAnalysis"/>
+        <Control id="ChatBarModuleAnalysis"/>
+        <Control id="ChatMachineStatusModuleAnalysis"/>
+        <Control id="MultiBarControlModuleAnalysis"/>
+        <Control id="ChatCtlBtnModuleAnalysis"/>
+        <Control id="LightModuleAnalysis"/>
+        <Control id="ChatTableModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatXYPolarModuleAnalysis"/>
+        <Control id="ChatGpsRouteModuleAnalysis"/>
+        <Control id="ChatLatAndLongitutdeModuleAnalysis"/>
+        <Control id="ChatCampbellModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatBalanceModuleAnalysis"/>
+        <Control id="HarmonicBalanceModuleAnalysis"/>
+        <Control id="ChatAirConditionModuleAnalysis"/>
+        <Control id="ChatAirConditionExModuleAnalysis"/>
+        <Control id="ChatWrestShakeModuleAnalysis"/>
+        <Control id="ChatCableModelModuleAnalysis"/>
+        <Control id="ChatShockCoefModuleAnalysis"/>
+        <Control id="ChatStakeModelModuleAnalysis"/>
+        <Control id="ChatDumpModuleAnalysis"/>
+        <Control id="ChatFreqDumpModuleAnalysis"/>
+        <Control id="ChatSpoilageGeneModuleAnalysis"/>
+        <Control id="ChatStockWaveModuleAnalysis"/>
+        <Control id="ChatFatigueTestChatModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <!--定制-->
+        <Control id="ChatAmpModuleAnalysis"/>
+        <Control id="ChatOrderModuleAnalysis"/>
+        <Control id="ChatOrderTestModuleAnalysis"/>
+        <Control id="TrialChatModuleAnalysis"/>
+        <Control id="ChatPathTrack3DModuleAnalysis"/>
+        <Control id="WaterGasChatModuleAnalysis"/>
+        <Control id="WaterPressChatModuleAnalysis"/>
+        <Control id="ChatRigitidyCurvesModuleAnalysis"/>
+        <Control id="ChatLoadDeviationModuleAnalysis"/>
+        <Control id="ChatVibrationShockModuleAnalysis"/>
+        <Control id="ChatStressLoadModuleAnalysis"/>
+        <Control id="ChatSpeedMileModuleAnalysis"/>
+        <Control id="ChatPlaneChannelModuleAnalysis"/>
+        <Control id="ChatSwitchCliqueModuleAnalysis"/>
+        <Control id="ChatScaleCliqueModuleAnalysis"/>
+        <Control id="ChatGongliBiaoModuleAnalysis"/>
+        <Control id="ChatExampleModuleAnalysis"/>
+        <Control id="ChatWorkFlowModuleAnalysis"/>
+        <Control id="ChatACSpecialityModuleAnalysis"/>
+        <Control id="ChatBindBeltTestModuleAnalysis"/>
+        <Control id="ChatSeaRouteXYRecorderModuleAnalysis"/>
+        <Control id="ChatShearWaveSingleAnalysis"/>
+        <Control id="ChatShearWaveDoubleAnalysis"/>
+        <Control id="ChatTimeTerritoryAnalysis"/>
+        <Control id="ChatTimeBorderAnalysis"/>
+        <Control id="ChatFFTAnalysisAnalysis"/>
+        <Control id="ChatPolarAnalysisAnalysis"/>
+        <Control id="ChatVibratorTrendModuleAnalysis"/>
+        <Control id="ChatPathTrackModuleAnalysis"/>
+        <Control id="ChatMoogPhotoModuleAnalysis"/>
+      </toolbar>
+    </menu>
+  </Module>
+  <!--分析-->
+  <Module type ="AnalysisModule" id ="AnalysisModuleAnalysis">
+    <!--通道-->
+    <menu id ="ChannelModuleAnalysis" analysis ="1">
+      <toolbar>
+        <Control id="EditChannelFunc"/>
+      </toolbar>
+    </menu>
+    <!--事件-->
+    <menu id ="EventModuleAnalysis" analysis ="1">
+      <toolbar>
+        <Control id="AddEventFunc"/>
+        <Control id="EditEventFunc"/>
+        <Control id="DelEventFunc"/>
+      </toolbar>
+    </menu>
+    <menu id ="MathSetupModuleAnalysis" analysis ="1">
+      <toolbar>
+        <Control id="MathSaveCurrentAlgParamFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="MathSelfDefineModuleAnalysis"/>
+        <!--<Control id="GeneralMathModuleAnalysis"/>-->
+        <Control id="SpectrumMathModuleAnalysis"/>
+        <Control id="CableMathModuleAnalysis"/>
+        <Control id="OrderMathModuleAnalysis"/>
+        <Control id="StableMathModuleAnalysis"/>
+        <Control id="AcousticsMathModuleAnalysis"/>
+        <Control id="FatigueMathModuleAnalysis"/>
+        <Control id="AlarmMathModuleAnalysis"/>
+        <Control id="ShakeMathModuleAnalysis"/>
+        <Control id="TorqueTransRateMathModuleAnalysis"/>
+        <Control id="BatchvalCalModuleAnalysis"/>
+        <Control id="RainFlowMathModuleAnalysis"/>
+      </toolbar>
+    </menu>
+    <menu id ="AnalysisModuleAnalysis" analysis ="1" Default="1">
+      <toolbar>
+        <Control id="AnalysisSaveAllParamFunc"/>
+        <Control id="AnalysisExportTestFunc"/>
+        <!--<Control id="AnalysisExportHitdmsFunc"/>-->
+      </toolbar>
+      <toolbar>
+        <Control id="AnalysisStartPlaybackFunc"/>
+        <Control id="AnalysisSlowPlaybackFunc"/>
+        <Control id="AnalysisRatePlaybackFunc"/>
+        <Control id="AnalysisStepPlaybackFunc"/>
+        <Control id="AnalysisStopPlaybackFunc"/>
+        <Control id="MeasureTagFunc"/>
+        <Control id="MeasureJudgementFunc"/>
+        <Control id="AnalysisReduceAve"/>
+        <Control id="MeasureAudioFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="AnalysisHandCalFunc"/>
+        <Control id="AnalysisAutoCalFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="LayoutRecorderFunc" layout="1"/>
+        <Control id="LayoutFFTFunc" layout="1"/>
+        <Control id="Layout2DFunc" layout="1"/>
+        <Control id="LayoutSpectrumFunc" layout="1"/>
+      </toolbar>
+      <toolbar>
+        <Control id="RunInfoFunc"/>
+      </toolbar>
+    </menu>
+    <menu id ="AnalysisChatDesignModuleAnalysis" analysis ="1">
+      <toolbar>
+        <Control id="DelAllChatFunc"/>
+        <Control id="DelChatFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatHorizFunc"/>
+        <Control id="ChatVertFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="MultiScreenFunc"/>
+        <Control id="MultiScreenLayOutMgrFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatRecordModuleAnalysis"/>
+        <Control id="ChatXYRecordModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatFFTModuleAnalysis"/>
+        <Control id="ChatOctaveModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <Control id="Chat2DModuleAnalysis"/>
+        <Control id="Chat3DModuleAnalysis"/>
+        <!--云图-->
+        <Control id="ChatCloud3DModuleAnalysis"/>
+        <Control id="ChatModalModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatStaticModuleAnalysis"/>
+        <Control id="ChatExperimentModuleAnalysis"/>
+        <Control id="ChatLoadExprtimenetModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatVideoModuleAnalysis"/>
+        <Control id="ChatAudioModuleAnalysis"/>
+        <Control id="ChatMeterModuleAnalysis"/>
+        <Control id="ChatDigitalModuleAnalysis"/>
+        <Control id="ChatBarModuleAnalysis"/>
+        <Control id="ChatMachineStatusModuleAnalysis"/>
+        <Control id="LightModuleAnalysis"/>
+        <Control id="ChatTableModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatXYPolarModuleAnalysis"/>
+        <Control id="ChatGpsRouteModuleAnalysis"/>
+        <Control id="ChatLatAndLongitutdeModuleAnalysis"/>
+        <Control id="ChatCampbellModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatBalanceModuleAnalysis"/>
+        <Control id="ChatAirConditionExModuleAnalysis"/>
+        <Control id="ChatWrestShakeModuleAnalysis"/>
+        <Control id="ChatCableModelModuleAnalysis"/>
+        <Control id="ChatShockCoefModuleAnalysis"/>
+        <Control id="ChatStakeModelModuleAnalysis"/>
+        <Control id="ChatDumpModuleAnalysis"/>
+        <Control id="ChatFreqDumpModuleAnalysis"/>
+        <Control id="ChatTimeDumpModuleAnalysis"/>
+        <Control id="ChatSpoilageGeneModuleAnalysis"/>
+        <Control id="ChatStockWaveModuleAnalysis"/>
+        <Control id="ChatFatigueTestChatModuleAnalysis"/>
+        <Control id="ChatWaveletModuleAnalysis"/>
+        <Control id="ChatHopkinsonBarModuleAnalysis"/>
+        <Control id="ChatMaterialModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ChatOrderModuleAnalysis"/>
+        <Control id="ChatOrderTestModuleAnalysis"/>
+        <Control id="TrialChatModuleAnalysis"/>
+        <!--3D轴心轨迹插件-->
+        <Control id="ChatPathTrack3DModuleAnalysis"/>
+        <Control id="ChatRigitidyCurvesModuleAnalysis"/>
+        <Control id="ChatLoadDeviationModuleAnalysis"/>
+        <Control id="ChatVibrationShockModuleAnalysis"/>
+        <Control id="ChatStressLoadModuleAnalysis"/>
+        <Control id="ChatPlaneChannelModuleAnalysis"/>
+        <Control id="ChatACSpecialityModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <!--定制-->
+        <Control id="ChatHydrovalveModuleAnalysis"/>
+        <Control id="ChatSlopeModuleAnalysis"/>
+        <Control id="ChatModelParamModuleAnalysis"/>
+        <Control id="ChatGongliBiaoModuleAnalysis"/>
+        <Control id="ChatSpeedMileModuleAnalysis"/>
+        <Control id="ChatStableModuleAnalysis"/>
+        <Control id="ChatScatterModuleAnalysis"/>
+        <Control id="ChatStattableModuleAnalysis"/>
+        <Control id="SoundStatModuleAnalysis"/>
+        <Control id="ChatBindBeltTestModuleAnalysis"/>
+        <Control id="ChatSeaRouteXYRecorderModuleAnalysis"/>
+        <Control id="ChatWeaponModuleAnalysis"/>
+        <Control id="ChatShearWaveSingleAnalysis"/>
+        <Control id="ChatShearWaveDoubleAnalysis"/>
+        <Control id="ChatTimeTerritoryAnalysis"/>
+        <Control id="ChatTimeBorderAnalysis"/>
+        <Control id="ChatFFTAnalysisAnalysis"/>
+        <Control id="ChatPolarAnalysisAnalysis"/>
+        <Control id="ChatVibratorTrendModuleAnalysis"/>
+        <Control id="ChatPathTrackModuleAnalysis"/>
+        <Control id="ChatMoogPhotoModuleAnalysis"/>
+      </toolbar>
+    </menu>
+    <!--输出-->
+    <menu id ="OutputModuleAnalysis" analysis="1">
+      <toolbar>
+        <Control id="ExcelOutputModuleAnalysis" UserControl ="1"/>
+        <Control id="MatLabOutputModuleAnalysis" UserControl ="1"/>
+        <Control id="TxtOutputModuleAnalysis" UserControl ="1"/>
+        <Control id="UFFOutputModuleAnalysis" UserControl ="1"/>
+        <Control id="AcessOutputModuleAnalysis" UserControl ="1"/>
+      </toolbar>
+      <toolbar>
+        <Control id="WordOutputModuleAnalysis" UserControl ="1"/>
+        <Control id="PicOutputModuleAnalysis" UserControl ="1"/>
+      </toolbar>
+      <toolbar>
+        <Control id="DHSoftOutputModuleAnalysis" UserControl ="1"/>
+        <Control id="ReportOutputModuleAnalysis" UserControl ="1"/>
+      </toolbar>
+      <toolbar>
+        <Control id="WavOutputModuleAnalysis" UserControl ="1"/>
+      </toolbar>
+      <toolbar>
+        <Control id="OutOutputFunc"/>
+      </toolbar>
+    </menu>
+    <!--打印-->
+    <menu id ="PrintModuleAnalysis" analysis="1">
+      <toolbar>
+        <Control id="PrintSetupFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="PrintTitleFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="PrintMarginFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="PrintOutFunc"/>
+      </toolbar>
+    </menu>
+  </Module>
+  <!--模态-->
+  <Module type ="DataDelModule" id ="ModalAnalysis">
+    <!--建模-->
+    <menu id ="ModelModuleAnalysis" analysis="1">
+      <toolbar>
+        <Control id="ImportModelFunc"/>
+        <Control id="SaveModelFunc"/>
+        <Control id="SaveToModelFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="EditModelFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ShowModelFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ProcessionalModelFunc"/>
+      </toolbar>
+    </menu>
+    <!--截取-->
+    <Module type ="DataDelModule" id ="DataDelModuleAnalysis">
+      <menu id ="DataDelModuleAnalysis" analysis ="1">
+        <toolbar>
+          <Control id="ModalDataDelFunc"/>
+        </toolbar>
+      </menu>
+    </Module>
+    <!--模态数据-->
+    <menu id ="ModalDataModuleAnalysis" analysis ="1">
+      <toolbar>
+        <Control id="ModalFileManageFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ModalMeasureNoForceModuleAnalysis"/>
+        <Control id="ModalMeasureForceModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ModalSingleInMultiOutFunc"/>
+        <Control id="ModalMultiInSingleOutFunc"/>
+        <Control id="ModalMultiInMultiOutFunc"/>
+      </toolbar>
+    </menu>
+    <!--模态参数识别New-->
+    <menu id ="ModalIndentifyXModuleAnalysis" analysis ="1">
+      <toolbar>
+        <Control id="ModalIndentifyDataFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ModalIndentifyIDSelFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ModalIndentifyFFTAnalysis" UserControl="1"/>
+        <Control id="ModalIndentifySelFreqAnalysis" UserControl="1"/>
+        <Control id="ModalIndentifyModalIdenAnalysis" UserControl="1"/>
+        <Control id="ModalIndentifyCorrelationAnalysis" UserControl="1"/>
+        <Control id="ModalIndentifyDumpAnalysis" UserControl="1"/>
+        <Control id="ModalIndentifySelFreqWidthAnalysis" UserControl="1"/>
+        <Control id="ModalIndentifyStablyPicAnalysis" UserControl="1"/>
+        <Control id="ModalIndentifyPloyAnalysis" UserControl="1"/>
+      </toolbar>
+    </menu>
+    <!--振型-->
+    <menu id ="ModalVibModelModuleAnalysis" analysis ="1">
+      <toolbar>
+        <Control id="ShowModelFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ModalVibShapeCollateFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ModalVibFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ModalVibControlFunc"/>
+      </toolbar>
+    </menu>
+    <!--模态验证-->
+    <menu id ="ModalModelValidateModuleAnalysis" analysis ="1">
+      <toolbar>
+        <Control id="ModalIndentifyDataFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ModalValidateMACModuleAnalysis" UserControl="1"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ModalValidateMSFModuleAnalysis" UserControl="1"/>
+      </toolbar>
+      <toolbar>
+        <Control id="ModalValidateMOVModuleAnalysis" UserControl="1"/>
+      </toolbar>
+    </menu>
+    <!--激振器PCA检查-->
+    <!--menu id ="PCACheckModuleModuleAnalysis" analysis ="1">
+      <toolbar>
+        <Control id="PCACheckModuleFunc" UserControl="1"/>
+      </toolbar>
+    </menu-->
+    <!--动力修改预测-->
+    <!--menu id ="PowerChangeModuleModuleAnalysis" analysis ="1">
+      <toolbar>
+        <Control id="PowerChangeModuleFunc" UserControl="1"/>
+      </toolbar>
+    </menu-->
+  </Module>
+  <!--切换定义-->
+  <Switch>
+    <SwitchItem id="SwitchMeasurePath" path="MeasureModule|MeasureModuleAnalysis"></SwitchItem>
+    <SwitchItem id="SwitchAnalysisPath" path="AnalysisModule|AnalysisModuleAnalysis"></SwitchItem>
+  </Switch>
+</DHTest>

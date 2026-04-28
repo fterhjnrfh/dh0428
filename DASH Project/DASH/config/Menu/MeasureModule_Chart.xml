@@ -1,0 +1,6 @@
+<DHTest>
+  <DefaultID>ChatRecordModuleAnalysis</DefaultID>
+  <DefaultID>ChatXYRecordModuleAnalysis</DefaultID>
+  <DefaultID>ChatOctaveModuleAnalysis</DefaultID>
+  <DefaultID>Chat2DModuleAnalysis</DefaultID>
+</DHTest>

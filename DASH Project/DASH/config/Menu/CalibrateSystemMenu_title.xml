@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--索力测试-->
+<DHTest>
+  <Module type ="SensorSelectModule">
+  </Module>
+
+  <Module type ="SensitiveModule">
+  </Module>
+
+  <Module type ="FreqRespondModule">
+  </Module>
+
+  <Module type ="LinearModule">
+  </Module>
+
+  <Module type ="ResonanceFreqModule">
+  </Module>
+</DHTest>

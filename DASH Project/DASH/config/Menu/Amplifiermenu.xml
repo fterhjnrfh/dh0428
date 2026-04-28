@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DHTest>
+	<!--测量-->
+	<Module type ="MeasureModule" id ="MeasureModuleAnalysis">
+		<!--通道设置-->
+		<menu id ="ChnSetupModuleAnalysis" analysis ="0">
+			<toolbar>
+				<Control id="AnalogParamModuleAnalysis" UserControl ="1"/>
+			</toolbar>
+		</menu>
+	</Module>
+</DHTest>

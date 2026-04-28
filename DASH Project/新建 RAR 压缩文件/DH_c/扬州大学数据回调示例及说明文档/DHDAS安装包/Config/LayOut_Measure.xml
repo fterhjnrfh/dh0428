@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<DH>
+	<item ID="recorder" name="" namekey="27401" cmdID="LayoutRecorderFunc" image="measureRecorder.png">
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0" Width="1" Height="1" ScreenIndex="0"/>
+	</item>
+	<item ID="fft" name="" namekey="27402"  cmdID="LayoutFFTFunc" image="measureFFTlayout.png">
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0" Width="1" Height="0.5" ScreenIndex="0"/>
+		<panel ID="499716D9-63DD-4FBA-854A-0AEE1FED679E" X="0" Y="0.5" Width="1" Height="0.5" ScreenIndex="0"/>
+	</item>
+	<item ID="2D" name="" namekey="27406"  cmdID="Layout2DFunc" image="measureTwoD.png">
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0" Width="1" Height="0.5" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0" Y="0.5" Width="1" Height="0.5" ScreenIndex="0"/>
+	</item>
+	<item ID="spectrum" name="" namekey="27403"  cmdID="LayoutSpectrumFunc" image="MeasureSpectrumLay.png">
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0" Width="0.5" Height="0.33" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.5" Y="0" Width="0.5" Height="0.33" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0" Y="0.33" Width="0.5" Height="0.33" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.5" Y="0.33" Width="0.5" Height="0.33" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0" Y="0.66" Width="0.5" Height="0.34" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.5" Y="0.66" Width="0.5" Height="0.34" ScreenIndex="0"/>
+	</item>
+	<item ID="SaoFreq" name="" namekey="27404"  cmdID="LayoutSaoFreqFunc" image="measureRecorder.png">
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0" Width="1" Height="0.5" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0" Y="0.5" Width="1" Height="0.5" ScreenIndex="0"/>
+		<panel ID="02F83D6A-EA48-41CB-8276-3DC072F61581" X="0.8" Y="0" Width="0.125" Height="0.1" ScreenIndex="0"/>
+	</item>
+	<item ID="SRS" name="" namekey="27405"  cmdID="LayoutSRSFunc" image="measureRecorder.png">
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0" Width="1" Height="0.5" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0" Y="0.5" Width="1" Height="0.5" ScreenIndex="0"/>
+	</item>
+	<item ID="LayoutDigitalFunc" name="" namekey="27408" cmdID="LayoutDigitalFunc" image="DigitalLayout.png">
+		<panel ID="02F83D6A-EA48-41CB-8276-3DC072F61581" X="0" Y="0" Width="1" Height="1" ScreenIndex="0"/>
+	</item>
+	<item ID="LayoutShockCoiefFunc" name="" namekey="27410" cmdID="LayoutShockCoiefFunc" image="ShockCoefLayout.png">
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" PrjID ="282E698D-4395-4620-BEB4-E4BB898E95BE" X="0" Y="0" Width="1" Height="1" ScreenIndex="0"/>
+	</item>
+	<item ID="LayoutCableFunc" name="" namekey="27411" cmdID="LayoutCableFunc" image="CableLayout.png">
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" PrjID ="37318100-98F6-4A6B-B9D2-1DA68C9395E3" X="0" Y="0" Width="1" Height="0.5" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0.5" Width="1" Height="0.5" ScreenIndex="0"/>
+	</item>
+	<item ID="LayoutModelFunc" name="" namekey="27412" cmdID="LayoutModelFunc" image="ModelLayOut.png">
+		<panel ID="D1F3273F-7E9D-4947-8912-B9B3D3CF0554" X="0" Y="0" Width="1" Height="1" ScreenIndex="0"/>
+	</item>
+	<item ID="LayoutStaticFunc" name="" namekey="27413" cmdID="LayoutStaticFunc" image="StaticLayout.png">
+		<panel ID="add65ae9-d56e-43dc-ac5b-e24a7a98d085" X="0" Y="0" Width="1" Height="1" ScreenIndex="0"/>
+	</item>
+	<item ID="LayoutMTSFunc" name="" namekey="27413" cmdID="LayoutMTSFunc" image="MTSStaticLayout.png">
+		<panel ID="F357FB15-C583-468D-9E04-77AF19CEDF76" X="0" Y="0" Width="1" Height="1" ScreenIndex="0"/>
+	</item>
+	<item ID="LayoutModalFunc" name="" namekey="27416" cmdID="LayoutModalFunc" image="ModelLayOut.png">
+		<panel ID="AAFCDE9F-8F89-4AE2-95A9-2F67A055F7A0" X="0" Y="0" Width="1" Height="1" ScreenIndex="0"/>
+	</item>
+	<item ID="LayoutCustom" name="" namekey="27415" cmdID="LayoutCustom" image="measureRecorder.png">
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0" Width="1" Height="1" ScreenIndex="0"/>
+	</item>
+	<item ID="LayOutShangDe1" name="" namekey="73059" cmdID="LayOutShangDe1" image="measureRecorder.png">
+		<panel ID="02F83D6A-EA48-41CB-8276-3DC072F61581" X="0" Y="0" Width="0.2" Height="0.15" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.2" Y="0" Width="0.8" Height="0.33" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.2" Y="0.33" Width="0.8" Height="0.33" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.2" Y="0.66" Width="0.8" Height="0.33" ScreenIndex="0"/>
+	</item>
+	<item ID="LayOutShangDe2" name="" namekey="73060"  cmdID="LayOutShangDe2" image="measureRecorder.png">
+		<panel ID="02F83D6A-EA48-41CB-8276-3DC072F61581" X="0" Y="0" Width="0.2" Height="0.15" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.2" Y="0" Width="0.8" Height="0.33" ScreenIndex="0"/>
+		<panel ID="02F83D6A-EA48-41CB-8276-3DC072F61581" X="0.2" Y="0.33" Width="0.25" Height="0.2" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.2" Y="0.66" Width="0.8" Height="0.33" ScreenIndex="0"/>
+	</item>
+	<item ID="LayoutSelfRorateFunc" name="" namekey="58571"  cmdID="LayoutSelfRorateFunc" image="MeasureSpectrumLay.png">
+		<panel ID="39E31744-D1C3-4222-BA10-FBAE7235E9B5" X="0" Y="0" Width="0.5" Height="0.4" ScreenIndex="0"/>
+		<panel ID="39E31744-D1C3-4222-BA10-FBAE7235E9B5" X="0.5" Y="0" Width="0.5" Height="0.4" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0.4" Width="0.5" Height="0.4" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.5" Y="0.4" Width="0.5" Height="0.4" ScreenIndex="0"/>
+		<panel ID="5F19BC52-A712-4927-B2F7-29B281E6727B" X="0" Y="0.8" Width="0.33" Height="0.2" ScreenIndex="0"/>
+		<panel ID="A0723194-F865-427D-8B8C-46DE461E0DAA" X="0.33" Y="0.8" Width="0.33" Height="0.2" ScreenIndex="0"/>
+		<panel ID="02F83D6A-EA48-41CB-8276-3DC072F61581" X="0.66" Y="0.8" Width="0.34" Height="0.2" ScreenIndex="0"/>
+	</item>
+	<item ID="LayoutGUIFunc" name="" namekey="58571"  cmdID="LayoutGUIFunc" image="DigitalLayout.png">
+		<panel ID="BE8E520B-6BB1-4B80-9289-9C240F5E1833" X="0" Y="0" Width="1" Height="0.66" ScreenIndex="0" PageIndex="0" Title="">
+			<cmd ID="1" First="6"/>
+			<cmd ID="412" First="8"/>
+		</panel>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0.66" Width="1" Height="0.34" ScreenIndex="0" PageIndex="0"/>
+	</item>
+	<item ID="LayoutGUI1" name="" namekey="74654"  cmdID="LayoutGUI1" image="DigitalLayout.png">
+		<panel ID="BE8E520B-6BB1-4B80-9289-9C240F5E1833" X="0" Y="0" Width="1" Height="0.66" ScreenIndex="0" Title="">
+			<cmd ID="1" First="6"/>
+			<cmd ID="412" First="8"/>
+		</panel>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0.66" Width="1" Height="0.34" ScreenIndex="0"/>
+	</item>
+	<item ID="LayoutGUI2" name="" namekey="74655"  cmdID="LayoutGUI2" image="DigitalLayout.png">
+		<panel ID="D3C67B6D-3359-4215-9660-E4F6A760A121" X="0" Y="0" Width="0.25" Height="0.34" ScreenIndex="0"/>
+		<panel ID="D3C67B6D-3359-4215-9660-E4F6A760A121" X="0.25" Y="0" Width="0.25" Height="0.34" ScreenIndex="0"/>
+		<panel ID="D3C67B6D-3359-4215-9660-E4F6A760A121" X="0.5" Y="0" Width="0.25" Height="0.34" ScreenIndex="0"/>
+		<panel ID="D3C67B6D-3359-4215-9660-E4F6A760A121" X="0.75" Y="0" Width="0.25" Height="0.34" ScreenIndex="0"/>
+		<panel ID="BE8E520B-6BB1-4B80-9289-9C240F5E1833" X="0" Y="0.34" Width="1" Height="0.14" ScreenIndex="0" Title="">
+			<cmd ID="1" First="4"/>
+			<cmd ID="412" First="2"/>
+		</panel>
+		<panel ID="BE8E520B-6BB1-4B80-9289-9C240F5E1833" X="0" Y="0.48" Width="1" Height="0.29" ScreenIndex="0" Title="">
+			<cmd ID="1" First="6"/>
+			<cmd ID="412" First="4"/>
+		</panel>
+		<panel ID="B38F3368-D03B-49BA-9B8C-D0E471AE1A4D" X="0" Y="0.77" Width="1" Height="0.23" ScreenIndex="0" Title="">
+			<cmd ID="1" First="8"/>
+			<cmd ID="412" First="4"/>
+		</panel>
+	</item>
+	<item ID="LayoutGUI3" name="" namekey="74656"  cmdID="LayoutGUI3" image="DigitalLayout.png">
+		<panel ID="BE8E520B-6BB1-4B80-9289-9C240F5E1833" X="0" Y="0" Width="0.2858" Height="1" ScreenIndex="0" Title="压力参数">
+			<cmd ID="1" First="2"/>
+			<cmd ID="412" First="22"/>
+		</panel>
+		<panel ID="BE8E520B-6BB1-4B80-9289-9C240F5E1833" X="0.2858" Y="0" Width="0.1428" Height="1" ScreenIndex="0" Title="压力/温度参数">
+			<cmd ID="1" First="1"/>
+			<cmd ID="412" First="22"/>
+		</panel>
+		<panel ID="BE8E520B-6BB1-4B80-9289-9C240F5E1833" X="0.4286" Y="0" Width="0.1428" Height="1" ScreenIndex="0" Title="温度参数">
+			<cmd ID="1" First="1"/>
+			<cmd ID="412" First="22"/>
+		</panel>
+		<panel ID="BE8E520B-6BB1-4B80-9289-9C240F5E1833" X="0.5714" Y="0" Width="0.2858" Height="1" ScreenIndex="0" Title="其他参数">
+			<cmd ID="1" First="2"/>
+			<cmd ID="412" First="22"/>
+		</panel>
+		<panel ID="BE8E520B-6BB1-4B80-9289-9C240F5E1833" X="0.8572" Y="0" Width="0.1428" Height="1" ScreenIndex="0" Title="流量/振动/脉动参数">
+			<cmd ID="1" First="1"/>
+			<cmd ID="412" First="22"/>
+		</panel>
+	</item>
+	<item ID="LayoutDistributed" name="" namekey="74811" cmdID="LayoutDistributed" image="measureRecorder.png">
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0" Width="0.25" Height="0.5" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.25" Y="0" Width="0.25" Height="0.5" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.5" Y="0" Width="0.25" Height="0.5" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.75" Y="0" Width="0.25" Height="0.5" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0.5" Width="0.25" Height="0.5" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.25" Y="0.5" Width="0.25" Height="0.5" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.5" Y="0.5" Width="0.25" Height="0.5" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.75" Y="0.5" Width="0.25" Height="0.5" ScreenIndex="0"/>
+	</item>
+	<item ID="LayoutDistributed2D" name="" namekey="74811" cmdID="LayoutDistributed2D" image="measureTwoD.png">
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0" Y="0" Width="0.25" Height="0.5" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.25" Y="0" Width="0.25" Height="0.5" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.5" Y="0" Width="0.25" Height="0.5" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.75" Y="0" Width="0.25" Height="0.5" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0" Y="0.5" Width="0.25" Height="0.5" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.25" Y="0.5" Width="0.25" Height="0.5" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.5" Y="0.5" Width="0.25" Height="0.5" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.75" Y="0.5" Width="0.25" Height="0.5" ScreenIndex="0"/>
+	</item>
+	<item ID="LayoutDistributed2" name="" namekey="74811" cmdID="LayoutDistributed" image="measureRecorder.png">
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.25" Y="0" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.5" Y="0" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.75" Y="0" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0.25" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.25" Y="0.25" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.5" Y="0.25" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.75" Y="0.25" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0.5" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.25" Y="0.5" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.5" Y="0.5" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.75" Y="0.5" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0" Y="0.75" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.25" Y="0.75" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.5" Y="0.75" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="68A2CEEA-53C9-41AF-A4D7-B661A92C8424" X="0.75" Y="0.75" Width="0.25" Height="0.25" ScreenIndex="0"/>
+	</item>
+	<item ID="LayoutDistributed2D2" name="" namekey="74811" cmdID="LayoutDistributed2D" image="measureTwoD.png">
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0" Y="0" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.25" Y="0" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.5" Y="0" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.75" Y="0" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0" Y="0.25" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.25" Y="0.25" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.5" Y="0.25" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.75" Y="0.25" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0" Y="0.5" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.25" Y="0.5" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.5" Y="0.5" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.75" Y="0.5" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0" Y="0.75" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.25" Y="0.75" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.5" Y="0.75" Width="0.25" Height="0.25" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0.75" Y="0.75" Width="0.25" Height="0.25" ScreenIndex="0"/>
+	</item>
+	<item ID="Table" name="" namekey="2651" cmdID="Table" image="measureTable.png">
+		<panel ID="E2B9E3E3-3CC3-42F9-9EC8-36779A9CAD07" X="0" Y="0" Width="1" Height="1" ScreenIndex="0"/>
+	</item>
+	<item ID="MR" name="" namekey="83174" cmdID="MR" image="measureRecorder.png">
+		<panel ID="796BBC7E-87DC-4A09-950E-234147F46BAA" X="0" Y="0" Width="1" Height="0.5" ScreenIndex="0"/>
+		<panel ID="85C950BE-936A-436B-A267-351613C422ED" X="0" Y="0.5" Width="0.5" Height="0.5" ScreenIndex="0"/>
+		<panel ID="02F83D6A-EA48-41CB-8276-3DC072F61581" X="0.5" Y="0.5" Width="0.5" Height="0.5" ScreenIndex="0"/>
+	</item>
+</DH>

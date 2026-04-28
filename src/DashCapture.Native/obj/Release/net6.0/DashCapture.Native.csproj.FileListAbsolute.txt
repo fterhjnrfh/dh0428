@@ -1,0 +1,11 @@
+E:\NEW-DH\src\DashCapture.Native\bin\Release\net6.0\DashCapture.Native.deps.json
+E:\NEW-DH\src\DashCapture.Native\bin\Release\net6.0\DashCapture.Native.dll
+E:\NEW-DH\src\DashCapture.Native\bin\Release\net6.0\DashCapture.Native.pdb
+E:\NEW-DH\src\DashCapture.Native\obj\Release\net6.0\DashCapture.Native.GeneratedMSBuildEditorConfig.editorconfig
+E:\NEW-DH\src\DashCapture.Native\obj\Release\net6.0\DashCapture.Native.AssemblyInfoInputs.cache
+E:\NEW-DH\src\DashCapture.Native\obj\Release\net6.0\DashCapture.Native.AssemblyInfo.cs
+E:\NEW-DH\src\DashCapture.Native\obj\Release\net6.0\DashCapture.Native.csproj.CoreCompileInputs.cache
+E:\NEW-DH\src\DashCapture.Native\obj\Release\net6.0\DashCapture.Native.dll
+E:\NEW-DH\src\DashCapture.Native\obj\Release\net6.0\refint\DashCapture.Native.dll
+E:\NEW-DH\src\DashCapture.Native\obj\Release\net6.0\DashCapture.Native.pdb
+E:\NEW-DH\src\DashCapture.Native\obj\Release\net6.0\ref\DashCapture.Native.dll

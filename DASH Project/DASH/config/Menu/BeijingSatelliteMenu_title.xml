@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DHTest>
+  <!--测量-->
+  <Module type ="MeasureModule" id ="MeasureModuleAnalysis">
+    <!--参数管理-->
+    <menu id ="ParamModuleAnalysis" analysis="1">
+      <toolbar>
+        <Control id="NewParamFunc" switch="MeasureModule|ChnSetupModuleAnalysis|AnalogParamModuleAnalysis"/>
+      </toolbar>
+      <toolbar>
+        <Control id="SaveParamFunc"/>
+        <Control id="SaveToParamFunc"/>
+        <Control id="SaveHardWareParamFunc"/>
+        <Control id="SaveDefaultParamFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="LoadSecondAmpParamFunc"/>
+        <Control id="LoadParamFunc" switch="MeasureModule|ChnSetupModuleAnalysis|AnalogParamModuleAnalysis"/>
+        <Control id="RenameParamFunc"/>
+        <Control id="DelParamFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="CopyParamFunc"/>
+        <Control id="CutParamFunc"/>
+        <Control id="PasteParamFunc"/>
+      </toolbar>
+    </menu>
+    <!--通道设置-->
+    <menu id ="ChnSetupModuleAnalysis" analysis ="0">
+      <toolbar>
+        <Control id="SaveParamFunc"/>
+        <Control id="SaveToParamFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="LoadParamFunc"/>
+        <Control id="LoadCSVParamFunc"/>
+      </toolbar>
+      <toolbar>
+        <Control id="AnalogParamModuleAnalysis" UserControl ="1"/>
+        <Control id="ForceLimitParamModuleAnalysis" UserControl ="1"/>
+      </toolbar>
+    </menu>
+  </Module>
+</DHTest>

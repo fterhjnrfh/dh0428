@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--静载试验-->
+<DHTest>
+	<!--工程管理-->
+	<Module type ="ProjectModule" id ="ProjectModuleAnalysis" Default="1">
+		<menu id ="ProjectModuleAnalysis" analysis="1">
+			<toolbar>
+				<Control id="NewPrjFunc" switch="ChnSetupModule|ChnSetupModuleAnalysis"/>
+			</toolbar>
+			<toolbar>
+				<Control id="OpenPrjFunc" switch="AnalysisModule|AnalysisModuleAnalysis"/>
+				<Control id="RenamePrjFunc"/>
+				<Control id="DelPrjFunc" />
+			</toolbar>
+		</menu>
+	</Module>
+	<!--通道设置-->
+	<Module type ="ChnSetupModule" id ="ChnSetupModuleAnalysis">
+		<menu id ="ChnSetupModuleAnalysis" analysis ="0">
+			<toolbar>
+				<Control id="SaveParamFunc"/>
+				<Control id="SaveToParamFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="AnalogParamModuleAnalysis" UserControl ="1"/>
+				<Control id="TachoParamModuleAnalysis" UserControl ="1"/>
+				<Control id="SignalParamModuleAnalysis" UserControl ="1"/>
+				<Control id="GPSParamModuleAnalysis" UserControl ="1"/>
+				<Control id="OutDataParamModuleAnalysis" UserControl ="1"/>
+				<Control id="VideoParamModuleAnalysis" UserControl ="1"/>
+				<Control id="AudioParamModuleAnalysis" UserControl ="1"/>
+				<Control id="DigitalParamModuleAnalysis" UserControl ="1"/>
+        <Control id="VibrationWireParamModuleAnalysis" UserControl="1"/>
+			</toolbar>
+		</menu>
+	</Module>
+	<!--测量-->
+	<Module type ="MeasureModule" id ="MeasureModuleAnalysis">
+		<menu id ="MeasureModuleAnalysis" analysis ="0">
+			<toolbar>
+				<Control id="MeasureStoreFunc"/>
+				<Control id="MeasurePauseFunc"/>
+				<Control id="MeasureContinueFunc"/>
+				<Control id="MeasureStopFunc"/>
+				<Control id="MeasureShiBoFunc"/>
+				<Control id="MeasureTrigFunc"/>
+				<Control id="MeasureFreezeFunc"/>
+				<Control id="MeasureBalanceZero"/>
+				<Control id="MeasureAutoRand"/>
+				<Control id="MeasureTagFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="LayoutStaticFunc" layout="1"/>
+				<Control id="LayoutRecorderFunc" layout="1"/>
+				<Control id="LayoutDigitalFunc" layout="1"/>
+				<Control id="CustomLayoutFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="RunInfoFunc"/>			
+			</toolbar>
+		</menu>
+		<menu id ="MeasureChatDesignModuleAnalysis" analysis ="0">
+			<toolbar>
+				<Control id="DelAllChatFunc"/>
+				<Control id="DelChatFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="ChatHorizFunc"/>
+				<Control id="ChatVertFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="ChatRecordModuleAnalysis"/>
+				<Control id="ChatXYRecordModuleAnalysis"/>
+			</toolbar>
+			<toolbar>
+				<Control id="ChatFFTModuleAnalysis"/>
+				<Control id="ChatOctaveModuleAnalysis"/>
+			</toolbar>
+			<toolbar>
+				<Control id="Chat2DModuleAnalysis"/>
+				<Control id="Chat3DModuleAnalysis"/>
+			</toolbar>
+			<toolbar>
+				<Control id="ChatDigitalModuleAnalysis"/>
+				<Control id="ChatBarModuleAnalysis"/>
+				<Control id="ChatTableModuleAnalysis"/>
+				<Control id="ChatStaticModuleAnalysis"/>
+			</toolbar>
+		</menu>
+	</Module>
+	<!--分析-->
+	<Module type ="AnalysisModule" id ="AnalysisModuleAnalysis">
+		<!--通道-->
+		<menu id ="ChannelModuleAnalysis" analysis ="1">
+			<toolbar>
+				<Control id="EditChannelFunc"/>
+			</toolbar>
+		</menu>
+		<!--事件-->
+		<menu id ="EventModuleAnalysis" analysis ="1">
+			<toolbar>
+				<Control id="AddEventFunc"/>
+				<Control id="EditEventFunc"/>
+				<Control id="DelEventFunc"/>
+			</toolbar>
+		</menu>
+		<menu id ="AnalysisModuleAnalysis" analysis ="1" Default="1">
+			<toolbar>
+        		<Control id="MeasureTagFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="AnalysisHandCalFunc"/>
+				<Control id="AnalysisAutoCalFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="LayoutStaticFunc" layout="1"/>
+				<Control id="LayoutRecorderFunc" layout="1"/>
+				<Control id="LayoutDigitalFunc" layout="1"/>
+				<Control id="CustomLayoutFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="RunInfoFunc"/>
+			</toolbar>
+		</menu>
+		<menu id ="AnalysisChatDesignModuleAnalysis" analysis ="1">
+			<toolbar>
+				<Control id="DelAllChatFunc"/>
+				<Control id="DelChatFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="ChatHorizFunc"/>
+				<Control id="ChatVertFunc"/>
+			</toolbar>
+			<toolbar>
+				<Control id="ChatRecordModuleAnalysis"/>
+				<Control id="ChatXYRecordModuleAnalysis"/>
+			</toolbar>
+			<toolbar>
+				<Control id="ChatFFTModuleAnalysis"/>
+				<Control id="ChatOctaveModuleAnalysis"/>
+			</toolbar>
+			<toolbar>
+				<Control id="Chat2DModuleAnalysis"/>
+				<Control id="Chat3DModuleAnalysis"/>
+			</toolbar>
+			<toolbar>
+				<Control id="ChatDigitalModuleAnalysis"/>
+				<Control id="ChatBarModuleAnalysis"/>
+				<Control id="ChatTableModuleAnalysis"/>
+				<Control id="ChatStaticModuleAnalysis"/>
+			</toolbar>
+		</menu>
+	</Module>
+	<!--输出-->
+	<Module type ="OutputModule" id ="OutputModuleAnalysis">
+		<menu id ="OutputModuleAnalysis" analysis="1">
+			<toolbar>
+				<Control id="ExcelOutputModuleAnalysis" UserControl ="1"/>
+				<Control id="MatLabOutputModuleAnalysis" UserControl ="1"/>
+				<Control id="TxtOutputModuleAnalysis" UserControl ="1"/>
+				<Control id="UFFOutputModuleAnalysis" UserControl ="1"/>
+				<Control id="AcessOutputModuleAnalysis" UserControl ="1"/>
+			</toolbar>
+			<toolbar>
+				<Control id="WordOutputModuleAnalysis" UserControl ="1"/>
+				<Control id="PicOutputModuleAnalysis" UserControl ="1"/>
+			</toolbar>
+			<toolbar>
+				<Control id="DHSoftOutputModuleAnalysis" UserControl ="1"/>
+				<Control id="ReportOutputModuleAnalysis" UserControl ="1"/>
+			</toolbar>
+			<toolbar>
+				<Control id="OutOutputFunc"/>
+			</toolbar>
+		</menu>
+	</Module>
+	
+	<!--切换定义-->
+	<Switch>
+		<SwitchItem id="SwitchMeasurePath" path="MeasureModule|MeasureModuleAnalysis"></SwitchItem>
+		<SwitchItem id="SwitchAnalysisPath" path="AnalysisModule|AnalysisModuleAnalysis"></SwitchItem>
+    <SwitchItem id="SwitchChnAnalogPath" path="MeasureModule|ChnSetupModuleAnalysis|AnalogParamModuleAnalysis"></SwitchItem>
+	</Switch>
+</DHTest>
