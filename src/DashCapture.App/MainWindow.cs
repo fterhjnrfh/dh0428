@@ -15,6 +15,9 @@ namespace DashCapture.App;
 
 public sealed class MainWindow : Window
 {
+    private const int MaxMonitorViews = 64;
+    private const int MaxChannelsPerMonitorView = 64;
+
     private static readonly IBrush PageBackground = new SolidColorBrush(Color.FromRgb(242, 246, 251));
     private static readonly IBrush PanelBackground = new SolidColorBrush(Color.FromRgb(255, 255, 255));
     private static readonly IBrush PanelBackground2 = new SolidColorBrush(Color.FromRgb(236, 243, 252));
@@ -33,6 +36,13 @@ public sealed class MainWindow : Window
 
     private readonly ComboBox _deviceCombo = new();
     private readonly StackPanel _channelPanel = new();
+    private readonly WrapPanel _viewNavPanel = new() { Orientation = Orientation.Horizontal };
+    private readonly Grid _monitorGrid = new();
+    private readonly Button _addViewButton = new() { Content = "+" };
+    private readonly Button _removeViewButton = new() { Content = "-" };
+    private readonly Button _selectAllChannelsButton = new() { Content = "\u5168\u9009" };
+    private readonly Button _clearChannelsButton = new() { Content = "\u6e05\u7a7a" };
+    private readonly TextBlock _activeViewText = new();
     private readonly StackPanel _deviceInfoPanel = new();
     private readonly TextBox _storagePath = new();
     private readonly TextBox _customFileName = new();
@@ -40,31 +50,44 @@ public sealed class MainWindow : Window
     private readonly TextBlock _status = new();
     private readonly TextBlock _metrics = new();
     private readonly TextBlock _storagePreview = new();
-    private readonly Button _connectButton = new() { Content = "连接设备" };
-    private readonly Button _startButton = new() { Content = "开始采集", IsEnabled = false };
-    private readonly Button _stopButton = new() { Content = "停止采集", IsEnabled = false };
-    private readonly Button _browseButton = new() { Content = "浏览" };
-    private readonly WaveformControl _waveform = new();
+    private readonly Button _connectButton = new() { Content = "\u8fde\u63a5\u8bbe\u5907" };
+    private readonly Button _startButton = new() { Content = "\u5f00\u59cb\u91c7\u96c6", IsEnabled = false };
+    private readonly Button _stopButton = new() { Content = "\u505c\u6b62\u91c7\u96c6", IsEnabled = false };
+    private readonly Button _browseButton = new() { Content = "\u6d4f\u89c8" };
+    private readonly CheckBox _storageEnabledCheck = new() { Content = "\u4fdd\u5b58 TDMS" };
+    private readonly CheckBox _storageTabEnabledCheck = new() { Content = "\u4fdd\u5b58 TDMS" };
+    private readonly TdmsViewerControl _tdmsViewer;
     private readonly DispatcherTimer _renderTimer;
-    private readonly List<ChannelDescriptor> _selectedChannels = new();
+    private readonly List<MonitorViewState> _monitorViews = new();
+    private int _activeViewIndex;
 
     public MainWindow()
     {
         _settings = AppSettingsLoader.Load();
         _acquisition = new AcquisitionService(_settings);
-        _waveformStore = new WaveformStore(Math.Max(1000, _settings.Display.WindowSeconds * 10000));
-        _displayPipeline = new DisplayPipeline(_acquisition, _waveformStore, () => _acquisition.Devices);
-        _waveform.Store = _waveformStore;
-        _waveform.WindowSeconds = _settings.Display.WindowSeconds;
+        _waveformStore = new WaveformStore(DisplayCapacity());
+        _displayPipeline = new DisplayPipeline(
+            _acquisition,
+            _waveformStore,
+            () => _acquisition.Devices,
+            _settings.Display.MaxDisplayPointsPerSecond);
+        _tdmsViewer = new TdmsViewerControl(_settings.Storage.TdmRuntimeDir);
+        AddMonitorView();
 
         _storagePath.Text = _settings.Storage.RootPath;
         _customFileName.Text = _settings.Storage.CustomFileName;
-        _namingMode.ItemsSource = new[] { "按时间命名", "自定义命名" };
+        _storageEnabledCheck.IsChecked = _settings.Storage.Enabled;
+        _storageTabEnabledCheck.IsChecked = _settings.Storage.Enabled;
+        _namingMode.ItemsSource = new[] { "\u6309\u65f6\u95f4\u547d\u540d", "\u81ea\u5b9a\u4e49\u547d\u540d" };
         _namingMode.SelectedIndex = _settings.Storage.NamingMode == FileNamingMode.Time ? 0 : 1;
         StyleInput(_storagePath);
         StyleInput(_customFileName);
         StyleComboBox(_deviceCombo);
         StyleComboBox(_namingMode);
+        StyleControlButton(_addViewButton, AccentBlue);
+        StyleControlButton(_removeViewButton, AccentRed);
+        StyleControlButton(_selectAllChannelsButton, AccentBlue);
+        StyleControlButton(_clearChannelsButton, AccentBlue);
 
         Title = "DASH Capture";
         Background = PageBackground;
@@ -79,6 +102,31 @@ public sealed class MainWindow : Window
         _stopButton.Click += async (_, _) => await StopAsync();
         _browseButton.Click += async (_, _) => await BrowseStorageFolderAsync();
         _deviceCombo.SelectionChanged += (_, _) => RebuildChannelList();
+        _addViewButton.Click += (_, _) =>
+        {
+            if (_monitorViews.Count < MaxMonitorViews)
+            {
+                AddMonitorView();
+                SelectMonitorView(_monitorViews.Count - 1);
+                RebuildMonitorGrid();
+                RebuildViewNav();
+                ApplyMonitorSelectionsToStore();
+            }
+        };
+        _removeViewButton.Click += (_, _) =>
+        {
+            if (_monitorViews.Count > 1)
+            {
+                _monitorViews.RemoveAt(_activeViewIndex);
+                _activeViewIndex = Math.Clamp(_activeViewIndex, 0, _monitorViews.Count - 1);
+                RebuildMonitorGrid();
+                RebuildViewNav();
+                RebuildChannelList();
+                ApplyMonitorSelectionsToStore();
+            }
+        };
+        _selectAllChannelsButton.Click += (_, _) => SetDeviceChannelsForActiveView(true);
+        _clearChannelsButton.Click += (_, _) => SetDeviceChannelsForActiveView(false);
         _namingMode.SelectionChanged += (_, _) => UpdateStoragePreview();
         _customFileName.PropertyChanged += (_, e) =>
         {
@@ -94,6 +142,24 @@ public sealed class MainWindow : Window
                 UpdateStoragePreview();
             }
         };
+        _storageEnabledCheck.IsCheckedChanged += (_, _) =>
+        {
+            if (_storageTabEnabledCheck.IsChecked != _storageEnabledCheck.IsChecked)
+            {
+                _storageTabEnabledCheck.IsChecked = _storageEnabledCheck.IsChecked;
+            }
+
+            UpdateStoragePreview();
+        };
+        _storageTabEnabledCheck.IsCheckedChanged += (_, _) =>
+        {
+            if (_storageEnabledCheck.IsChecked != _storageTabEnabledCheck.IsChecked)
+            {
+                _storageEnabledCheck.IsChecked = _storageTabEnabledCheck.IsChecked;
+            }
+
+            UpdateStoragePreview();
+        };
 
         _acquisition.Faulted += fault => Dispatcher.UIThread.Post(() => _status.Text = fault.Message);
         _acquisition.TelemetryUpdated += telemetry => Dispatcher.UIThread.Post(() => UpdateTelemetry(telemetry));
@@ -102,7 +168,13 @@ public sealed class MainWindow : Window
         {
             Interval = TimeSpan.FromMilliseconds(1000.0 / Math.Max(1, _settings.Display.TargetFps))
         };
-        _renderTimer.Tick += (_, _) => _waveform.InvalidateVisual();
+        _renderTimer.Tick += (_, _) =>
+        {
+            foreach (MonitorViewState view in _monitorViews)
+            {
+                view.Waveform.InvalidateVisual();
+            }
+        };
         _renderTimer.Start();
 
         Closing += async (_, _) =>
@@ -114,6 +186,7 @@ public sealed class MainWindow : Window
                 await _storageService.DisposeAsync();
             }
 
+            _tdmsViewer.Dispose();
             await _acquisition.DisposeAsync();
         };
 
@@ -142,9 +215,13 @@ public sealed class MainWindow : Window
         StyleControlButton(_startButton, AccentGreen);
         StyleControlButton(_stopButton, AccentRed);
 
-        _status.Text = "未连接";
+        _status.Text = "\u672a\u8fde\u63a5";
         _status.Foreground = TextPrimary;
         _status.VerticalAlignment = VerticalAlignment.Center;
+        _storageEnabledCheck.Foreground = TextPrimary;
+        _storageEnabledCheck.VerticalAlignment = VerticalAlignment.Center;
+        _storageTabEnabledCheck.Foreground = TextPrimary;
+        _storageTabEnabledCheck.VerticalAlignment = VerticalAlignment.Center;
 
         var bar = new Grid
         {
@@ -152,7 +229,7 @@ public sealed class MainWindow : Window
             ColumnDefinitions = new ColumnDefinitions("Auto,Auto,Auto,*")
         };
 
-        Control deviceGroup = AddControlGroup("设备", _connectButton);
+        Control deviceGroup = AddControlGroup("\u8bbe\u5907", _connectButton);
         Grid.SetColumn(deviceGroup, 0);
         bar.Children.Add(deviceGroup);
 
@@ -160,9 +237,9 @@ public sealed class MainWindow : Window
         {
             Orientation = Orientation.Horizontal,
             Spacing = 8,
-            Children = { _startButton, _stopButton }
+            Children = { _startButton, _stopButton, _storageEnabledCheck }
         };
-        Control acquisitionGroup = AddControlGroup("采集", sampleGroup);
+        Control acquisitionGroup = AddControlGroup("\u91c7\u96c6", sampleGroup);
         Grid.SetColumn(acquisitionGroup, 1);
         bar.Children.Add(acquisitionGroup);
 
@@ -172,7 +249,7 @@ public sealed class MainWindow : Window
 
         var title = new TextBlock
         {
-            Text = "高吞吐回调采集 / TDMS 原始存储",
+            Text = "\u9ad8\u901f\u91c7\u96c6 / TDMS \u539f\u59cb\u5b58\u50a8",
             Foreground = TextSecondary,
             FontSize = 15,
             VerticalAlignment = VerticalAlignment.Center,
@@ -198,38 +275,109 @@ public sealed class MainWindow : Window
             FontSize = 15,
             Items =
             {
-                new TabItem { Header = "主监控", Content = BuildMonitorTab() },
-                new TabItem { Header = "设备通道", Content = BuildDeviceTab() },
-                new TabItem { Header = "存储", Content = BuildStorageTab() }
+                new TabItem { Header = "\u4e3b\u76d1\u63a7", Content = BuildMonitorTab() },
+                new TabItem { Header = "\u8bbe\u5907\u901a\u9053", Content = BuildDeviceTab() },
+                new TabItem { Header = "TDMS \u67e5\u770b", Content = _tdmsViewer },
+                new TabItem { Header = "\u5b58\u50a8", Content = BuildStorageTab() }
             }
         };
     }
 
     private Control BuildMonitorTab()
     {
-        var grid = new Grid
+        var root = new DockPanel();
+
+        Control nav = BuildMonitorNav();
+        DockPanel.SetDock(nav, Dock.Top);
+        root.Children.Add(nav);
+
+        var scroll = new ScrollViewer
         {
-            ColumnDefinitions = new ColumnDefinitions("330,*")
+            Content = _monitorGrid,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Margin = new Thickness(0, 8, 0, 8)
         };
 
-        Control sideBar = BuildSideBar();
-        Grid.SetColumn(sideBar, 0);
-        grid.Children.Add(sideBar);
+        root.Children.Add(scroll);
+        RebuildMonitorGrid();
+        RebuildViewNav();
+        return root;
+    }
 
-        var plotHost = new Border
+    private Control BuildMonitorNav()
+    {
+        _deviceCombo.MinWidth = 210;
+        _deviceCombo.FontSize = 13;
+        _channelPanel.Orientation = Orientation.Horizontal;
+        _channelPanel.Spacing = 6;
+        _activeViewText.Foreground = TextSecondary;
+        _activeViewText.FontSize = 13;
+        _activeViewText.VerticalAlignment = VerticalAlignment.Center;
+
+        var viewScroll = new ScrollViewer
         {
-            Margin = new Thickness(10, 10, 0, 10),
-            Padding = new Thickness(0),
+            Content = _viewNavPanel,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            MaxHeight = 42
+        };
+
+        var viewRow = new DockPanel
+        {
+            LastChildFill = true,
+            Children =
+            {
+                new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Spacing = 6,
+                    Margin = new Thickness(0, 0, 10, 0),
+                    Children = { _addViewButton, _removeViewButton, _activeViewText }
+                },
+                viewScroll
+            }
+        };
+
+        DockPanel.SetDock(viewRow.Children[0], Dock.Right);
+
+        var channelScroll = new ScrollViewer
+        {
+            Content = _channelPanel,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            MinHeight = 42
+        };
+
+        var editRow = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitions("Auto,Auto,Auto,*"),
+            ColumnSpacing = 8,
+            Margin = new Thickness(0, 8, 0, 0)
+        };
+        editRow.Children.Add(_deviceCombo);
+
+        Grid.SetColumn(_selectAllChannelsButton, 1);
+        editRow.Children.Add(_selectAllChannelsButton);
+        Grid.SetColumn(_clearChannelsButton, 2);
+        editRow.Children.Add(_clearChannelsButton);
+        Grid.SetColumn(channelScroll, 3);
+        editRow.Children.Add(channelScroll);
+
+        return new Border
+        {
+            Margin = new Thickness(0, 10, 0, 0),
+            Padding = new Thickness(10),
             Background = PanelBackground,
             BorderBrush = BorderBrushSoft,
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
-            Child = _waveform
+            Child = new StackPanel
+            {
+                Spacing = 0,
+                Children = { viewRow, editRow }
+            }
         };
-        Grid.SetColumn(plotHost, 1);
-        grid.Children.Add(plotHost);
-
-        return grid;
     }
 
     private Control BuildSideBar()
@@ -240,7 +388,7 @@ public sealed class MainWindow : Window
 
         var header = new TextBlock
         {
-            Text = "通道叠加",
+            Text = "\u901a\u9053\u53e0\u52a0",
             Foreground = TextPrimary,
             FontSize = 17,
             FontWeight = FontWeight.SemiBold,
@@ -293,9 +441,9 @@ public sealed class MainWindow : Window
     private Control BuildStorageTab()
     {
         _storagePath.Width = 580;
-        _storagePath.Watermark = "选择 TDMS 文件保存目录";
+        _storagePath.Watermark = "\u9009\u62e9 TDMS \u4fdd\u5b58\u76ee\u5f55";
         _customFileName.Width = 360;
-        _customFileName.Watermark = "例如 TestRun_A";
+        _customFileName.Watermark = "\u4f8b\u5982 TestRun_A";
         _namingMode.Width = 180;
         StyleControlButton(_browseButton, AccentBlue);
 
@@ -307,7 +455,9 @@ public sealed class MainWindow : Window
             HorizontalAlignment = HorizontalAlignment.Left
         };
 
-        root.Children.Add(SectionTitle("TDMS 存储设置"));
+        root.Children.Add(SectionTitle("TDMS \u5b58\u50a8\u8bbe\u7f6e"));
+
+        root.Children.Add(FieldBlock("\u91c7\u96c6\u65f6\u5199\u5165 TDMS", _storageTabEnabledCheck));
 
         var pathRow = new StackPanel
         {
@@ -319,10 +469,10 @@ public sealed class MainWindow : Window
                 _browseButton
             }
         };
-        root.Children.Add(FieldBlock("保存位置", pathRow));
+        root.Children.Add(FieldBlock("\u4fdd\u5b58\u4f4d\u7f6e", pathRow));
 
-        root.Children.Add(FieldBlock("文件命名方式", _namingMode));
-        root.Children.Add(FieldBlock("自定义文件名", _customFileName));
+        root.Children.Add(FieldBlock("\u6587\u4ef6\u547d\u540d\u65b9\u5f0f", _namingMode));
+        root.Children.Add(FieldBlock("\u81ea\u5b9a\u4e49\u6587\u4ef6\u540d", _customFileName));
 
         root.Children.Add(new Border
         {
@@ -336,7 +486,7 @@ public sealed class MainWindow : Window
 
         root.Children.Add(new TextBlock
         {
-            Text = $"分文件大小: {_settings.Storage.FileSplitGb} GB    Flush 间隔: {_settings.Storage.FlushIntervalMs} ms",
+            Text = $"\u5206\u6587\u4ef6\u5927\u5c0f: {_settings.Storage.FileSplitGb} GB    Flush \u95f4\u9694: {_settings.Storage.FlushIntervalMs} ms",
             Foreground = TextSecondary,
             FontSize = 14
         });
@@ -370,7 +520,7 @@ public sealed class MainWindow : Window
         IReadOnlyList<IStorageFolder> folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
             AllowMultiple = false,
-            Title = "选择 TDMS 保存目录"
+            Title = "\u9009\u62e9 TDMS \u4fdd\u5b58\u76ee\u5f55"
         });
 
         string? path = folders.FirstOrDefault()?.TryGetLocalPath();
@@ -383,37 +533,70 @@ public sealed class MainWindow : Window
     private async Task ConnectAsync()
     {
         SetButtons(connect: false, start: false, stop: false);
-        _status.Text = "正在连接";
+        _status.Text = "\u6b63\u5728\u8fde\u63a5";
         try
         {
             await _acquisition.ConnectAsync(CancellationToken.None);
-            _deviceCombo.ItemsSource = _acquisition.Devices.Select(d => new DeviceItem(d)).ToList();
-            _deviceCombo.SelectedIndex = _acquisition.Devices.Count > 0 ? 0 : -1;
-            RefreshDeviceInfoPanel();
+            RefreshDevicesFromAcquisition(seedDefault: true);
             _startButton.IsEnabled = _acquisition.Devices.Count > 0;
             _connectButton.IsEnabled = true;
-            _status.Text = _acquisition.Devices.Count > 0 ? "已连接" : "未发现设备";
+            _status.Text = _acquisition.Devices.Count > 0 ? "\u5df2\u8fde\u63a5" : "\u672a\u53d1\u73b0\u8bbe\u5907";
         }
         catch (Exception ex)
         {
-            _status.Text = "连接失败";
+            _status.Text = "\u8fde\u63a5\u5931\u8d25";
             await ShowConnectionFailureAsync(ex);
             SetButtons(connect: true, start: false, stop: false);
         }
     }
 
+    private void RefreshDevicesFromAcquisition(bool seedDefault)
+    {
+        DeviceKey? selectedKey = _deviceCombo.SelectedItem is DeviceItem selected
+            ? new DeviceKey(selected.Device.DeviceId, selected.Device.IpAddress)
+            : null;
+
+        List<DeviceItem> items = _acquisition.Devices
+            .Select((device, index) => new DeviceItem(device, index + 1))
+            .ToList();
+        _deviceCombo.ItemsSource = items;
+
+        if (items.Count == 0)
+        {
+            _deviceCombo.SelectedIndex = -1;
+        }
+        else if (selectedKey is { } key)
+        {
+            DeviceItem? next = items.FirstOrDefault(item => item.Key.Equals(key));
+            _deviceCombo.SelectedItem = next ?? items[0];
+        }
+        else if (_deviceCombo.SelectedIndex < 0)
+        {
+            _deviceCombo.SelectedIndex = 0;
+        }
+
+        if (seedDefault)
+        {
+            SeedDefaultMonitorSelection();
+        }
+
+        ApplyMonitorSelectionsToStore();
+        RebuildChannelList();
+        RefreshDeviceInfoPanel();
+    }
+
     private async Task ShowConnectionFailureAsync(Exception ex)
     {
         string message =
-            "设备连接失败。\n\n" +
-            $"错误: {ex.Message}\n\n" +
+            "\u8bbe\u5907\u8fde\u63a5\u5931\u8d25\u3002\n\n" +
+            $"\u9519\u8bef: {ex.Message}\n\n" +
             $"DashRoot: {_settings.Sdk.DashRoot}\n" +
             $"ConfigDir: {_settings.Sdk.ConfigDir}\n\n" +
-            "请确认 DASH 目录、Config/Serial、网络配置和模拟仪器/真实仪器已启动。";
+            "\u8bf7\u786e\u8ba4 DASH \u76ee\u5f55\u3001ConfigDir\u3001Serial \u914d\u7f6e\u3001\u8bbe\u5907\u7535\u6e90\u548c\u7f51\u7edc\u8fde\u63a5\u3002";
 
         await new Window
         {
-            Title = "连接失败",
+            Title = "\u8fde\u63a5\u5931\u8d25",
             Width = 640,
             Height = 320,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
@@ -444,23 +627,31 @@ public sealed class MainWindow : Window
             return;
         }
 
-        UpdateSelectedChannels();
+        ApplyMonitorSelectionsToStore();
         ApplyStorageSettingsFromUi();
+        bool storageEnabled = _settings.Storage.Enabled;
+        _acquisition.SetStorageEnabled(storageEnabled);
         _waveformStore.Clear();
 
         if (_storageService is not null)
         {
             await _storageService.DisposeAsync();
+            _storageService = null;
         }
 
-        _storageService = new TdmsStorageService(_acquisition, _settings.Storage);
-        _storageService.Faulted += fault => Dispatcher.UIThread.Post(() => _status.Text = fault.Message);
+        if (storageEnabled)
+        {
+            _storageService = new TdmsStorageService(_acquisition, _settings.Storage);
+            _storageService.Faulted += fault => Dispatcher.UIThread.Post(() => _status.Text = fault.Message);
+            await _storageService.StartAsync(_acquisition.Devices, CancellationToken.None);
+        }
 
-        await _storageService.StartAsync(_acquisition.Devices, CancellationToken.None);
         await _displayPipeline.StartAsync(CancellationToken.None);
         await _acquisition.StartAsync(CancellationToken.None);
         SetButtons(connect: false, start: false, stop: true);
-        _status.Text = "采集中";
+        _storageEnabledCheck.IsEnabled = false;
+        _storageTabEnabledCheck.IsEnabled = false;
+        _status.Text = storageEnabled ? "\u91c7\u96c6\u4e2d\uff0c\u6b63\u5728\u4fdd\u5b58 TDMS" : "\u91c7\u96c6\u4e2d\uff0c\u4ec5\u663e\u793a\u4e0d\u4fdd\u5b58";
     }
 
     private async Task StopAsync()
@@ -478,57 +669,307 @@ public sealed class MainWindow : Window
         if (_storageService is not null)
         {
             await _storageService.StopAsync();
+            _storageService = null;
         }
+        _acquisition.ReleaseQueuedBlocks();
 
         SetButtons(connect: true, start: _acquisition.Devices.Count > 0, stop: false);
+        _storageEnabledCheck.IsEnabled = true;
+        _storageTabEnabledCheck.IsEnabled = true;
         if (_acquisition.Devices.Count > 0)
         {
-            _status.Text = "已停止";
+            _status.Text = "\u5df2\u505c\u6b62";
         }
     }
 
     private void RebuildChannelList()
     {
         _channelPanel.Children.Clear();
-        if (_deviceCombo.SelectedItem is not DeviceItem selected)
+        if (_deviceCombo.SelectedItem is not DeviceItem selected || _monitorViews.Count == 0)
         {
             return;
         }
 
-        int added = 0;
-        foreach (ChannelDescriptor channel in selected.Device.Channels)
+        MonitorViewState view = _monitorViews[_activeViewIndex];
+        foreach (ChannelDescriptor channel in selected.Device.Channels.Take(256))
         {
-            var label = new TextBlock
-            {
-                Text = channel.Name,
-                FontSize = 15,
-                Foreground = channel.Online ? TextPrimary : TextSecondary,
-                FontWeight = FontWeight.SemiBold
-            };
-
             var checkBox = new CheckBox
             {
-                Content = label,
+                Content = channel.Name,
                 Tag = channel,
-                IsChecked = added < Math.Min(4, _settings.Display.MaxVisibleChannels),
-                Margin = new Thickness(0)
+                IsChecked = view.SelectedKeys.Contains(new ChannelKey(channel)),
+                Margin = new Thickness(0, 0, 4, 0),
+                Foreground = channel.Online ? TextPrimary : TextSecondary,
+                FontSize = 13
             };
-            checkBox.IsCheckedChanged += (_, _) => UpdateSelectedChannels();
+            checkBox.IsCheckedChanged += (_, _) =>
+            {
+                if (checkBox.Tag is not ChannelDescriptor item)
+                {
+                    return;
+                }
+
+                ChannelKey key = new(item);
+                if (checkBox.IsChecked == true)
+                {
+                    if (view.SelectedKeys.Count >= MaxChannelsPerMonitorView && !view.SelectedKeys.Contains(key))
+                    {
+                        checkBox.IsChecked = false;
+                        return;
+                    }
+
+                    view.SelectedKeys.Add(key);
+                }
+                else
+                {
+                    view.SelectedKeys.Remove(key);
+                }
+
+                RefreshViewChannels(view);
+                ApplyMonitorSelectionsToStore();
+            };
 
             _channelPanel.Children.Add(new Border
             {
-                Margin = new Thickness(0, 4),
-                Padding = new Thickness(10, 8),
-                Background = added % 2 == 0 ? PanelBackground2 : new SolidColorBrush(Color.FromRgb(246, 249, 253)),
+                Margin = new Thickness(0, 0, 6, 0),
+                Padding = new Thickness(8, 5),
+                Background = PanelBackground2,
                 BorderBrush = BorderBrushSoft,
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(6),
                 Child = checkBox
             });
-            added++;
         }
 
-        UpdateSelectedChannels();
+        UpdateActiveViewText();
+    }
+
+    private void AddMonitorView()
+    {
+        var waveform = new WaveformControl
+        {
+            Store = _waveformStore,
+            WindowSeconds = _settings.Display.WindowSeconds,
+            DefaultYAxisAmplitude = _settings.Display.DefaultYAxisAmplitude
+        };
+
+        var title = new TextBlock
+        {
+            Foreground = TextSecondary,
+            FontSize = 12,
+            Margin = new Thickness(8, 6, 8, 0),
+            TextWrapping = TextWrapping.NoWrap
+        };
+
+        var host = new Border
+        {
+            Margin = new Thickness(4),
+            Background = PanelBackground,
+            BorderBrush = BorderBrushSoft,
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Child = new DockPanel
+            {
+                Children =
+                {
+                    title,
+                    waveform
+                }
+            }
+        };
+        DockPanel.SetDock(title, Dock.Top);
+
+        var view = new MonitorViewState(waveform, host, title);
+        host.PointerPressed += (_, _) => SelectMonitorView(_monitorViews.IndexOf(view));
+        _monitorViews.Add(view);
+        RefreshViewChannels(view);
+    }
+
+    private void SelectMonitorView(int index)
+    {
+        if (index < 0 || index >= _monitorViews.Count)
+        {
+            return;
+        }
+
+        _activeViewIndex = index;
+        RebuildViewNav();
+        RebuildChannelList();
+        UpdateViewSelectionChrome();
+    }
+
+    private void RebuildViewNav()
+    {
+        _viewNavPanel.Children.Clear();
+        for (int i = 0; i < _monitorViews.Count; i++)
+        {
+            int index = i;
+            var button = new Button
+            {
+                Content = $"V{index + 1}",
+                Padding = new Thickness(10, 5),
+                Margin = new Thickness(0, 0, 6, 0),
+                FontSize = 13,
+                Background = index == _activeViewIndex ? AccentBlue : PanelBackground2,
+                Foreground = index == _activeViewIndex ? Brushes.White : TextPrimary,
+                BorderBrush = BorderBrushSoft
+            };
+            button.Click += (_, _) => SelectMonitorView(index);
+            _viewNavPanel.Children.Add(button);
+        }
+
+        _addViewButton.IsEnabled = _monitorViews.Count < MaxMonitorViews;
+        _removeViewButton.IsEnabled = _monitorViews.Count > 1;
+        UpdateActiveViewText();
+        UpdateViewSelectionChrome();
+    }
+
+    private void RebuildMonitorGrid()
+    {
+        _monitorGrid.Children.Clear();
+        _monitorGrid.RowDefinitions.Clear();
+        _monitorGrid.ColumnDefinitions.Clear();
+
+        int count = Math.Max(1, _monitorViews.Count);
+        int columns = (int)Math.Ceiling(Math.Sqrt(count));
+        int rows = (int)Math.Ceiling(count / (double)columns);
+
+        for (int i = 0; i < rows; i++)
+        {
+            _monitorGrid.RowDefinitions.Add(new RowDefinition(GridLength.Star) { MinHeight = 220 });
+        }
+
+        for (int i = 0; i < columns; i++)
+        {
+            _monitorGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star) { MinWidth = 260 });
+        }
+
+        for (int i = 0; i < _monitorViews.Count; i++)
+        {
+            Border host = _monitorViews[i].Host;
+            Grid.SetRow(host, i / columns);
+            Grid.SetColumn(host, i % columns);
+            _monitorGrid.Children.Add(host);
+        }
+
+        UpdateViewSelectionChrome();
+    }
+
+    private void UpdateViewSelectionChrome()
+    {
+        for (int i = 0; i < _monitorViews.Count; i++)
+        {
+            _monitorViews[i].Host.BorderBrush = i == _activeViewIndex ? AccentBlue : BorderBrushSoft;
+            _monitorViews[i].Host.BorderThickness = new Thickness(i == _activeViewIndex ? 2 : 1);
+        }
+    }
+
+    private void SeedDefaultMonitorSelection()
+    {
+        if (_acquisition.Devices.Count == 0 || _monitorViews.Count == 0 || _monitorViews.Any(view => view.SelectedKeys.Count > 0))
+        {
+            return;
+        }
+
+        MonitorViewState firstView = _monitorViews[0];
+        foreach (ChannelDescriptor channel in _acquisition.Devices[0].Channels.Take(Math.Min(4, MaxChannelsPerMonitorView)))
+        {
+            firstView.SelectedKeys.Add(new ChannelKey(channel));
+        }
+
+        RefreshViewChannels(firstView);
+        ApplyMonitorSelectionsToStore();
+    }
+
+    private void SetDeviceChannelsForActiveView(bool selected)
+    {
+        if (_deviceCombo.SelectedItem is not DeviceItem item || _monitorViews.Count == 0)
+        {
+            return;
+        }
+
+        MonitorViewState view = _monitorViews[_activeViewIndex];
+        foreach (ChannelDescriptor channel in item.Device.Channels)
+        {
+            ChannelKey key = new(channel);
+            if (selected)
+            {
+                if (view.SelectedKeys.Count >= MaxChannelsPerMonitorView && !view.SelectedKeys.Contains(key))
+                {
+                    break;
+                }
+
+                view.SelectedKeys.Add(key);
+            }
+            else
+            {
+                view.SelectedKeys.Remove(key);
+            }
+        }
+
+        RefreshViewChannels(view);
+        RebuildChannelList();
+        ApplyMonitorSelectionsToStore();
+    }
+
+    private void ApplyMonitorSelectionsToStore()
+    {
+        foreach (MonitorViewState view in _monitorViews)
+        {
+            RefreshViewChannels(view);
+        }
+
+        ChannelDescriptor[] union = _monitorViews
+            .SelectMany(view => view.Channels)
+            .GroupBy(channel => new ChannelKey(channel))
+            .Select(group => group.First())
+            .ToArray();
+
+        _waveformStore.SetCapacity(DisplayCapacity());
+        _waveformStore.SetVisibleChannels(union);
+        UpdateActiveViewText();
+    }
+
+    private int DisplayCapacity()
+    {
+        int pointsPerSecond = Math.Max(1, _settings.Display.MaxDisplayPointsPerSecond);
+        int seconds = Math.Max(1, _settings.Display.WindowSeconds);
+        return Math.Max(1000, pointsPerSecond * seconds);
+    }
+
+    private void RefreshViewChannels(MonitorViewState view)
+    {
+        Dictionary<ChannelKey, ChannelDescriptor> lookup = _acquisition.Devices
+            .SelectMany(device => device.Channels)
+            .GroupBy(channel => new ChannelKey(channel))
+            .ToDictionary(group => group.Key, group => group.First());
+
+        view.Channels = view.SelectedKeys
+            .Where(lookup.ContainsKey)
+            .Select(key => lookup[key])
+            .Take(MaxChannelsPerMonitorView)
+            .ToArray();
+        view.SelectedKeys.Clear();
+        foreach (ChannelDescriptor channel in view.Channels)
+        {
+            view.SelectedKeys.Add(new ChannelKey(channel));
+        }
+
+        int viewIndex = _monitorViews.IndexOf(view);
+        view.Title.Text = $"View {viewIndex + 1}    {view.Channels.Count} ch";
+        view.Waveform.Channels = view.Channels;
+    }
+
+    private void UpdateActiveViewText()
+    {
+        if (_monitorViews.Count == 0)
+        {
+            _activeViewText.Text = string.Empty;
+            return;
+        }
+
+        MonitorViewState view = _monitorViews[_activeViewIndex];
+        _activeViewText.Text = $"View {_activeViewIndex + 1}/{_monitorViews.Count}    {view.Channels.Count}/{MaxChannelsPerMonitorView} ch";
     }
 
     private void RefreshDeviceInfoPanel()
@@ -538,7 +979,7 @@ public sealed class MainWindow : Window
         {
             _deviceInfoPanel.Children.Add(new TextBlock
             {
-                Text = "未连接设备",
+                Text = "\u672a\u8fde\u63a5\u8bbe\u5907",
                 Foreground = TextSecondary,
                 FontSize = 16,
                 Margin = new Thickness(4)
@@ -552,14 +993,14 @@ public sealed class MainWindow : Window
             var card = new StackPanel { Spacing = 10 };
             card.Children.Add(new TextBlock
             {
-                Text = $"{device.DisplayName}",
+                Text = FormatDeviceName(device, index + 1),
                 Foreground = TextPrimary,
                 FontSize = 18,
                 FontWeight = FontWeight.SemiBold
             });
             card.Children.Add(new TextBlock
             {
-                Text = $"采样率 {device.SampleRate:0.##} Hz    通道 {device.Channels.Count}    状态 {(device.Online ? "在线" : "离线")}",
+                Text = $"\u91c7\u6837\u7387 {device.SampleRate:0.##} Hz    \u901a\u9053 {device.Channels.Count}    \u72b6\u6001 {(device.Online ? "\u5728\u7ebf" : "\u79bb\u7ebf")}",
                 Foreground = TextSecondary,
                 FontSize = 14
             });
@@ -609,32 +1050,7 @@ public sealed class MainWindow : Window
 
     private void UpdateSelectedChannels()
     {
-        _selectedChannels.Clear();
-        if (_deviceCombo.SelectedItem is not DeviceItem selected)
-        {
-            _waveformStore.SetVisibleChannels(Array.Empty<ChannelDescriptor>());
-            return;
-        }
-
-        foreach (CheckBox checkBox in _channelPanel.Children
-            .OfType<Border>()
-            .Select(border => border.Child)
-            .OfType<CheckBox>())
-        {
-            if (checkBox.IsChecked == true && checkBox.Tag is ChannelDescriptor channel && channel.DeviceId == selected.Device.DeviceId)
-            {
-                _selectedChannels.Add(channel);
-            }
-        }
-
-        if (_selectedChannels.Count > _settings.Display.MaxVisibleChannels)
-        {
-            _selectedChannels.RemoveRange(_settings.Display.MaxVisibleChannels, _selectedChannels.Count - _settings.Display.MaxVisibleChannels);
-        }
-
-        int sampleRate = Math.Max(1, (int)selected.Device.SampleRate);
-        _waveformStore.SetCapacity(Math.Max(1000, sampleRate * Math.Max(1, _settings.Display.WindowSeconds)));
-        _waveformStore.SetVisibleChannels(_selectedChannels);
+        ApplyMonitorSelectionsToStore();
     }
 
     private void UpdateTelemetry(CaptureTelemetry telemetry)
@@ -650,6 +1066,7 @@ public sealed class MainWindow : Window
     private void ApplyStorageSettingsFromUi()
     {
         _settings.Storage.RootPath = string.IsNullOrWhiteSpace(_storagePath.Text) ? _settings.Storage.RootPath : _storagePath.Text.Trim();
+        _settings.Storage.Enabled = _storageEnabledCheck.IsChecked == true;
         _settings.Storage.NamingMode = _namingMode.SelectedIndex == 1 ? FileNamingMode.Custom : FileNamingMode.Time;
         _settings.Storage.CustomFileName = string.IsNullOrWhiteSpace(_customFileName.Text) ? "DashCapture" : _customFileName.Text.Trim();
         UpdateStoragePreview();
@@ -662,9 +1079,9 @@ public sealed class MainWindow : Window
         string folder = string.IsNullOrWhiteSpace(_storagePath.Text) ? _settings.Storage.RootPath : _storagePath.Text.Trim();
         string baseName = string.IsNullOrWhiteSpace(_customFileName.Text) ? "DashCapture" : _customFileName.Text.Trim();
         string preview = custom
-            ? $"{baseName}.tdms；若重名则自动使用 {baseName}_001.tdms、{baseName}_002.tdms"
+            ? $"{baseName}.tdms\uff1b\u82e5\u91cd\u540d\u5219\u81ea\u52a8\u4f7f\u7528 {baseName}_001.tdms\u3001{baseName}_002.tdms"
             : $"DashCapture_yyyyMMdd_HHmmss_001.tdms";
-        _storagePreview.Text = $"保存目录: {folder}\n文件名: {preview}";
+        _storagePreview.Text = $"\u4fdd\u5b58\u76ee\u5f55: {folder}\n\u6587\u4ef6\u540d: {preview}";
         _storagePreview.Foreground = TextPrimary;
         _storagePreview.FontSize = 14;
     }
@@ -716,7 +1133,7 @@ public sealed class MainWindow : Window
                 {
                     new TextBlock
                     {
-                        Text = "状态",
+                        Text = "\u72b6\u6001",
                         Foreground = TextSecondary,
                         FontSize = 13
                     },
@@ -801,22 +1218,49 @@ public sealed class MainWindow : Window
     {
         return status switch
         {
-            "Idle" => "空闲",
-            "Sampling" => "采集中",
-            "Stopped" => "已停止",
-            var text when text.StartsWith("Connected", StringComparison.OrdinalIgnoreCase) => "已连接",
+            "Idle" => "\u7a7a\u95f2",
+            "Sampling" => "\u91c7\u96c6\u4e2d",
+            "Stopped" => "\u5df2\u505c\u6b62",
+            var text when text.StartsWith("Connected", StringComparison.OrdinalIgnoreCase) => "\u5df2\u8fde\u63a5",
             _ => status
         };
     }
 
+    private static string FormatDeviceName(DeviceDescriptor device, int displayIndex)
+    {
+        return $"Device {displayIndex} ({device.IpAddress})";
+    }
+
     private sealed class DeviceItem
     {
-        public DeviceItem(DeviceDescriptor device)
+        public DeviceItem(DeviceDescriptor device, int displayIndex)
         {
             Device = device;
+            Key = new DeviceKey(device.DeviceId, device.IpAddress);
+            DisplayName = FormatDeviceName(device, displayIndex);
         }
 
         public DeviceDescriptor Device { get; }
-        public override string ToString() => Device.DisplayName;
+        public DeviceKey Key { get; }
+        public string DisplayName { get; }
+        public override string ToString() => DisplayName;
+    }
+
+    private readonly record struct DeviceKey(int DeviceId, string IpAddress);
+
+    private sealed class MonitorViewState
+    {
+        public MonitorViewState(WaveformControl waveform, Border host, TextBlock title)
+        {
+            Waveform = waveform;
+            Host = host;
+            Title = title;
+        }
+
+        public WaveformControl Waveform { get; }
+        public Border Host { get; }
+        public TextBlock Title { get; }
+        public HashSet<ChannelKey> SelectedKeys { get; } = new();
+        public IReadOnlyList<ChannelDescriptor> Channels { get; set; } = Array.Empty<ChannelDescriptor>();
     }
 }

@@ -1,12 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "0/c+X615z3o=",
+  "dgSpecHash": "GhtFctLV8bc=",
   "success": true,
-  "projectFilePath": "E:\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj",
+  "projectFilePath": "C:\\dh\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Destiny\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.36\\microsoft.netcore.app.ref.6.0.36.nupkg.sha512",
-    "C:\\Users\\Destiny\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.36\\microsoft.windowsdesktop.app.ref.6.0.36.nupkg.sha512",
-    "C:\\Users\\Destiny\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.36\\microsoft.aspnetcore.app.ref.6.0.36.nupkg.sha512"
+    "C:\\Users\\26453\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.36\\microsoft.netcore.app.ref.6.0.36.nupkg.sha512",
+    "C:\\Users\\26453\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.36\\microsoft.windowsdesktop.app.ref.6.0.36.nupkg.sha512",
+    "C:\\Users\\26453\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.36\\microsoft.aspnetcore.app.ref.6.0.36.nupkg.sha512"
   ],
   "logs": []
 }

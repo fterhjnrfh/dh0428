@@ -31,7 +31,7 @@ public static class DashSdkNative
     public static extern int DA_ReleaseBuffer(long point);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-    public static extern int InitMacControl(string dll_dir);
+    public static extern void InitMacControl(string dll_dir);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern void QuitMacControl();
@@ -55,6 +55,29 @@ public static class DashSdkNative
     public static extern int GetChannelIDFromAllChannelIndex(int nMachineID, string pMacIp, int nIndex, out int nMacChnId, out int bOnLine);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public static extern int GetOneMacDataIndex(int nMachineID, int nChnId);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public static extern int GetOneMacChnData_New(
+        int nMachineID,
+        out long nReceiveCount,
+        out long nChnCount,
+        out long lTotalPos,
+        int lBufferSize,
+        IntPtr pBufferAddr);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public static extern int GetAllMacChnData(
+        int lBufferSize,
+        IntPtr pBufferAddr,
+        out long lTotalPos,
+        out long nReceiveCount,
+        out long nChnCount);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public static extern int GetAllMacDataIndex(int nMachineID, int nChnId);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern bool GetMacSampleFreqList(IntPtr pFreqList, int nFreqBuffer, out int nUsedBuffer);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
@@ -62,6 +85,9 @@ public static class DashSdkNative
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern bool SetMacSampleFreq(float fltSampleFreq);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    public static extern int LoadMacParameter(string pFilePath);
 
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public static extern bool GetMacSampleFreqListEx(int nMachineID, IntPtr pFreqList, int nFreqBuffer, out int nUsedBuffer);

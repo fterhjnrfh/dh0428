@@ -20,7 +20,7 @@
         },
         "runtime": {
           "DashCapture.Core.dll": {
-            "assemblyVersion": "1.0.0",
+            "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
         }
@@ -31,7 +31,7 @@
         },
         "runtime": {
           "DashCapture.Display.dll": {
-            "assemblyVersion": "1.0.0",
+            "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
         }
@@ -39,7 +39,7 @@
       "DashCapture.Native/1.0.0": {
         "runtime": {
           "DashCapture.Native.dll": {
-            "assemblyVersion": "1.0.0",
+            "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
         }

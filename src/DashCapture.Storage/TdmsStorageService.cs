@@ -22,6 +22,8 @@ public sealed class TdmsStorageService : IAsyncDisposable
 
     public event Action<AcquisitionFault>? Faulted;
     public string CurrentPath => _writer?.CurrentPath ?? string.Empty;
+    public string CurrentFolder => _writer?.CurrentFolder ?? string.Empty;
+    public string CurrentAuditPath => _writer?.CurrentAuditPath ?? string.Empty;
     public bool IsRunning => _worker is not null && !_worker.IsCompleted;
 
     public Task StartAsync(IReadOnlyList<DeviceDescriptor> devices, CancellationToken cancellationToken)
@@ -39,10 +41,8 @@ public sealed class TdmsStorageService : IAsyncDisposable
 
     public async Task StopAsync()
     {
-        if (_cts is not null)
-        {
-            _cts.Cancel();
-        }
+        await DrainStorageQueueAsync().ConfigureAwait(false);
+        _cts?.Cancel();
 
         if (_worker is not null)
         {
@@ -62,6 +62,29 @@ public sealed class TdmsStorageService : IAsyncDisposable
         _worker = null;
     }
 
+    private async Task DrainStorageQueueAsync()
+    {
+        if (_worker is null)
+        {
+            return;
+        }
+
+        DateTimeOffset deadline = DateTimeOffset.UtcNow.AddMilliseconds(Math.Max(1000, _settings.DrainTimeoutMs));
+        while (!_worker.IsCompleted && _acquisition.GetTelemetry().StorageQueueDepth > 0 && DateTimeOffset.UtcNow < deadline)
+        {
+            await Task.Delay(50).ConfigureAwait(false);
+        }
+
+        int remaining = _acquisition.GetTelemetry().StorageQueueDepth;
+        if (remaining > 0)
+        {
+            Faulted?.Invoke(new AcquisitionFault(
+                DateTimeOffset.UtcNow,
+                "TDMS_DRAIN_TIMEOUT",
+                $"Storage queue still has {remaining} block(s) after waiting for drain timeout."));
+        }
+    }
+
     public async ValueTask DisposeAsync()
     {
         await StopAsync().ConfigureAwait(false);
@@ -78,6 +101,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
         {
             try
             {
+                _writer.UpdateDeviceRates(_acquisition.Devices);
                 _writer.AppendBlock(block);
                 DateTimeOffset now = DateTimeOffset.UtcNow;
                 if ((now - _lastSave).TotalMilliseconds >= _settings.FlushIntervalMs)

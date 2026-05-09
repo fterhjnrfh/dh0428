@@ -1,33 +1,35 @@
 {
   "format": 1,
   "restore": {
-    "E:\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj": {}
+    "C:\\dh\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj": {}
   },
   "projects": {
-    "E:\\NEW-DH\\src\\DashCapture.Core\\DashCapture.Core.csproj": {
+    "C:\\dh\\NEW-DH\\src\\DashCapture.Core\\DashCapture.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\NEW-DH\\src\\DashCapture.Core\\DashCapture.Core.csproj",
+        "projectUniqueName": "C:\\dh\\NEW-DH\\src\\DashCapture.Core\\DashCapture.Core.csproj",
         "projectName": "DashCapture.Core",
-        "projectPath": "E:\\NEW-DH\\src\\DashCapture.Core\\DashCapture.Core.csproj",
-        "packagesPath": "C:\\Users\\Destiny\\.nuget\\packages\\",
-        "outputPath": "E:\\NEW-DH\\src\\DashCapture.Core\\obj\\",
+        "projectPath": "C:\\dh\\NEW-DH\\src\\DashCapture.Core\\DashCapture.Core.csproj",
+        "packagesPath": "C:\\Users\\26453\\.nuget\\packages\\",
+        "outputPath": "C:\\dh\\NEW-DH\\src\\DashCapture.Core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Destiny\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\26453\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "E:\\NEW-DH\\src\\DashCapture.Native\\DashCapture.Native.csproj": {
-                "projectPath": "E:\\NEW-DH\\src\\DashCapture.Native\\DashCapture.Native.csproj"
+              "C:\\dh\\NEW-DH\\src\\DashCapture.Native\\DashCapture.Native.csproj": {
+                "projectPath": "C:\\dh\\NEW-DH\\src\\DashCapture.Native\\DashCapture.Native.csproj"
               }
             }
           }
@@ -41,7 +43,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net6.0": {
@@ -76,34 +79,36 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.416\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.310\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "E:\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj": {
+    "C:\\dh\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj",
+        "projectUniqueName": "C:\\dh\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj",
         "projectName": "DashCapture.Display",
-        "projectPath": "E:\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj",
-        "packagesPath": "C:\\Users\\Destiny\\.nuget\\packages\\",
-        "outputPath": "E:\\NEW-DH\\src\\DashCapture.Display\\obj\\",
+        "projectPath": "C:\\dh\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj",
+        "packagesPath": "C:\\Users\\26453\\.nuget\\packages\\",
+        "outputPath": "C:\\dh\\NEW-DH\\src\\DashCapture.Display\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Destiny\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\26453\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "E:\\NEW-DH\\src\\DashCapture.Core\\DashCapture.Core.csproj": {
-                "projectPath": "E:\\NEW-DH\\src\\DashCapture.Core\\DashCapture.Core.csproj"
+              "C:\\dh\\NEW-DH\\src\\DashCapture.Core\\DashCapture.Core.csproj": {
+                "projectPath": "C:\\dh\\NEW-DH\\src\\DashCapture.Core\\DashCapture.Core.csproj"
               }
             }
           }
@@ -117,7 +122,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net6.0": {
@@ -152,26 +158,28 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.416\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.310\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "E:\\NEW-DH\\src\\DashCapture.Native\\DashCapture.Native.csproj": {
+    "C:\\dh\\NEW-DH\\src\\DashCapture.Native\\DashCapture.Native.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\NEW-DH\\src\\DashCapture.Native\\DashCapture.Native.csproj",
+        "projectUniqueName": "C:\\dh\\NEW-DH\\src\\DashCapture.Native\\DashCapture.Native.csproj",
         "projectName": "DashCapture.Native",
-        "projectPath": "E:\\NEW-DH\\src\\DashCapture.Native\\DashCapture.Native.csproj",
-        "packagesPath": "C:\\Users\\Destiny\\.nuget\\packages\\",
-        "outputPath": "E:\\NEW-DH\\src\\DashCapture.Native\\obj\\",
+        "projectPath": "C:\\dh\\NEW-DH\\src\\DashCapture.Native\\DashCapture.Native.csproj",
+        "packagesPath": "C:\\Users\\26453\\.nuget\\packages\\",
+        "outputPath": "C:\\dh\\NEW-DH\\src\\DashCapture.Native\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Destiny\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\26453\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
         ],
         "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -189,7 +197,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net6.0": {
@@ -224,7 +233,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.416\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.310\\RuntimeIdentifierGraph.json"
         }
       }
     }

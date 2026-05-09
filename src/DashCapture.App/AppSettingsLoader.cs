@@ -20,6 +20,7 @@ public static class AppSettingsLoader
 
         settings.Sdk.DashRoot = Resolve(settings.Sdk.DashRoot);
         settings.Sdk.ConfigDir = Resolve(settings.Sdk.ConfigDir);
+        settings.Sdk.ParamDir = Resolve(settings.Sdk.ParamDir);
         settings.Storage.RootPath = Resolve(settings.Storage.RootPath);
         settings.Storage.TdmRuntimeDir = Resolve(settings.Storage.TdmRuntimeDir);
         return settings;

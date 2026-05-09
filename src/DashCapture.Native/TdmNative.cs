@@ -30,6 +30,13 @@ public static class TdmNative
         out IntPtr file);
 
     [DllImport(LibName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+    public static extern int DDC_OpenFileEx(
+        string filePath,
+        string fileType,
+        int readOnly,
+        out IntPtr file);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
     public static extern int DDC_AddChannelGroup(
         IntPtr file,
         string name,
@@ -49,10 +56,61 @@ public static class TdmNative
     public static extern int DDC_AppendDataValues(IntPtr channel, IntPtr values, UIntPtr numValues);
 
     [DllImport(LibName, CallingConvention = CallingConvention.StdCall)]
+    public static extern int DDC_AppendDataValuesFloat(IntPtr channel, IntPtr values, UIntPtr numValues);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.StdCall)]
     public static extern int DDC_SaveFile(IntPtr file);
 
     [DllImport(LibName, CallingConvention = CallingConvention.StdCall)]
     public static extern int DDC_CloseFile(IntPtr file);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.StdCall)]
+    public static extern int DDC_GetNumChannelGroups(IntPtr file, out uint numChannelGroups);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.StdCall)]
+    public static extern int DDC_GetChannelGroups(IntPtr file, [Out] IntPtr[] channelGroupsBuf, UIntPtr numChannelGroups);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.StdCall)]
+    public static extern int DDC_GetNumChannels(IntPtr channelGroup, out uint numChannels);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.StdCall)]
+    public static extern int DDC_GetChannels(IntPtr channelGroup, [Out] IntPtr[] channelsBuf, UIntPtr numChannels);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.StdCall)]
+    public static extern int DDC_GetNumDataValues(IntPtr channel, out ulong numValues);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.StdCall)]
+    public static extern int DDC_GetDataValuesFloat(
+        IntPtr channel,
+        UIntPtr indexOfFirstValueToGet,
+        UIntPtr numValuesToGet,
+        [Out] float[] values);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+    public static extern int DDC_GetChannelGroupStringPropertyLength(IntPtr channelGroup, string property, out uint length);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+    public static extern int DDC_GetChannelGroupPropertyString(
+        IntPtr channelGroup,
+        string property,
+        System.Text.StringBuilder value,
+        UIntPtr valueSize);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+    public static extern int DDC_SetChannelGroupPropertyString(
+        IntPtr channelGroup,
+        string property,
+        string value);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+    public static extern int DDC_GetChannelStringPropertyLength(IntPtr channel, string property, out uint length);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
+    public static extern int DDC_GetChannelPropertyString(
+        IntPtr channel,
+        string property,
+        System.Text.StringBuilder value,
+        UIntPtr valueSize);
 
     [DllImport(LibName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]
     public static extern IntPtr DDC_GetLibraryErrorDescription(int errorCode);

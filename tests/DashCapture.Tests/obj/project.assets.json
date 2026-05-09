@@ -63,32 +63,34 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Destiny\\.nuget\\packages\\": {}
+    "C:\\Users\\26453\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\NEW-DH\\tests\\DashCapture.Tests\\DashCapture.Tests.csproj",
+      "projectUniqueName": "C:\\dh\\NEW-DH\\tests\\DashCapture.Tests\\DashCapture.Tests.csproj",
       "projectName": "DashCapture.Tests",
-      "projectPath": "E:\\NEW-DH\\tests\\DashCapture.Tests\\DashCapture.Tests.csproj",
-      "packagesPath": "C:\\Users\\Destiny\\.nuget\\packages\\",
-      "outputPath": "E:\\NEW-DH\\tests\\DashCapture.Tests\\obj\\",
+      "projectPath": "C:\\dh\\NEW-DH\\tests\\DashCapture.Tests\\DashCapture.Tests.csproj",
+      "packagesPath": "C:\\Users\\26453\\.nuget\\packages\\",
+      "outputPath": "C:\\dh\\NEW-DH\\tests\\DashCapture.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\Destiny\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\26453\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net6.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
           "projectReferences": {
-            "E:\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj": {
-              "projectPath": "E:\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj"
+            "C:\\dh\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj": {
+              "projectPath": "C:\\dh\\NEW-DH\\src\\DashCapture.Display\\DashCapture.Display.csproj"
             }
           }
         }
@@ -102,7 +104,8 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      }
+      },
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net6.0": {
@@ -141,7 +144,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.416\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.310\\RuntimeIdentifierGraph.json"
       }
     }
   }

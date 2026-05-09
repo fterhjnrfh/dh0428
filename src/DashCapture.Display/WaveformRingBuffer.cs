@@ -47,6 +47,21 @@ public sealed class WaveformRingBuffer
         }
     }
 
+    public WaveformRingBuffer Resize(int capacity)
+    {
+        if (capacity <= 0) throw new ArgumentOutOfRangeException(nameof(capacity));
+
+        float[] snapshot = Snapshot();
+        if (snapshot.Length > capacity)
+        {
+            snapshot = snapshot.AsSpan(snapshot.Length - capacity, capacity).ToArray();
+        }
+
+        var resized = new WaveformRingBuffer(capacity);
+        resized.Append(snapshot);
+        return resized;
+    }
+
     public void Clear()
     {
         lock (_sync)

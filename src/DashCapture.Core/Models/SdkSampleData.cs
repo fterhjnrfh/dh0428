@@ -14,7 +14,14 @@ public readonly record struct SdkSampleData(
     int DataCountPerChannel,
     int BufferCount,
     int BlockIndex,
-    IntPtr DataPointer);
+    IntPtr DataPointer,
+    SampleDataLayout Layout = SampleDataLayout.SampleInterleavedFloat32);
+
+public enum SampleDataLayout
+{
+    SampleInterleavedFloat32,
+    ChannelContiguousFloat32
+}
 
 public static class DashSampleMessageType
 {
