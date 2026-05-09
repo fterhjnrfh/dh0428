@@ -486,7 +486,7 @@ public sealed class MainWindow : Window
 
         root.Children.Add(new TextBlock
         {
-            Text = $"\u5206\u6587\u4ef6\u5927\u5c0f: {_settings.Storage.FileSplitGb} GB    Flush \u95f4\u9694: {_settings.Storage.FlushIntervalMs} ms",
+            Text = $"\u5206\u6587\u4ef6\u5927\u5c0f: {FormatFileSplitSize()}    Flush \u95f4\u9694: {_settings.Storage.FlushIntervalMs} ms",
             Foreground = TextSecondary,
             FontSize = 14
         });
@@ -499,6 +499,16 @@ public sealed class MainWindow : Window
         });
 
         return root;
+    }
+
+    private string FormatFileSplitSize()
+    {
+        if (_settings.Storage.FileSplitMb > 0)
+        {
+            return $"{_settings.Storage.FileSplitMb} MB";
+        }
+
+        return $"{Math.Max(1, _settings.Storage.FileSplitGb)} GB";
     }
 
     private Control BuildStatusBar()
