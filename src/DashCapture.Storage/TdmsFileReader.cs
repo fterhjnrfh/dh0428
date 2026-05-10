@@ -1,5 +1,7 @@
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using DashCapture.Native;
 
 namespace DashCapture.Storage;
@@ -7,9 +9,9 @@ namespace DashCapture.Storage;
 public sealed class TdmsFileReader : IDisposable
 {
     private const int ChunkSamples = 1_048_576;
-    private readonly List<TdmsSegment> _segments;
+    private readonly List<IReadableSegment> _segments;
 
-    private TdmsFileReader(string path, TdmsFileInfo fileInfo, List<TdmsSegment> segments)
+    private TdmsFileReader(string path, TdmsFileInfo fileInfo, List<IReadableSegment> segments)
     {
         Path = path;
         FileInfo = fileInfo;
@@ -38,24 +40,21 @@ public sealed class TdmsFileReader : IDisposable
         }
 
         NativeBootstrap.AddSearchDirectory(tdmRuntimeDir);
-        TdmsSegment segment = OpenSegment(path);
-        return new TdmsFileReader(path, segment.FileInfo, new List<TdmsSegment> { segment });
+        IReadableSegment segment = OpenSegment(path);
+        return new TdmsFileReader(path, segment.FileInfo, new List<IReadableSegment> { segment });
     }
 
     private static TdmsFileReader OpenFolder(string path, string tdmRuntimeDir)
     {
-        string[] files = Directory
-            .EnumerateFiles(path, "*.tdms", SearchOption.TopDirectoryOnly)
-            .OrderBy(file => file, StringComparer.OrdinalIgnoreCase)
-            .ToArray();
+        string[] files = DiscoverSegmentFiles(path);
 
         if (files.Length == 0)
         {
-            throw new FileNotFoundException("TDMS folder does not contain any .tdms files.", path);
+            throw new FileNotFoundException("Folder does not contain any .tdms, .tdms.dhc, or .dhcap files.", path);
         }
 
         NativeBootstrap.AddSearchDirectory(tdmRuntimeDir);
-        var segments = new List<TdmsSegment>(files.Length);
+        var segments = new List<IReadableSegment>(files.Length);
         try
         {
             foreach (string file in files)
@@ -67,7 +66,7 @@ public sealed class TdmsFileReader : IDisposable
         }
         catch
         {
-            foreach (TdmsSegment segment in segments)
+            foreach (IReadableSegment segment in segments)
             {
                 segment.Dispose();
             }
@@ -76,23 +75,65 @@ public sealed class TdmsFileReader : IDisposable
         }
     }
 
-    private static TdmsSegment OpenSegment(string path)
+    private static IReadableSegment OpenSegment(string path)
     {
-        TdmNative.ThrowIfError(
-            TdmNative.DDC_OpenFileEx(path, TdmNative.TdmsFileType, readOnly: 1, out IntPtr file),
-            "DDC_OpenFileEx");
+        if (CompressedCaptureFormat.IsCompressedCaptureFile(path))
+        {
+            return CompressedCaptureSegment.Open(path);
+        }
 
+        MaterializedTdmsFile materialized = CompressedTdmsCodec.MaterializeForRead(path);
+        IntPtr file = IntPtr.Zero;
         try
         {
+            TdmNative.ThrowIfError(
+                TdmNative.DDC_OpenFileEx(materialized.Path, TdmNative.TdmsFileType, readOnly: 1, out file),
+                "DDC_OpenFileEx");
             Dictionary<TdmsChannelKey, IntPtr> handles = new();
             List<TdmsGroupInfo> groups = ReadGroups(file, handles);
-            return new TdmsSegment(path, new TdmsFileInfo(path, groups), file, handles);
+            return new DdcTdmsSegment(path, new TdmsFileInfo(path, groups), file, handles, materialized);
         }
         catch
         {
-            TdmNative.DDC_CloseFile(file);
+            if (file != IntPtr.Zero)
+            {
+                TdmNative.DDC_CloseFile(file);
+            }
+
+            materialized.Dispose();
             throw;
         }
+    }
+
+    private static string[] DiscoverSegmentFiles(string path)
+    {
+        return Directory
+            .EnumerateFiles(path, "*.tdms", SearchOption.TopDirectoryOnly)
+            .Concat(Directory.EnumerateFiles(path, "*.tdms" + CompressedTdmsCodec.Extension, SearchOption.TopDirectoryOnly))
+            .Concat(Directory.EnumerateFiles(path, "*" + CompressedCaptureFormat.Extension, SearchOption.TopDirectoryOnly))
+            .GroupBy(SegmentIdentity, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group
+                .OrderBy(file => CompressedTdmsCodec.IsCompressedFile(file) ? 1 : 0)
+                .ThenBy(file => file, StringComparer.OrdinalIgnoreCase)
+                .First())
+            .OrderBy(file => SegmentIdentity(file), StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+    }
+
+    private static string SegmentIdentity(string path)
+    {
+        return CompressedTdmsCodec.IsCompressedFile(path)
+            ? path[..^CompressedTdmsCodec.Extension.Length]
+            : CompressedCaptureFormat.IsCompressedCaptureFile(path)
+                ? CompressedCaptureIdentity(path)
+            : path;
+    }
+
+    private static string CompressedCaptureIdentity(string path)
+    {
+        return path.EndsWith(CompressedCaptureFormat.Extension, StringComparison.OrdinalIgnoreCase)
+            ? path[..^CompressedCaptureFormat.Extension.Length]
+            : path[..^".tdms".Length];
     }
 
     public TdmsChannelEnvelope ReadEnvelope(TdmsChannelInfo channel, ulong startSample, ulong sampleCount, int bucketCount, CancellationToken cancellationToken)
@@ -110,30 +151,123 @@ public sealed class TdmsFileReader : IDisposable
         }
 
         int buckets = (int)Math.Min((ulong)Math.Max(1, bucketCount), sampleCount);
-        var points = new TdmsEnvelopePoint[buckets];
+        var accumulators = new TdmsEnvelopeAccumulator[buckets];
         var buffer = new float[(int)Math.Min((ulong)ChunkSamples, sampleCount)];
-
-        for (int bucket = 0; bucket < buckets; bucket++)
+        ulong remainingStart = startSample;
+        ulong remainingCount = sampleCount;
+        ulong outputOffset = 0;
+        foreach (IReadableSegment segment in _segments)
         {
             cancellationToken.ThrowIfCancellationRequested();
-
-            ulong relativeStart = Scale(bucket, sampleCount, buckets);
-            ulong relativeEnd = Scale(bucket + 1, sampleCount, buckets);
-            if (relativeEnd <= relativeStart)
+            if (!segment.Channels.TryGetValue(channel.Key, out TdmsChannelInfo? segmentChannel))
             {
-                relativeEnd = relativeStart + 1;
+                continue;
             }
 
-            ReadBucketAcrossSegments(channel.Key, startSample + relativeStart, relativeEnd - relativeStart, buffer, out float first, out float last, out float min, out float max, cancellationToken);
-            points[bucket] = new TdmsEnvelopePoint(bucket, first, last, min, max);
+            if (remainingStart >= segmentChannel.SampleCount)
+            {
+                remainingStart -= segmentChannel.SampleCount;
+                continue;
+            }
+
+            ulong segmentStart = remainingStart;
+            ulong segmentCount = Math.Min(remainingCount, segmentChannel.SampleCount - segmentStart);
+            segment.AccumulateEnvelope(
+                channel.Key,
+                segmentStart,
+                segmentCount,
+                outputOffset,
+                sampleCount,
+                accumulators,
+                buffer,
+                cancellationToken);
+
+            remainingCount -= segmentCount;
+            outputOffset += segmentCount;
+            remainingStart = 0;
+            if (remainingCount == 0)
+            {
+                break;
+            }
         }
 
+        TdmsEnvelopePoint[] points = accumulators
+            .Select((accumulator, index) => accumulator.ToPoint(index))
+            .ToArray();
         return new TdmsChannelEnvelope(channel, startSample, sampleCount, points);
+    }
+
+    public void ExportToTdms(string targetPath, CancellationToken cancellationToken, IProgress<TdmsExportProgress>? progress = null)
+    {
+        ThrowIfDisposed();
+        if (string.IsNullOrWhiteSpace(targetPath))
+        {
+            throw new ArgumentException("Export target path is required.", nameof(targetPath));
+        }
+
+        targetPath = System.IO.Path.GetFullPath(targetPath);
+        string? directory = System.IO.Path.GetDirectoryName(targetPath);
+        if (!string.IsNullOrWhiteSpace(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        string tempPath = System.IO.Path.Combine(
+            directory ?? Environment.CurrentDirectory,
+            $"{System.IO.Path.GetFileNameWithoutExtension(targetPath)}.{Guid.NewGuid():N}.tmp.tdms");
+        File.Delete(tempPath);
+
+        IntPtr file = IntPtr.Zero;
+        try
+        {
+            TdmNative.ThrowIfError(
+                TdmNative.DDC_CreateFile(
+                    tempPath,
+                    TdmNative.TdmsFileType,
+                    System.IO.Path.GetFileNameWithoutExtension(targetPath),
+                    $"Exported from DASH capture source. Source={Path}",
+                    "DASH Capture Export",
+                    Environment.UserName,
+                    out file),
+                "DDC_CreateFile");
+
+            Dictionary<TdmsChannelKey, IntPtr> channelHandles = CreateExportStructure(file);
+            ExportChannelData(channelHandles, cancellationToken, progress);
+
+            TdmNative.ThrowIfError(TdmNative.DDC_SaveFile(file), "DDC_SaveFile");
+            TdmNative.ThrowIfError(TdmNative.DDC_CloseFile(file), "DDC_CloseFile");
+            file = IntPtr.Zero;
+
+            if (File.Exists(targetPath))
+            {
+                File.Delete(targetPath);
+            }
+
+            File.Move(tempPath, targetPath);
+        }
+        catch
+        {
+            if (file != IntPtr.Zero)
+            {
+                TdmNative.DDC_CloseFile(file);
+            }
+
+            try
+            {
+                File.Delete(tempPath);
+            }
+            catch
+            {
+                // Export cleanup is best effort.
+            }
+
+            throw;
+        }
     }
 
     public void Dispose()
     {
-        foreach (TdmsSegment segment in _segments)
+        foreach (IReadableSegment segment in _segments)
         {
             segment.Dispose();
         }
@@ -141,7 +275,7 @@ public sealed class TdmsFileReader : IDisposable
         _segments.Clear();
     }
 
-    private static TdmsFileInfo AggregateInfo(string path, IReadOnlyList<TdmsSegment> segments)
+    private static TdmsFileInfo AggregateInfo(string path, IReadOnlyList<IReadableSegment> segments)
     {
         var groups = new List<TdmsGroupInfo>();
         foreach (IGrouping<string, TdmsGroupInfo> groupSet in segments
@@ -167,6 +301,95 @@ public sealed class TdmsFileReader : IDisposable
         }
 
         return new TdmsFileInfo(path, groups);
+    }
+
+    private Dictionary<TdmsChannelKey, IntPtr> CreateExportStructure(IntPtr file)
+    {
+        var channelHandles = new Dictionary<TdmsChannelKey, IntPtr>();
+        foreach (TdmsGroupInfo group in FileInfo.Groups)
+        {
+            TdmNative.ThrowIfError(
+                TdmNative.DDC_AddChannelGroup(file, group.Name, group.Description, out IntPtr groupHandle),
+                "DDC_AddChannelGroup");
+
+            foreach (TdmsChannelInfo channel in group.Channels)
+            {
+                TdmNative.ThrowIfError(
+                    TdmNative.DDC_AddChannel(
+                        groupHandle,
+                        DdcDataType.Float,
+                        channel.Name,
+                        channel.Description,
+                        string.IsNullOrWhiteSpace(channel.Unit) ? "raw" : channel.Unit,
+                        out IntPtr channelHandle),
+                    "DDC_AddChannel");
+                channelHandles[channel.Key] = channelHandle;
+            }
+        }
+
+        return channelHandles;
+    }
+
+    private void ExportChannelData(
+        Dictionary<TdmsChannelKey, IntPtr> channelHandles,
+        CancellationToken cancellationToken,
+        IProgress<TdmsExportProgress>? progress)
+    {
+        float[] buffer = new float[ChunkSamples];
+        int totalChannels = Math.Max(1, FileInfo.ChannelCount);
+        int exportedChannels = 0;
+        foreach (TdmsGroupInfo group in FileInfo.Groups)
+        {
+            foreach (TdmsChannelInfo channel in group.Channels)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (!channelHandles.TryGetValue(channel.Key, out IntPtr channelHandle))
+                {
+                    continue;
+                }
+
+                ulong exportedSamples = 0;
+                progress?.Report(new TdmsExportProgress(channel.DisplayName, exportedChannels, totalChannels, exportedSamples, channel.SampleCount));
+                foreach (IReadableSegment segment in _segments)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    if (!segment.Channels.TryGetValue(channel.Key, out TdmsChannelInfo? segmentChannel))
+                    {
+                        continue;
+                    }
+
+                    ulong offset = 0;
+                    while (offset < segmentChannel.SampleCount)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        int count = (int)Math.Min((ulong)buffer.Length, segmentChannel.SampleCount - offset);
+                        int read = segment.ReadSamples(channel.Key, offset, count, buffer, cancellationToken);
+                        if (read <= 0)
+                        {
+                            throw new InvalidDataException($"No samples were read while exporting {channel.DisplayName}.");
+                        }
+
+                        AppendFloatValues(channelHandle, buffer, read);
+                        offset += (ulong)read;
+                        exportedSamples += (ulong)read;
+                        progress?.Report(new TdmsExportProgress(channel.DisplayName, exportedChannels, totalChannels, exportedSamples, channel.SampleCount));
+                    }
+                }
+
+                exportedChannels++;
+                progress?.Report(new TdmsExportProgress(channel.DisplayName, exportedChannels, totalChannels, exportedSamples, channel.SampleCount));
+            }
+        }
+    }
+
+    private static unsafe void AppendFloatValues(IntPtr channel, float[] values, int count)
+    {
+        fixed (float* ptr = values)
+        {
+            TdmNative.ThrowIfError(
+                TdmNative.DDC_AppendDataValuesFloat(channel, new IntPtr(ptr), (UIntPtr)count),
+                "DDC_AppendDataValuesFloat");
+        }
     }
 
     private static List<TdmsGroupInfo> ReadGroups(IntPtr file, Dictionary<TdmsChannelKey, IntPtr> handles)
@@ -280,69 +503,6 @@ public sealed class TdmsFileReader : IDisposable
         }
     }
 
-    private void ReadBucketAcrossSegments(
-        TdmsChannelKey key,
-        ulong startSample,
-        ulong sampleCount,
-        float[] buffer,
-        out float first,
-        out float last,
-        out float min,
-        out float max,
-        CancellationToken cancellationToken)
-    {
-        first = 0;
-        last = 0;
-        min = float.MaxValue;
-        max = float.MinValue;
-        bool hasValue = false;
-        ulong remainingStart = startSample;
-        ulong remainingCount = sampleCount;
-
-        foreach (TdmsSegment segment in _segments)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (!segment.ChannelHandles.TryGetValue(key, out IntPtr handle) ||
-                !segment.Channels.TryGetValue(key, out TdmsChannelInfo? segmentChannel))
-            {
-                continue;
-            }
-
-            if (remainingStart >= segmentChannel.SampleCount)
-            {
-                remainingStart -= segmentChannel.SampleCount;
-                continue;
-            }
-
-            ulong segmentStart = remainingStart;
-            ulong segmentCount = Math.Min(remainingCount, segmentChannel.SampleCount - segmentStart);
-            ReadBucket(handle, segmentStart, segmentCount, buffer, out float partFirst, out float partLast, out float partMin, out float partMax, cancellationToken);
-
-            if (!hasValue)
-            {
-                first = partFirst;
-                hasValue = true;
-            }
-
-            last = partLast;
-            if (partMin < min) min = partMin;
-            if (partMax > max) max = partMax;
-
-            remainingCount -= segmentCount;
-            remainingStart = 0;
-            if (remainingCount == 0)
-            {
-                break;
-            }
-        }
-
-        if (!hasValue)
-        {
-            min = 0;
-            max = 0;
-        }
-    }
-
     private static ulong Scale(int index, ulong sampleCount, int buckets)
     {
         return (ulong)Math.Floor((decimal)index * sampleCount / buckets);
@@ -433,14 +593,91 @@ public sealed class TdmsFileReader : IDisposable
         }
     }
 
-    private sealed class TdmsSegment : IDisposable
+    private interface IReadableSegment : IDisposable
     {
-        public TdmsSegment(string path, TdmsFileInfo fileInfo, IntPtr file, Dictionary<TdmsChannelKey, IntPtr> channelHandles)
+        TdmsFileInfo FileInfo { get; }
+        Dictionary<TdmsChannelKey, TdmsChannelInfo> Channels { get; }
+
+        void AccumulateEnvelope(
+            TdmsChannelKey key,
+            ulong segmentStart,
+            ulong segmentCount,
+            ulong outputOffset,
+            ulong totalSampleCount,
+            TdmsEnvelopeAccumulator[] accumulators,
+            float[] buffer,
+            CancellationToken cancellationToken);
+
+        int ReadSamples(
+            TdmsChannelKey key,
+            ulong segmentStart,
+            int sampleCount,
+            float[] buffer,
+            CancellationToken cancellationToken);
+    }
+
+    private struct TdmsEnvelopeAccumulator
+    {
+        private bool _hasValue;
+        private float _first;
+        private float _last;
+        private float _min;
+        private float _max;
+
+        public void Add(float value)
+        {
+            if (!_hasValue)
+            {
+                _first = value;
+                _min = value;
+                _max = value;
+                _hasValue = true;
+            }
+
+            _last = value;
+            if (value < _min) _min = value;
+            if (value > _max) _max = value;
+        }
+
+        public void AddSummary(float first, float last, float min, float max)
+        {
+            if (!_hasValue)
+            {
+                _first = first;
+                _min = min;
+                _max = max;
+                _hasValue = true;
+            }
+
+            _last = last;
+            if (min < _min) _min = min;
+            if (max > _max) _max = max;
+        }
+
+        public readonly TdmsEnvelopePoint ToPoint(int pixel)
+        {
+            return _hasValue
+                ? new TdmsEnvelopePoint(pixel, _first, _last, _min, _max)
+                : new TdmsEnvelopePoint(pixel, 0, 0, 0, 0);
+        }
+    }
+
+    private sealed class DdcTdmsSegment : IReadableSegment
+    {
+        private readonly MaterializedTdmsFile _materialized;
+
+        public DdcTdmsSegment(
+            string path,
+            TdmsFileInfo fileInfo,
+            IntPtr file,
+            Dictionary<TdmsChannelKey, IntPtr> channelHandles,
+            MaterializedTdmsFile materialized)
         {
             Path = path;
             FileInfo = fileInfo;
             File = file;
             ChannelHandles = channelHandles;
+            _materialized = materialized;
             Channels = fileInfo.Groups
                 .SelectMany(group => group.Channels)
                 .ToDictionary(channel => channel.Key, channel => channel);
@@ -452,6 +689,65 @@ public sealed class TdmsFileReader : IDisposable
         public Dictionary<TdmsChannelKey, IntPtr> ChannelHandles { get; }
         public Dictionary<TdmsChannelKey, TdmsChannelInfo> Channels { get; }
 
+        public void AccumulateEnvelope(
+            TdmsChannelKey key,
+            ulong segmentStart,
+            ulong segmentCount,
+            ulong outputOffset,
+            ulong totalSampleCount,
+            TdmsEnvelopeAccumulator[] accumulators,
+            float[] buffer,
+            CancellationToken cancellationToken)
+        {
+            if (!ChannelHandles.TryGetValue(key, out IntPtr handle))
+            {
+                return;
+            }
+
+            ulong outputEnd = outputOffset + segmentCount;
+            for (int bucket = 0; bucket < accumulators.Length; bucket++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                ulong bucketStart = Scale(bucket, totalSampleCount, accumulators.Length);
+                ulong bucketEnd = Scale(bucket + 1, totalSampleCount, accumulators.Length);
+                if (bucketEnd <= bucketStart)
+                {
+                    bucketEnd = bucketStart + 1;
+                }
+
+                ulong overlapStart = Math.Max(bucketStart, outputOffset);
+                ulong overlapEnd = Math.Min(bucketEnd, outputEnd);
+                if (overlapEnd <= overlapStart)
+                {
+                    continue;
+                }
+
+                ulong localStart = segmentStart + overlapStart - outputOffset;
+                ulong localCount = overlapEnd - overlapStart;
+                ReadBucket(handle, localStart, localCount, buffer, out float first, out float last, out float min, out float max, cancellationToken);
+                accumulators[bucket].AddSummary(first, last, min, max);
+            }
+        }
+
+        public int ReadSamples(
+            TdmsChannelKey key,
+            ulong segmentStart,
+            int sampleCount,
+            float[] buffer,
+            CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!ChannelHandles.TryGetValue(key, out IntPtr handle))
+            {
+                return 0;
+            }
+
+            TdmNative.ThrowIfError(
+                TdmNative.DDC_GetDataValuesFloat(handle, (UIntPtr)segmentStart, (UIntPtr)sampleCount, buffer),
+                "DDC_GetDataValuesFloat");
+            return sampleCount;
+        }
+
         public void Dispose()
         {
             if (File != IntPtr.Zero)
@@ -462,7 +758,303 @@ public sealed class TdmsFileReader : IDisposable
 
             ChannelHandles.Clear();
             Channels.Clear();
+            _materialized.Dispose();
         }
+    }
+
+    private sealed class CompressedCaptureSegment : IReadableSegment
+    {
+        private const int RecordHeaderSize = sizeof(int) + sizeof(ulong) + sizeof(int) + sizeof(int) + sizeof(int) + sizeof(int) + sizeof(byte);
+        private readonly FileStream _stream;
+        private readonly object _streamSync = new();
+        private readonly CompressedCaptureManifest _manifest;
+        private readonly Dictionary<int, CompressedCaptureChannelManifest> _channelsByOrdinal;
+        private readonly Dictionary<TdmsChannelKey, List<CompressedRecordIndex>> _recordsByChannel = new();
+
+        private CompressedCaptureSegment(string path, FileStream stream, CompressedCaptureManifest manifest)
+        {
+            Path = path;
+            _stream = stream;
+            _manifest = manifest;
+            _channelsByOrdinal = manifest.Channels.ToDictionary(channel => channel.Ordinal, channel => channel);
+            Channels = new Dictionary<TdmsChannelKey, TdmsChannelInfo>();
+            FileInfo = new TdmsFileInfo(path, Array.Empty<TdmsGroupInfo>());
+        }
+
+        public string Path { get; }
+        public TdmsFileInfo FileInfo { get; private set; }
+        public Dictionary<TdmsChannelKey, TdmsChannelInfo> Channels { get; private set; }
+
+        public static CompressedCaptureSegment Open(string path)
+        {
+            var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            try
+            {
+                using var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
+                byte[] magic = reader.ReadBytes(CompressedCaptureFormat.Magic.Length);
+                if (!magic.SequenceEqual(CompressedCaptureFormat.Magic))
+                {
+                    throw new InvalidDataException("The file is not a DASH compressed capture segment.");
+                }
+
+                int version = reader.ReadInt32();
+                if (version != CompressedCaptureFormat.Version)
+                {
+                    throw new InvalidDataException($"Unsupported compressed capture version {version}.");
+                }
+
+                int manifestLength = reader.ReadInt32();
+                if (manifestLength <= 0 || manifestLength > 16 * 1024 * 1024)
+                {
+                    throw new InvalidDataException("Compressed capture manifest length is invalid.");
+                }
+
+                byte[] manifestBytes = reader.ReadBytes(manifestLength);
+                if (manifestBytes.Length != manifestLength)
+                {
+                    throw new EndOfStreamException("Unexpected end of compressed capture manifest.");
+                }
+
+                CompressedCaptureManifest manifest =
+                    JsonSerializer.Deserialize<CompressedCaptureManifest>(manifestBytes, CompressedCaptureFormat.JsonOptions) ??
+                    throw new InvalidDataException("Compressed capture manifest is invalid.");
+
+                var segment = new CompressedCaptureSegment(path, stream, manifest);
+                segment.ScanRecords(reader);
+                segment.BuildFileInfo();
+                return segment;
+            }
+            catch
+            {
+                stream.Dispose();
+                throw;
+            }
+        }
+
+        public void AccumulateEnvelope(
+            TdmsChannelKey key,
+            ulong segmentStart,
+            ulong segmentCount,
+            ulong outputOffset,
+            ulong totalSampleCount,
+            TdmsEnvelopeAccumulator[] accumulators,
+            float[] buffer,
+            CancellationToken cancellationToken)
+        {
+            if (!_recordsByChannel.TryGetValue(key, out List<CompressedRecordIndex>? records))
+            {
+                return;
+            }
+
+            ulong requestEnd = segmentStart + segmentCount;
+            foreach (CompressedRecordIndex record in records)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                ulong recordEnd = record.SampleStart + (ulong)record.SampleCount;
+                if (recordEnd <= segmentStart || record.SampleStart >= requestEnd)
+                {
+                    continue;
+                }
+
+                byte[] raw = ReadRecord(record);
+                ReadOnlySpan<float> values = MemoryMarshal.Cast<byte, float>(raw);
+                int localStart = (int)(Math.Max(segmentStart, record.SampleStart) - record.SampleStart);
+                int localEnd = (int)(Math.Min(requestEnd, recordEnd) - record.SampleStart);
+                for (int index = localStart; index < localEnd; index++)
+                {
+                    ulong relative = outputOffset + record.SampleStart + (ulong)index - segmentStart;
+                    int bucket = BucketIndex(relative, totalSampleCount, accumulators.Length);
+                    accumulators[bucket].Add(values[index]);
+                }
+            }
+        }
+
+        public int ReadSamples(
+            TdmsChannelKey key,
+            ulong segmentStart,
+            int sampleCount,
+            float[] buffer,
+            CancellationToken cancellationToken)
+        {
+            if (!_recordsByChannel.TryGetValue(key, out List<CompressedRecordIndex>? records) || sampleCount <= 0)
+            {
+                return 0;
+            }
+
+            Array.Clear(buffer, 0, sampleCount);
+            ulong requestEnd = segmentStart + (ulong)sampleCount;
+            int copied = 0;
+            foreach (CompressedRecordIndex record in records)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                ulong recordEnd = record.SampleStart + (ulong)record.SampleCount;
+                if (recordEnd <= segmentStart || record.SampleStart >= requestEnd)
+                {
+                    continue;
+                }
+
+                byte[] raw = ReadRecord(record);
+                ReadOnlySpan<float> values = MemoryMarshal.Cast<byte, float>(raw);
+                int localStart = (int)(Math.Max(segmentStart, record.SampleStart) - record.SampleStart);
+                int localEnd = (int)(Math.Min(requestEnd, recordEnd) - record.SampleStart);
+                int length = localEnd - localStart;
+                int destination = (int)(Math.Max(segmentStart, record.SampleStart) - segmentStart);
+                values.Slice(localStart, length).CopyTo(buffer.AsSpan(destination, length));
+                copied += length;
+            }
+
+            return copied == 0 ? 0 : sampleCount;
+        }
+
+        public void Dispose()
+        {
+            _stream.Dispose();
+            Channels.Clear();
+            _recordsByChannel.Clear();
+        }
+
+        private void ScanRecords(BinaryReader reader)
+        {
+            while (_stream.Position < _stream.Length)
+            {
+                if (_stream.Length - _stream.Position < RecordHeaderSize)
+                {
+                    break;
+                }
+
+                int channelOrdinal = reader.ReadInt32();
+                ulong sampleStart = reader.ReadUInt64();
+                int sampleCount = reader.ReadInt32();
+                int originalLength = reader.ReadInt32();
+                int transformedLength = reader.ReadInt32();
+                int payloadLength = reader.ReadInt32();
+                byte flags = reader.ReadByte();
+
+                if (!_channelsByOrdinal.TryGetValue(channelOrdinal, out CompressedCaptureChannelManifest? channel) ||
+                    sampleCount <= 0 ||
+                    originalLength != sampleCount * sizeof(float) ||
+                    transformedLength < 0 ||
+                    payloadLength < 0)
+                {
+                    throw new InvalidDataException("Compressed capture record header is invalid.");
+                }
+
+                if (_stream.Length - _stream.Position < payloadLength)
+                {
+                    break;
+                }
+
+                long payloadOffset = _stream.Position;
+                _stream.Position += payloadLength;
+                var key = new TdmsChannelKey(channel.GroupName, channel.ChannelName);
+                if (!_recordsByChannel.TryGetValue(key, out List<CompressedRecordIndex>? records))
+                {
+                    records = new List<CompressedRecordIndex>();
+                    _recordsByChannel[key] = records;
+                }
+
+                records.Add(new CompressedRecordIndex(
+                    channelOrdinal,
+                    sampleStart,
+                    sampleCount,
+                    originalLength,
+                    transformedLength,
+                    payloadLength,
+                    flags,
+                    payloadOffset));
+            }
+        }
+
+        private void BuildFileInfo()
+        {
+            var groups = new List<TdmsGroupInfo>();
+            foreach (IGrouping<string, CompressedCaptureChannelManifest> groupSet in _manifest.Channels
+                .GroupBy(channel => channel.GroupName, StringComparer.OrdinalIgnoreCase)
+                .OrderBy(group => group.First().DeviceId))
+            {
+                CompressedCaptureChannelManifest first = groupSet.First();
+                var channels = groupSet
+                    .Select(channel =>
+                    {
+                        var key = new TdmsChannelKey(channel.GroupName, channel.ChannelName);
+                        ulong sampleCount = _recordsByChannel.TryGetValue(key, out List<CompressedRecordIndex>? records)
+                            ? records.Aggregate(0UL, (max, record) => Math.Max(max, record.SampleStart + (ulong)record.SampleCount))
+                            : 0;
+                        return new TdmsChannelInfo(
+                            key,
+                            channel.DeviceId,
+                            channel.GroupName,
+                            channel.ChannelName,
+                            channel.ChannelDescription,
+                            string.IsNullOrWhiteSpace(channel.Unit) ? "raw" : channel.Unit,
+                            channel.ChannelId,
+                            channel.DataIndex,
+                            channel.LocalDataIndex,
+                            sampleCount,
+                            channel.SampleRate);
+                    })
+                    .OrderBy(channel => channel.LocalDataIndex)
+                    .ThenBy(channel => channel.Name, StringComparer.OrdinalIgnoreCase)
+                    .ToArray();
+
+                groups.Add(new TdmsGroupInfo(first.DeviceId, first.GroupName, first.GroupDescription, first.SampleRate, channels));
+            }
+
+            FileInfo = new TdmsFileInfo(Path, groups);
+            Channels = groups
+                .SelectMany(group => group.Channels)
+                .ToDictionary(channel => channel.Key, channel => channel);
+        }
+
+        private byte[] ReadRecord(CompressedRecordIndex record)
+        {
+            byte[] payload = new byte[record.PayloadLength];
+            lock (_streamSync)
+            {
+                _stream.Position = record.PayloadOffset;
+                int offset = 0;
+                while (offset < payload.Length)
+                {
+                    int read = _stream.Read(payload, offset, payload.Length - offset);
+                    if (read == 0)
+                    {
+                        throw new EndOfStreamException("Unexpected end of compressed capture record.");
+                    }
+
+                    offset += read;
+                }
+            }
+
+            return CompressedTdmsCodec.DecodePayload(
+                payload,
+                _manifest.Algorithm,
+                _manifest.Preprocessor,
+                _manifest.LpcOrder,
+                record.OriginalLength,
+                record.TransformedLength,
+                record.Flags);
+        }
+
+        private static int BucketIndex(ulong relative, ulong totalSampleCount, int bucketCount)
+        {
+            if (bucketCount <= 1 || totalSampleCount == 0)
+            {
+                return 0;
+            }
+
+            int bucket = (int)((double)relative / totalSampleCount * bucketCount);
+            return Math.Clamp(bucket, 0, bucketCount - 1);
+        }
+
+        private readonly record struct CompressedRecordIndex(
+            int ChannelOrdinal,
+            ulong SampleStart,
+            int SampleCount,
+            int OriginalLength,
+            int TransformedLength,
+            int PayloadLength,
+            byte Flags,
+            long PayloadOffset);
     }
 }
 
@@ -511,3 +1103,10 @@ public sealed record TdmsChannelEnvelope(
     IReadOnlyList<TdmsEnvelopePoint> Points);
 
 public readonly record struct TdmsEnvelopePoint(int Pixel, float First, float Last, float Minimum, float Maximum);
+
+public readonly record struct TdmsExportProgress(
+    string ChannelName,
+    int CompletedChannels,
+    int TotalChannels,
+    ulong ChannelSamplesDone,
+    ulong ChannelSamplesTotal);

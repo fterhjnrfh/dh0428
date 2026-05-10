@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DashCapture.Native")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+da92ea8e29b93fddbf9eb64b41806b65fc3d5634")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+49919a6c0144080571ff85b13773815f060e8898")]
 [assembly: System.Reflection.AssemblyProductAttribute("DashCapture.Native")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DashCapture.Native")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

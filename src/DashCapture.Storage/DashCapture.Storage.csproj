@@ -7,4 +7,10 @@
     <ProjectReference Include="..\DashCapture.Core\DashCapture.Core.csproj" />
     <ProjectReference Include="..\DashCapture.Native\DashCapture.Native.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="K4os.Compression.LZ4" Version="1.3.8" />
+    <PackageReference Include="SharpZipLib" Version="1.4.2" />
+    <PackageReference Include="Snappier" Version="1.3.1" />
+    <PackageReference Include="ZstdSharp.Port" Version="0.8.8" />
+  </ItemGroup>
 </Project>

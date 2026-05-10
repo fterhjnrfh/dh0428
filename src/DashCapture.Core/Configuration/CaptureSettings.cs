@@ -34,12 +34,48 @@ public sealed class StorageSettings
     public bool EnableRawBlockAudit { get; set; } = true;
     public FileNamingMode NamingMode { get; set; } = FileNamingMode.Time;
     public string CustomFileName { get; set; } = "DashCapture";
+    public CompressionSettings Compression { get; set; } = new();
 }
 
 public enum FileNamingMode
 {
     Time,
     Custom
+}
+
+public sealed class CompressionSettings
+{
+    public bool Enabled { get; set; }
+    public CompressionAlgorithm Algorithm { get; set; } = CompressionAlgorithm.Zstd;
+    public CompressionPreprocessor Preprocessor { get; set; } = CompressionPreprocessor.None;
+    public int ChunkSizeMb { get; set; } = 4;
+    public int MaxParallelFiles { get; set; } = 1;
+    public bool DeleteSourceAfterCompression { get; set; } = true;
+    public int ZstdLevel { get; set; } = 3;
+    public int ZstdWindowLog { get; set; } = 0;
+    public int Lz4Level { get; set; } = 0;
+    public int Lz4HcLevel { get; set; } = 9;
+    public int ZlibLevel { get; set; } = 6;
+    public int BZip2BlockSize { get; set; } = 9;
+    public int LpcOrder { get; set; } = 2;
+}
+
+public enum CompressionAlgorithm
+{
+    Zstd,
+    Lz4,
+    Snappy,
+    Zlib,
+    Lz4Hc,
+    BZip2
+}
+
+public enum CompressionPreprocessor
+{
+    None,
+    Delta1,
+    Delta2,
+    Lpc
 }
 
 public sealed class DisplaySettings

@@ -554,3 +554,7 @@ C:\dh\NEW-DH\src\DashCapture.App\obj\Release\net6.0\win-x64\refint\DashCapture.A
 C:\dh\NEW-DH\src\DashCapture.App\obj\Release\net6.0\win-x64\DashCapture.App.pdb
 C:\dh\NEW-DH\src\DashCapture.App\obj\Release\net6.0\win-x64\DashCapture.App.genruntimeconfig.cache
 C:\dh\NEW-DH\src\DashCapture.App\obj\Release\net6.0\win-x64\ref\DashCapture.App.dll
+C:\dh\NEW-DH\src\DashCapture.App\bin\Release\net6.0\win-x64\K4os.Compression.LZ4.dll
+C:\dh\NEW-DH\src\DashCapture.App\bin\Release\net6.0\win-x64\ICSharpCode.SharpZipLib.dll
+C:\dh\NEW-DH\src\DashCapture.App\bin\Release\net6.0\win-x64\Snappier.dll
+C:\dh\NEW-DH\src\DashCapture.App\bin\Release\net6.0\win-x64\ZstdSharp.dll

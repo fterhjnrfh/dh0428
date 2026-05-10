@@ -11,7 +11,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
     private readonly StorageSettings _settings;
     private CancellationTokenSource? _cts;
     private Task? _worker;
-    private TdmsCaptureWriter? _writer;
+    private ICaptureStorageWriter? _writer;
     private DateTimeOffset _lastSave = DateTimeOffset.MinValue;
 
     public TdmsStorageService(AcquisitionService acquisition, StorageSettings settings)
@@ -33,7 +33,10 @@ public sealed class TdmsStorageService : IAsyncDisposable
             return Task.CompletedTask;
         }
 
-        _writer = new TdmsCaptureWriter(_settings, devices);
+        _writer = _settings.Compression.Enabled
+            ? new CompressedCaptureWriter(_settings, devices)
+            : new TdmsCaptureWriter(_settings, devices);
+        _writer.Faulted += OnWriterFaulted;
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         _worker = Task.Run(() => ConsumeAsync(_cts.Token), CancellationToken.None);
         return Task.CompletedTask;
@@ -55,8 +58,12 @@ public sealed class TdmsStorageService : IAsyncDisposable
             }
         }
 
-        _writer?.Dispose();
-        _writer = null;
+        if (_writer is not null)
+        {
+            _writer.Faulted -= OnWriterFaulted;
+            _writer.Dispose();
+            _writer = null;
+        }
         _cts?.Dispose();
         _cts = null;
         _worker = null;
@@ -112,7 +119,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
             }
             catch (Exception ex)
             {
-                Faulted?.Invoke(new AcquisitionFault(DateTimeOffset.UtcNow, "TDMS_WRITE_FAILED", ex.Message, block.Header.MachineId));
+                Faulted?.Invoke(new AcquisitionFault(DateTimeOffset.UtcNow, "STORAGE_WRITE_FAILED", ex.Message, block.Header.MachineId));
             }
             finally
             {
@@ -120,5 +127,13 @@ public sealed class TdmsStorageService : IAsyncDisposable
                 _acquisition.MarkStorageBlockConsumed();
             }
         }
+    }
+
+    private void OnWriterFaulted(Exception exception, string path)
+    {
+        Faulted?.Invoke(new AcquisitionFault(
+            DateTimeOffset.UtcNow,
+            "STORAGE_WRITE_FAILED",
+            $"Storage writer failed for {path}: {exception.Message}"));
     }
 }

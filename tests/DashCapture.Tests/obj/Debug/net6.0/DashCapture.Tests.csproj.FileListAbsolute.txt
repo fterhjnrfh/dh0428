@@ -44,3 +44,10 @@ C:\dh\NEW-DH\tests\DashCapture.Tests\obj\Debug\net6.0\DashCapture.Tests.pdb
 C:\dh\NEW-DH\tests\DashCapture.Tests\obj\Debug\net6.0\DashCapture.Tests.genruntimeconfig.cache
 C:\dh\NEW-DH\tests\DashCapture.Tests\obj\Debug\net6.0\ref\DashCapture.Tests.dll
 C:\dh\NEW-DH\tests\DashCapture.Tests\obj\Debug\net6.0\DashCapture.Tests.sourcelink.json
+C:\dh\NEW-DH\tests\DashCapture.Tests\bin\Debug\net6.0\K4os.Compression.LZ4.dll
+C:\dh\NEW-DH\tests\DashCapture.Tests\bin\Debug\net6.0\ICSharpCode.SharpZipLib.dll
+C:\dh\NEW-DH\tests\DashCapture.Tests\bin\Debug\net6.0\Snappier.dll
+C:\dh\NEW-DH\tests\DashCapture.Tests\bin\Debug\net6.0\System.Runtime.CompilerServices.Unsafe.dll
+C:\dh\NEW-DH\tests\DashCapture.Tests\bin\Debug\net6.0\ZstdSharp.dll
+C:\dh\NEW-DH\tests\DashCapture.Tests\bin\Debug\net6.0\DashCapture.Storage.dll
+C:\dh\NEW-DH\tests\DashCapture.Tests\bin\Debug\net6.0\DashCapture.Storage.pdb

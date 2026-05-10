@@ -566,3 +566,7 @@ C:\dh\NEW-DH\.buildverify\app\DashCapture.App.runtimeconfig.json
 C:\dh\NEW-DH\.buildverify\app\DashCapture.App.dll
 C:\dh\NEW-DH\.buildverify\app\DashCapture.App.pdb
 C:\dh\NEW-DH\src\DashCapture.App\obj\Debug\net6.0\win-x64\DashCapture.App.sourcelink.json
+C:\dh\NEW-DH\src\DashCapture.App\bin\Debug\net6.0\win-x64\K4os.Compression.LZ4.dll
+C:\dh\NEW-DH\src\DashCapture.App\bin\Debug\net6.0\win-x64\ICSharpCode.SharpZipLib.dll
+C:\dh\NEW-DH\src\DashCapture.App\bin\Debug\net6.0\win-x64\Snappier.dll
+C:\dh\NEW-DH\src\DashCapture.App\bin\Debug\net6.0\win-x64\ZstdSharp.dll

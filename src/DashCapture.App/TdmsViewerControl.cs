@@ -22,16 +22,21 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
     private static readonly IBrush AccentGreen = new SolidColorBrush(Color.FromRgb(35, 153, 100));
 
     private readonly string _tdmRuntimeDir;
-    private readonly Button _openFileButton = new() { Content = "Open TDMS" };
+    private readonly Button _openFileButton = new() { Content = "Open File" };
     private readonly Button _openFolderButton = new() { Content = "Open Folder" };
+    private readonly Button _exportTdmsButton = new() { Content = "Export TDMS", IsEnabled = false };
     private readonly Button _loadButton = new() { Content = "Load", IsEnabled = false };
     private readonly Button _selectAllButton = new() { Content = "All" };
     private readonly Button _clearSelectionButton = new() { Content = "None" };
+    private readonly Button _addChannelButton = new() { Content = "Add", IsEnabled = false };
     private readonly Button _fullRangeButton = new() { Content = "Full Range", IsEnabled = false };
-    private readonly TextBlock _fileText = new() { Text = "No TDMS file or folder opened." };
+    private readonly TextBlock _fileText = new() { Text = "No data file or folder opened." };
     private readonly TextBlock _summaryText = new();
     private readonly TextBlock _statusText = new();
-    private readonly StackPanel _channelPanel = new() { Spacing = 6 };
+    private readonly TextBlock _exportProgressText = new();
+    private readonly TextBlock _selectedChannelsText = new() { Text = "No channel selected." };
+    private readonly ComboBox _devicePicker = new() { Width = 210, IsEnabled = false };
+    private readonly ComboBox _channelPicker = new() { Width = 170, IsEnabled = false };
     private readonly TextBox _startSeconds = new() { Text = "0", Width = 110 };
     private readonly TextBox _windowSeconds = new() { Text = "10", Width = 110 };
     private readonly Slider _timeSlider = new() { Minimum = 0, Maximum = 0, Value = 0, IsEnabled = false };
@@ -40,12 +45,13 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
     private readonly TextBox _yMax = new() { Width = 110, IsEnabled = false };
     private readonly CheckBox _autoY = new() { Content = "Auto Y", IsChecked = true };
     private readonly TdmsWaveformControl _waveform = new();
-    private readonly List<CheckBox> _channelChecks = new();
     private readonly List<TdmsChannelInfo> _channels = new();
+    private readonly HashSet<TdmsChannelKey> _selectedChannelKeys = new();
     private readonly Dictionary<EnvelopeCacheKey, TdmsChannelEnvelope> _envelopeCache = new();
     private TdmsFileReader? _reader;
     private CancellationTokenSource? _loadCts;
     private CancellationTokenSource? _rangeCts;
+    private CancellationTokenSource? _exportCts;
     private double _fullDurationSeconds = 10;
     private bool _suppressAutoLoad;
     private bool _suppressSliderChange;
@@ -58,10 +64,13 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
 
         _openFileButton.Click += async (_, _) => await OpenFileAsync();
         _openFolderButton.Click += async (_, _) => await OpenFolderAsync();
+        _exportTdmsButton.Click += async (_, _) => await ExportTdmsAsync();
         _loadButton.Click += async (_, _) => await LoadSelectedAsync();
         _fullRangeButton.Click += async (_, _) => await LoadFullRangeAsync();
+        _addChannelButton.Click += async (_, _) => await AddSelectedChannelAsync();
         _selectAllButton.Click += (_, _) => SetAllChannels(true);
         _clearSelectionButton.Click += (_, _) => SetAllChannels(false);
+        _devicePicker.SelectionChanged += (_, _) => RefreshChannelPicker();
         _waveform.ViewRangeRequested += QueueViewportLoad;
         _waveform.ProbeChanged += text => SetStatus(text);
         _timeSlider.PropertyChanged += (_, e) =>
@@ -84,15 +93,19 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
 
         StyleButton(_openFileButton, AccentBlue);
         StyleButton(_openFolderButton, AccentBlue);
+        StyleButton(_exportTdmsButton, AccentGreen);
         StyleButton(_loadButton, AccentGreen);
         StyleButton(_selectAllButton, AccentBlue);
         StyleButton(_clearSelectionButton, AccentBlue);
+        StyleButton(_addChannelButton, AccentGreen);
         StyleButton(_fullRangeButton, AccentBlue);
         StyleInput(_startSeconds);
         StyleInput(_windowSeconds);
         StyleInput(_yMin);
         StyleInput(_yMax);
-        SetStatus("Open a TDMS file or a capture folder. Wheel zoom, drag to zoom, Shift/right-drag to pan.");
+        StyleComboBox(_devicePicker);
+        StyleComboBox(_channelPicker);
+        SetStatus("Open data, choose device/channel, then load or export.");
     }
 
     private Control BuildContent()
@@ -100,20 +113,116 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         var root = new Grid
         {
             Margin = new Thickness(10),
-            ColumnDefinitions = new ColumnDefinitions("430,*")
+            RowDefinitions = new RowDefinitions("Auto,*,Auto"),
+            RowSpacing = 8
         };
 
-        Control sidePanel = BuildSidePanel();
-        Grid.SetColumn(sidePanel, 0);
-        root.Children.Add(sidePanel);
+        Control topPanel = BuildSidePanel();
+        Grid.SetRow(topPanel, 0);
+        root.Children.Add(topPanel);
 
         _rangeText.Foreground = TextSecondary;
         _rangeText.FontSize = 12;
         _rangeText.VerticalAlignment = VerticalAlignment.Center;
 
-        var rangeBar = new Grid
+        var plotHost = new DockPanel
         {
-            Margin = new Thickness(10, 6, 10, 10),
+            LastChildFill = true,
+            Children =
+            {
+                _waveform
+            }
+        };
+
+        var plotPanel = new Border
+        {
+            Background = PanelBackground,
+            BorderBrush = BorderBrushSoft,
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Child = plotHost
+        };
+        Grid.SetRow(plotPanel, 1);
+        root.Children.Add(plotPanel);
+
+        var statusGrid = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitions("1.1*,1.4*,1.5*"),
+            ColumnSpacing = 12,
+            Children =
+            {
+                _summaryText,
+                _selectedChannelsText,
+                _statusText
+            }
+        };
+        Grid.SetColumn(_selectedChannelsText, 1);
+        Grid.SetColumn(_statusText, 2);
+        var statusPanel = new Border
+        {
+            Padding = new Thickness(10, 6),
+            Background = PanelBackground2,
+            BorderBrush = BorderBrushSoft,
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Child = statusGrid
+        };
+        Grid.SetRow(statusPanel, 2);
+        root.Children.Add(statusPanel);
+        return root;
+    }
+
+    private Control BuildSidePanel()
+    {
+        _fileText.Foreground = TextPrimary;
+        _fileText.FontSize = 13;
+        _fileText.TextWrapping = TextWrapping.NoWrap;
+        _fileText.TextTrimming = TextTrimming.CharacterEllipsis;
+        _summaryText.Foreground = TextSecondary;
+        _summaryText.FontSize = 12;
+        _summaryText.TextWrapping = TextWrapping.NoWrap;
+        _summaryText.TextTrimming = TextTrimming.CharacterEllipsis;
+        _statusText.Foreground = TextSecondary;
+        _statusText.FontSize = 12;
+        _statusText.TextWrapping = TextWrapping.NoWrap;
+        _statusText.TextTrimming = TextTrimming.CharacterEllipsis;
+        _selectedChannelsText.Foreground = TextPrimary;
+        _selectedChannelsText.FontSize = 12;
+        _selectedChannelsText.TextWrapping = TextWrapping.NoWrap;
+        _selectedChannelsText.TextTrimming = TextTrimming.CharacterEllipsis;
+        _exportProgressText.Foreground = AccentGreen;
+        _exportProgressText.FontSize = 13;
+        _exportProgressText.FontWeight = FontWeight.SemiBold;
+        _exportProgressText.TextWrapping = TextWrapping.NoWrap;
+        _exportProgressText.TextTrimming = TextTrimming.CharacterEllipsis;
+        _exportProgressText.IsVisible = false;
+
+        var toolbar = new WrapPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Children =
+            {
+                _openFileButton,
+                _openFolderButton,
+                _exportTdmsButton,
+                _fullRangeButton,
+                _loadButton,
+                _selectAllButton,
+                _clearSelectionButton,
+                ToolbarField("Device", _devicePicker),
+                ToolbarField("Channel", _channelPicker),
+                _addChannelButton,
+                ToolbarField("Start", _startSeconds),
+                ToolbarField("Window", _windowSeconds),
+                ToolbarField("Y Min", _yMin),
+                ToolbarField("Y Max", _yMax),
+                _autoY
+            }
+        };
+        _autoY.Margin = new Thickness(0, 5, 8, 5);
+
+        var sliderRow = new Grid
+        {
             ColumnDefinitions = new ColumnDefinitions("*,Auto"),
             ColumnSpacing = 12,
             Children =
@@ -124,143 +233,51 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         };
         Grid.SetColumn(_rangeText, 1);
 
-        var plotHost = new DockPanel
+        var bottomLine = new Grid
         {
-            LastChildFill = true,
-            Children =
-            {
-                rangeBar,
-                _waveform
-            }
-        };
-        DockPanel.SetDock(rangeBar, Dock.Bottom);
-
-        var plotPanel = new Border
-        {
-            Margin = new Thickness(10, 0, 0, 0),
-            Background = PanelBackground,
-            BorderBrush = BorderBrushSoft,
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
-            Child = plotHost
-        };
-        Grid.SetColumn(plotPanel, 1);
-        root.Children.Add(plotPanel);
-        return root;
-    }
-
-    private Control BuildSidePanel()
-    {
-        _fileText.Foreground = TextPrimary;
-        _fileText.FontSize = 13;
-        _fileText.TextWrapping = TextWrapping.Wrap;
-        _fileText.MaxHeight = 42;
-        _summaryText.Foreground = TextSecondary;
-        _summaryText.FontSize = 13;
-        _summaryText.TextWrapping = TextWrapping.Wrap;
-        _summaryText.MaxHeight = 36;
-        _statusText.Foreground = TextSecondary;
-        _statusText.FontSize = 13;
-        _statusText.TextWrapping = TextWrapping.Wrap;
-        _statusText.MaxHeight = 48;
-
-        var fileButtons = new WrapPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Children = { _openFileButton, _openFolderButton, _fullRangeButton }
-        };
-
-        var selectionButtons = new WrapPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Children = { _selectAllButton, _clearSelectionButton, _loadButton }
-        };
-
-        var rangeGrid = new Grid
-        {
-            ColumnDefinitions = new ColumnDefinitions("Auto,Auto"),
-            RowDefinitions = new RowDefinitions("Auto,Auto"),
-            ColumnSpacing = 10,
-            RowSpacing = 6
-        };
-        AddRangeField(rangeGrid, "Start (s)", _startSeconds, 0, 0);
-        AddRangeField(rangeGrid, "Window (s)", _windowSeconds, 1, 0);
-        AddRangeField(rangeGrid, "Y Min", _yMin, 0, 1);
-        AddRangeField(rangeGrid, "Y Max", _yMax, 1, 1);
-
-        var scroll = new ScrollViewer
-        {
-            Content = _channelPanel,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled
-        };
-
-        var top = new StackPanel
-        {
-            Spacing = 8,
-            Margin = new Thickness(12, 10, 12, 8),
-            Children =
-            {
-                SectionTitle("TDMS Viewer"),
-                fileButtons,
-                InfoBlock(_fileText),
-                InfoBlock(_summaryText),
-                rangeGrid,
-                _autoY,
-                selectionButtons
-            }
-        };
-
-        var channelHeader = new Grid
-        {
-            Margin = new Thickness(12, 4, 12, 6),
             ColumnDefinitions = new ColumnDefinitions("*,Auto"),
+            ColumnSpacing = 12,
             Children =
             {
-                SectionTitle("Channels"),
-                new TextBlock
-                {
-                    Text = "device / channel",
-                    Foreground = TextSecondary,
-                    FontSize = 12,
-                    VerticalAlignment = VerticalAlignment.Center
-                }
+                _fileText,
+                _exportProgressText
             }
         };
-        Grid.SetColumn(channelHeader.Children[1], 1);
-
-        var statusBlock = InfoBlock(_statusText);
-        statusBlock.Margin = new Thickness(12, 8, 12, 12);
-
-        var panel = new Grid
-        {
-            RowDefinitions = new RowDefinitions("Auto,*,Auto"),
-            Children =
-            {
-                top,
-                new DockPanel
-                {
-                    LastChildFill = true,
-                    Children =
-                    {
-                        channelHeader,
-                        scroll
-                    }
-                },
-                statusBlock
-            }
-        };
-        Grid.SetRow(panel.Children[1], 1);
-        Grid.SetRow(panel.Children[2], 2);
-        DockPanel.SetDock(channelHeader, Dock.Top);
+        Grid.SetColumn(_exportProgressText, 1);
 
         return new Border
         {
+            Padding = new Thickness(10),
             Background = PanelBackground,
             BorderBrush = BorderBrushSoft,
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
-            Child = panel
+            Child = new StackPanel
+            {
+                Spacing = 8,
+                Children = { toolbar, sliderRow, bottomLine }
+            }
+        };
+    }
+
+    private static Control ToolbarField(string label, Control editor)
+    {
+        return new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 5,
+            Margin = new Thickness(0, 0, 8, 6),
+            Children =
+            {
+                new TextBlock
+                {
+                    Text = label,
+                    Foreground = TextSecondary,
+                    FontSize = 12,
+                    VerticalAlignment = VerticalAlignment.Center
+                },
+                editor
+            }
         };
     }
 
@@ -291,10 +308,10 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         IReadOnlyList<IStorageFile> files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             AllowMultiple = false,
-            Title = "Open TDMS file",
+            Title = "Open data file",
             FileTypeFilter = new[]
             {
-                new FilePickerFileType("TDMS") { Patterns = new[] { "*.tdms" } },
+                new FilePickerFileType("Capture Data") { Patterns = new[] { "*.tdms", "*.tdms.dhc", "*.dhcap" } },
                 FilePickerFileTypes.All
             }
         });
@@ -317,7 +334,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         IReadOnlyList<IStorageFolder> folders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
             AllowMultiple = false,
-            Title = "Open TDMS capture folder"
+            Title = "Open capture folder"
         });
 
         string? path = folders.FirstOrDefault()?.TryGetLocalPath();
@@ -329,7 +346,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
 
     private async Task OpenPathAsync(string path)
     {
-        SetBusy(true, "Opening TDMS source...");
+        SetBusy(true, "Opening data source...");
         try
         {
             TdmsFileReader reader = await Task.Run(() => TdmsFileReader.Open(path, _tdmRuntimeDir));
@@ -340,8 +357,9 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
             _fileText.Text = reader.Path;
             _loadButton.IsEnabled = _channels.Count > 0;
             _fullRangeButton.IsEnabled = _channels.Count > 0;
+            _exportTdmsButton.IsEnabled = _channels.Count > 0;
             SetDefaultRange(reader.FileInfo);
-            SetStatus("TDMS source opened.");
+            SetStatus("Data source opened.");
             await LoadSelectedAsync();
         }
         catch (Exception ex)
@@ -357,57 +375,157 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
     private void PopulateChannels(TdmsFileInfo fileInfo)
     {
         _channels.Clear();
-        _channelChecks.Clear();
-        _channelPanel.Children.Clear();
+        _selectedChannelKeys.Clear();
 
         ulong maxSamples = 0;
         double maxDuration = 0;
         foreach (TdmsGroupInfo group in fileInfo.Groups)
         {
-            _channelPanel.Children.Add(GroupHeader(group));
             foreach (TdmsChannelInfo channel in group.Channels)
             {
                 _channels.Add(channel);
                 maxSamples = Math.Max(maxSamples, channel.SampleCount);
                 maxDuration = Math.Max(maxDuration, channel.DurationSeconds);
-
-                var check = new CheckBox
-                {
-                    Tag = channel,
-                    IsChecked = _channelChecks.Count < 4,
-                    Content = new TextBlock
-                    {
-                        Text = $"{channel.Name}  {channel.SampleCount:N0}",
-                        FontSize = 14,
-                        Foreground = TextPrimary
-                    }
-                };
-                check.IsCheckedChanged += (_, _) =>
-                {
-                    UpdateLoadButtonState();
-                    if (!_suppressAutoLoad)
-                    {
-                        _ = LoadSelectedAsync();
-                    }
-                };
-
-                _channelChecks.Add(check);
-                _channelPanel.Children.Add(new Border
-                {
-                    Margin = new Thickness(8, 0, 8, 0),
-                    Padding = new Thickness(8, 5),
-                    Background = _channelChecks.Count % 2 == 0 ? PanelBackground2 : new SolidColorBrush(Color.FromRgb(247, 250, 253)),
-                    BorderBrush = BorderBrushSoft,
-                    BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(6),
-                    Child = check
-                });
             }
         }
 
+        foreach (TdmsChannelInfo channel in _channels.Take(4))
+        {
+            _selectedChannelKeys.Add(channel.Key);
+        }
+
+        _devicePicker.ItemsSource = fileInfo.Groups
+            .Select(group => new ComboItem<TdmsGroupInfo>($"{group.Name} ({group.Channels.Count})", group))
+            .ToArray();
+        _devicePicker.SelectedIndex = fileInfo.Groups.Count > 0 ? 0 : -1;
+        _devicePicker.IsEnabled = fileInfo.Groups.Count > 0;
+        RefreshChannelPicker();
+
         _fullDurationSeconds = Math.Max(0.001, maxDuration);
         _summaryText.Text = $"Group {fileInfo.Groups.Count}    Channel {fileInfo.ChannelCount}    MaxSamples {maxSamples:N0}    Duration {FormatDuration(_fullDurationSeconds)}";
+        UpdateSelectedChannelsText();
         UpdateLoadButtonState();
+    }
+
+    private void RefreshChannelPicker()
+    {
+        if (_devicePicker.SelectedItem is not ComboItem<TdmsGroupInfo> item)
+        {
+            _channelPicker.ItemsSource = Array.Empty<ComboItem<TdmsChannelInfo>>();
+            _channelPicker.SelectedIndex = -1;
+            _channelPicker.IsEnabled = false;
+            _addChannelButton.IsEnabled = false;
+            return;
+        }
+
+        _channelPicker.ItemsSource = item.Value.Channels
+            .Select(channel => new ComboItem<TdmsChannelInfo>($"{channel.Name}  {channel.SampleCount:N0}", channel))
+            .ToArray();
+        _channelPicker.SelectedIndex = item.Value.Channels.Count > 0 ? 0 : -1;
+        _channelPicker.IsEnabled = item.Value.Channels.Count > 0;
+        _addChannelButton.IsEnabled = item.Value.Channels.Count > 0;
+    }
+
+    private async Task AddSelectedChannelAsync()
+    {
+        if (_channelPicker.SelectedItem is not ComboItem<TdmsChannelInfo> item)
+        {
+            return;
+        }
+
+        _selectedChannelKeys.Add(item.Value.Key);
+        UpdateSelectedChannelsText();
+        UpdateLoadButtonState();
+        if (!_suppressAutoLoad)
+        {
+            await LoadSelectedAsync();
+        }
+    }
+
+    private async Task ExportTdmsAsync()
+    {
+        TdmsFileReader? reader = _reader;
+        if (reader is null)
+        {
+            SetStatusNow("请先打开一个采集文件或文件夹。");
+            return;
+        }
+
+        TopLevel? topLevel = TopLevel.GetTopLevel(this);
+        if (topLevel is null)
+        {
+            SetStatusNow("无法打开导出窗口：当前界面没有可用的顶层窗口。");
+            return;
+        }
+
+        SetExportFeedback("正在打开导出位置选择窗口...");
+        IStorageFile? file;
+        try
+        {
+            file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = "Export standard TDMS",
+                SuggestedFileName = SuggestedExportName(reader.Path),
+                DefaultExtension = "tdms",
+                FileTypeChoices = new[]
+                {
+                    new FilePickerFileType("TDMS") { Patterns = new[] { "*.tdms" } },
+                    FilePickerFileTypes.All
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            ClearExportFeedback();
+            SetStatusNow("导出窗口打开失败：" + ex.Message);
+            return;
+        }
+
+        string? path = file?.TryGetLocalPath();
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            ClearExportFeedback();
+            SetStatusNow("已取消导出。");
+            return;
+        }
+
+        path = EnsureExtension(path, ".tdms");
+        if (!IsExportTargetAllowed(reader.Path, path, out string reason))
+        {
+            ClearExportFeedback();
+            SetStatusNow(reason);
+            return;
+        }
+
+        _exportCts?.Cancel();
+        _exportCts?.Dispose();
+        _exportCts = new CancellationTokenSource();
+        CancellationToken token = _exportCts.Token;
+        var progress = new Progress<TdmsExportProgress>(UpdateExportProgress);
+        _exportTdmsButton.Content = "Exporting...";
+        SetBusy(true, "正在导出标准 TDMS...");
+        SetExportFeedback("正在导出标准 TDMS...");
+        try
+        {
+            await Task.Run(() => reader.ExportToTdms(path, token, progress), token);
+            SetExportFeedback("TDMS 导出完成。");
+            SetStatusNow("TDMS 导出完成：" + path);
+        }
+        catch (OperationCanceledException)
+        {
+            SetStatusNow("TDMS 导出已取消。");
+        }
+        catch (Exception ex)
+        {
+            SetStatusNow("TDMS 导出失败：" + ex.Message);
+        }
+        finally
+        {
+            SetBusy(false);
+            _exportTdmsButton.Content = "Export TDMS";
+            _exportCts?.Dispose();
+            _exportCts = null;
+        }
     }
 
     private async Task LoadFullRangeAsync()
@@ -632,40 +750,64 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
 
     private List<TdmsChannelInfo> SelectedChannels()
     {
-        return _channelChecks
-            .Where(check => check.IsChecked == true)
-            .Select(check => check.Tag)
-            .OfType<TdmsChannelInfo>()
+        return _channels
+            .Where(channel => _selectedChannelKeys.Contains(channel.Key))
             .ToList();
     }
 
     private void SetAllChannels(bool selected)
     {
         _suppressAutoLoad = true;
-        foreach (CheckBox check in _channelChecks)
+        _selectedChannelKeys.Clear();
+        if (selected)
         {
-            check.IsChecked = selected;
+            foreach (TdmsChannelInfo channel in _channels)
+            {
+                _selectedChannelKeys.Add(channel.Key);
+            }
         }
 
         _suppressAutoLoad = false;
+        UpdateSelectedChannelsText();
         UpdateLoadButtonState();
         _ = LoadSelectedAsync();
     }
 
     private void UpdateLoadButtonState()
     {
-        _loadButton.IsEnabled = _reader is not null && _channelChecks.Any(check => check.IsChecked == true);
+        _loadButton.IsEnabled = _reader is not null && _selectedChannelKeys.Count > 0;
+    }
+
+    private void UpdateSelectedChannelsText()
+    {
+        if (_selectedChannelKeys.Count == 0)
+        {
+            _selectedChannelsText.Text = "Selected 0";
+            return;
+        }
+
+        string preview = string.Join(", ", SelectedChannels().Take(4).Select(channel => channel.DisplayName));
+        if (_selectedChannelKeys.Count > 4)
+        {
+            preview += $", +{_selectedChannelKeys.Count - 4}";
+        }
+
+        _selectedChannelsText.Text = $"Selected {_selectedChannelKeys.Count}: {preview}";
     }
 
     private void SetBusy(bool busy, string? message = null)
     {
         _openFileButton.IsEnabled = !busy;
         _openFolderButton.IsEnabled = !busy;
-        _loadButton.IsEnabled = !busy && _reader is not null && _channelChecks.Any(check => check.IsChecked == true);
+        _exportTdmsButton.IsEnabled = !busy && _reader is not null;
+        _loadButton.IsEnabled = !busy && _reader is not null && _selectedChannelKeys.Count > 0;
         _fullRangeButton.IsEnabled = !busy && _reader is not null;
+        _devicePicker.IsEnabled = !busy && _reader is not null && _devicePicker.SelectedIndex >= 0;
+        _channelPicker.IsEnabled = !busy && _reader is not null && _channelPicker.SelectedIndex >= 0;
+        _addChannelButton.IsEnabled = !busy && _reader is not null && _channelPicker.SelectedIndex >= 0;
         if (!string.IsNullOrWhiteSpace(message))
         {
-            SetStatus(message);
+            SetStatusNow(message);
         }
     }
 
@@ -677,6 +819,9 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         _loadCts?.Cancel();
         _loadCts?.Dispose();
         _loadCts = null;
+        _exportCts?.Cancel();
+        _exportCts?.Dispose();
+        _exportCts = null;
         _reader?.Dispose();
         _reader = null;
     }
@@ -684,6 +829,33 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
     private void SetStatus(string text)
     {
         Dispatcher.UIThread.Post(() => _statusText.Text = text);
+    }
+
+    private void SetStatusNow(string text)
+    {
+        _statusText.Text = text;
+    }
+
+    private void SetExportFeedback(string text)
+    {
+        _exportProgressText.Text = text;
+        _exportProgressText.IsVisible = true;
+        _statusText.Text = text;
+    }
+
+    private void ClearExportFeedback()
+    {
+        _exportProgressText.Text = string.Empty;
+        _exportProgressText.IsVisible = false;
+    }
+
+    private void UpdateExportProgress(TdmsExportProgress progress)
+    {
+        double channelPercent = progress.ChannelSamplesTotal == 0
+            ? 100
+            : Math.Clamp((double)progress.ChannelSamplesDone / progress.ChannelSamplesTotal * 100, 0, 100);
+        string text = $"正在导出 TDMS：{progress.CompletedChannels}/{progress.TotalChannels} 通道    {progress.ChannelName} {channelPercent:0.#}%";
+        SetExportFeedback(text);
     }
 
     private static ulong SecondsToSample(double seconds, double sampleRate)
@@ -783,6 +955,15 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         textBox.Padding = new Thickness(8, 5);
     }
 
+    private static void StyleComboBox(ComboBox comboBox)
+    {
+        comboBox.Background = Brushes.White;
+        comboBox.Foreground = TextPrimary;
+        comboBox.BorderBrush = BorderBrushSoft;
+        comboBox.FontSize = 13;
+        comboBox.Padding = new Thickness(7, 4);
+    }
+
     private static string FormatDuration(double seconds)
     {
         if (seconds >= 3600)
@@ -811,6 +992,91 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         }
 
         return seconds.ToString(seconds < 1 ? "0.######s" : "0.###s", CultureInfo.InvariantCulture);
+    }
+
+    private static string SuggestedExportName(string sourcePath)
+    {
+        string sourceName = Directory.Exists(sourcePath)
+            ? new DirectoryInfo(sourcePath).Name
+            : Path.GetFileNameWithoutExtension(sourcePath);
+        if (string.IsNullOrWhiteSpace(sourceName))
+        {
+            sourceName = "DashCapture";
+        }
+
+        return sourceName + "_export.tdms";
+    }
+
+    private static string EnsureExtension(string path, string extension)
+    {
+        return path.EndsWith(extension, StringComparison.OrdinalIgnoreCase)
+            ? path
+            : path + extension;
+    }
+
+    private static bool IsExportTargetAllowed(string sourcePath, string targetPath, out string reason)
+    {
+        string fullTarget = Path.GetFullPath(targetPath);
+        string? targetDirectory = Path.GetDirectoryName(fullTarget);
+        if (string.IsNullOrWhiteSpace(targetDirectory))
+        {
+            reason = "导出目标无效。";
+            return false;
+        }
+
+        if (File.Exists(sourcePath) &&
+            string.Equals(Path.GetFullPath(sourcePath), fullTarget, StringComparison.OrdinalIgnoreCase))
+        {
+            reason = "导出目标不能覆盖当前打开的源文件。";
+            return false;
+        }
+
+        bool sourceIsCaptureSet = Directory.Exists(sourcePath) ||
+                                  sourcePath.EndsWith(".dhcap", StringComparison.OrdinalIgnoreCase) ||
+                                  sourcePath.EndsWith(".tdms.dhc", StringComparison.OrdinalIgnoreCase) ||
+                                  IsDashCaptureContainerFile(sourcePath);
+        string sourceDirectory = Directory.Exists(sourcePath)
+            ? Path.GetFullPath(sourcePath)
+            : Path.GetDirectoryName(Path.GetFullPath(sourcePath)) ?? string.Empty;
+        if (sourceIsCaptureSet &&
+            !string.IsNullOrWhiteSpace(sourceDirectory) &&
+            string.Equals(Path.GetFullPath(targetDirectory), sourceDirectory, StringComparison.OrdinalIgnoreCase))
+        {
+            reason = "请把 TDMS 导出到采集源文件夹外，避免导出的 TDMS 与源分段混在一起。";
+            return false;
+        }
+
+        reason = string.Empty;
+        return true;
+    }
+
+    private static bool IsDashCaptureContainerFile(string path)
+    {
+        try
+        {
+            if (!File.Exists(path))
+            {
+                return false;
+            }
+
+            Span<byte> magic = stackalloc byte[8];
+            using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            if (stream.Read(magic) != magic.Length)
+            {
+                return false;
+            }
+
+            return magic.SequenceEqual(new byte[] { (byte)'D', (byte)'H', (byte)'C', (byte)'A', (byte)'P', (byte)'0', (byte)'1', 0 });
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private sealed record ComboItem<T>(string Label, T Value)
+    {
+        public override string ToString() => Label;
     }
 
     private readonly record struct EnvelopeCacheKey(TdmsChannelKey Channel, ulong StartSample, ulong SampleCount, int Buckets);

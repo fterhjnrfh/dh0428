@@ -6,7 +6,7 @@ using DashCapture.Native;
 
 namespace DashCapture.Storage;
 
-public sealed class TdmsCaptureWriter : IDisposable
+public sealed class TdmsCaptureWriter : ICaptureStorageWriter
 {
     private readonly StorageSettings _settings;
     private readonly IReadOnlyList<DeviceDescriptor> _devices;
@@ -16,6 +16,9 @@ public sealed class TdmsCaptureWriter : IDisposable
     private readonly Dictionary<int, float> _latestSampleRates = new();
     private readonly DateTimeOffset _startedAt = DateTimeOffset.Now;
     private readonly int _totalChannelCount;
+    private readonly List<Task> _compressionTasks = new();
+    private readonly SemaphoreSlim _compressionSemaphore;
+    private readonly object _compressionSync = new();
     private IntPtr _file;
     private RawBlockAuditWriter? _auditWriter;
     private int _fileIndex;
@@ -30,6 +33,7 @@ public sealed class TdmsCaptureWriter : IDisposable
         _settings = settings;
         _devices = devices;
         _totalChannelCount = devices.Sum(d => d.Channels.Count);
+        _compressionSemaphore = new SemaphoreSlim(Math.Max(1, settings.Compression.MaxParallelFiles));
         NativeBootstrap.AddSearchDirectory(settings.TdmRuntimeDir);
         Directory.CreateDirectory(settings.RootPath);
         _runStem = CreateRunStem();
@@ -40,18 +44,20 @@ public sealed class TdmsCaptureWriter : IDisposable
     public string CurrentPath => _currentPath;
     public string CurrentFolder => _runFolder;
     public string CurrentAuditPath => _auditWriter?.CurrentPath ?? string.Empty;
+    public event Action<Exception, string>? CompressionFaulted;
+    public event Action<Exception, string>? Faulted;
 
     public void AppendBlock(AcquisitionBlock block)
     {
-        if (_file == IntPtr.Zero)
-        {
-            return;
-        }
-
         if (_rollPending)
         {
             OpenNextFile();
             _rollPending = false;
+        }
+
+        if (_file == IntPtr.Zero)
+        {
+            return;
         }
 
         _auditWriter?.Write(block);
@@ -157,24 +163,9 @@ public sealed class TdmsCaptureWriter : IDisposable
 
     public void Dispose()
     {
-        _auditWriter?.Flush();
-        _auditWriter?.Dispose();
-        _auditWriter = null;
-
-        if (_file == IntPtr.Zero)
-        {
-            return;
-        }
-
-        try
-        {
-            TdmNative.DDC_SaveFile(_file);
-        }
-        finally
-        {
-            TdmNative.DDC_CloseFile(_file);
-            _file = IntPtr.Zero;
-        }
+        FinalizeCurrentFile(scheduleCompression: true);
+        WaitForCompressionTasks();
+        _compressionSemaphore.Dispose();
     }
 
     private bool AllExpectedChannelsInitialized => _totalChannelCount == 0 || _initializedChannels.Count >= _totalChannelCount;
@@ -203,7 +194,7 @@ public sealed class TdmsCaptureWriter : IDisposable
 
     private void OpenNextFile()
     {
-        DisposeCurrentFile();
+        FinalizeCurrentFile(scheduleCompression: true);
         _groups.Clear();
         _channels.Clear();
         _initializedChannels.Clear();
@@ -253,7 +244,7 @@ public sealed class TdmsCaptureWriter : IDisposable
         long splitBytes = SplitBytes();
         if (_segmentPayloadBytes >= splitBytes)
         {
-            Save();
+            FinalizeCurrentFile(scheduleCompression: true);
             _rollPending = true;
         }
     }
@@ -324,7 +315,7 @@ public sealed class TdmsCaptureWriter : IDisposable
         return Math.Max(1L, _settings.FileSplitGb) * 1024L * 1024L * 1024L;
     }
 
-    private void DisposeCurrentFile()
+    private void FinalizeCurrentFile(bool scheduleCompression)
     {
         if (_file == IntPtr.Zero)
         {
@@ -336,6 +327,66 @@ public sealed class TdmsCaptureWriter : IDisposable
         _file = IntPtr.Zero;
         _auditWriter?.Dispose();
         _auditWriter = null;
+
+        if (scheduleCompression)
+        {
+            QueueCompression(_currentPath);
+        }
+    }
+
+    private void QueueCompression(string path)
+    {
+        if (!_settings.Compression.Enabled || string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+        {
+            return;
+        }
+
+        Task task = Task.Run(async () =>
+        {
+            await _compressionSemaphore.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                CompressedTdmsCodec.CompressFile(path, _settings.Compression);
+            }
+            catch (Exception ex)
+            {
+                CompressionFaulted?.Invoke(ex, path);
+                Faulted?.Invoke(ex, path);
+            }
+            finally
+            {
+                _compressionSemaphore.Release();
+            }
+        });
+
+        lock (_compressionSync)
+        {
+            _compressionTasks.RemoveAll(task => task.IsCompleted);
+            _compressionTasks.Add(task);
+        }
+    }
+
+    private void WaitForCompressionTasks()
+    {
+        Task[] tasks;
+        lock (_compressionSync)
+        {
+            tasks = _compressionTasks.ToArray();
+            _compressionTasks.Clear();
+        }
+
+        try
+        {
+            Task.WaitAll(tasks);
+        }
+        catch (AggregateException ex)
+        {
+            foreach (Exception inner in ex.Flatten().InnerExceptions)
+            {
+                CompressionFaulted?.Invoke(inner, _runFolder);
+                Faulted?.Invoke(inner, _runFolder);
+            }
+        }
     }
 
     private static string Sanitize(string value)
