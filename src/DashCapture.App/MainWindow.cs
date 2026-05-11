@@ -84,9 +84,13 @@ public sealed class MainWindow : Window
     private readonly TdmsViewerControl _tdmsViewer;
     private readonly DispatcherTimer _renderTimer;
     private readonly DispatcherTimer _captureTimer;
+    private readonly DispatcherTimer _runtimeStatsTimer;
+    private readonly RuntimeUsageSampler _runtimeUsageSampler = new();
     private readonly List<MonitorViewState> _monitorViews = new();
     private DateTimeOffset _captureStartedAt;
+    private DateTimeOffset _lastRuntimeStatsAt = DateTimeOffset.UtcNow;
     private int _activeViewIndex;
+    private int _displayFrameCounter;
 
     public MainWindow()
     {
@@ -232,12 +236,21 @@ public sealed class MainWindow : Window
         };
         _renderTimer.Tick += (_, _) =>
         {
+            _displayFrameCounter++;
             foreach (MonitorViewState view in _monitorViews)
             {
                 view.Waveform.InvalidateVisual();
             }
         };
         _renderTimer.Start();
+
+        _runtimeStatsTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(1)
+        };
+        _runtimeStatsTimer.Tick += (_, _) => UpdateRuntimeTitle();
+        _runtimeStatsTimer.Start();
+        UpdateRuntimeTitle();
 
         Closing += async (_, _) =>
         {
@@ -250,6 +263,9 @@ public sealed class MainWindow : Window
 
             _tdmsViewer.Dispose();
             _captureTimer.Stop();
+            _renderTimer.Stop();
+            _runtimeStatsTimer.Stop();
+            _runtimeUsageSampler.Dispose();
             await _acquisition.DisposeAsync();
         };
 
@@ -1412,6 +1428,77 @@ public sealed class MainWindow : Window
         {
             _status.Text = TranslateStatus(telemetry.Status);
         }
+    }
+
+    private void UpdateRuntimeTitle()
+    {
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        double elapsedSeconds = Math.Max(0.001, (now - _lastRuntimeStatsAt).TotalSeconds);
+        double displayFps = _displayFrameCounter / elapsedSeconds;
+        _displayFrameCounter = 0;
+        _lastRuntimeStatsAt = now;
+
+        RuntimeUsageSnapshot usage = _runtimeUsageSampler.Sample();
+        Title = $"DASH Capture | FPS {displayFps:0.0} | CPU App {FormatPercent(usage.ProcessCpuPercent)} Sys {FormatPercent(usage.SystemCpuPercent)} | {FormatGpuUsage(usage)}";
+    }
+
+    private static string FormatGpuUsage(RuntimeUsageSnapshot usage)
+    {
+        if (!usage.GpuTotalPercent.HasValue)
+        {
+            return "GPU N/A";
+        }
+
+        string engines = FormatGpuEngines(usage.GpuEngines);
+        string suffix = string.IsNullOrWhiteSpace(engines) ? string.Empty : $" ({engines})";
+        return $"GPU App {FormatPercent(usage.GpuProcessPercent)} Sys {FormatPercent(usage.GpuTotalPercent)}{suffix}";
+    }
+
+    private static string FormatGpuEngines(IReadOnlyList<GpuEngineUsage> engines)
+    {
+        string[] priority = { "3D", "Compute", "Copy", "VideoDecode", "VideoEncode" };
+        var selected = new List<GpuEngineUsage>();
+        foreach (string engine in priority)
+        {
+            GpuEngineUsage? item = engines.FirstOrDefault(value => value.Engine.Equals(engine, StringComparison.OrdinalIgnoreCase));
+            if (item is not null)
+            {
+                selected.Add(item);
+            }
+        }
+
+        foreach (GpuEngineUsage item in engines.Where(item => selected.All(selectedItem => !selectedItem.Engine.Equals(item.Engine, StringComparison.OrdinalIgnoreCase))))
+        {
+            if (selected.Count >= 4)
+            {
+                break;
+            }
+
+            selected.Add(item);
+        }
+
+        return string.Join(" ", selected
+            .Where(item => item.TotalPercent >= 0.05 || item.ProcessPercent >= 0.05)
+            .Take(4)
+            .Select(item => $"{ShortGpuEngineName(item.Engine)} {item.TotalPercent:0.#}%"));
+    }
+
+    private static string ShortGpuEngineName(string engine)
+    {
+        return engine switch
+        {
+            "VideoDecode" => "VDec",
+            "VideoEncode" => "VEnc",
+            "VideoProcessing" => "VProc",
+            _ => engine
+        };
+    }
+
+    private static string FormatPercent(double? value)
+    {
+        return value.HasValue
+            ? value.Value.ToString("0.#", CultureInfo.InvariantCulture) + "%"
+            : "N/A";
     }
 
     private void ApplyStorageSettingsFromUi()

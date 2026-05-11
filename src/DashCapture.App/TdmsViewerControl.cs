@@ -1,7 +1,6 @@
 using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
@@ -39,7 +38,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
     private readonly ComboBox _channelPicker = new() { Width = 170, IsEnabled = false };
     private readonly TextBox _startSeconds = new() { Text = "0", Width = 110 };
     private readonly TextBox _windowSeconds = new() { Text = "10", Width = 110 };
-    private readonly Slider _timeSlider = new() { Minimum = 0, Maximum = 0, Value = 0, IsEnabled = false };
+    private readonly TdmsOverviewSlider _overviewSlider = new();
     private readonly TextBlock _rangeText = new();
     private readonly TextBox _yMin = new() { Width = 110, IsEnabled = false };
     private readonly TextBox _yMax = new() { Width = 110, IsEnabled = false };
@@ -48,13 +47,14 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
     private readonly List<TdmsChannelInfo> _channels = new();
     private readonly HashSet<TdmsChannelKey> _selectedChannelKeys = new();
     private readonly Dictionary<EnvelopeCacheKey, TdmsChannelEnvelope> _envelopeCache = new();
+    private readonly SemaphoreSlim _readerReadGate = new(1, 1);
     private TdmsFileReader? _reader;
     private CancellationTokenSource? _loadCts;
     private CancellationTokenSource? _rangeCts;
+    private CancellationTokenSource? _overviewCts;
     private CancellationTokenSource? _exportCts;
     private double _fullDurationSeconds = 10;
     private bool _suppressAutoLoad;
-    private bool _suppressSliderChange;
 
     public TdmsViewerControl(string tdmRuntimeDir)
     {
@@ -73,16 +73,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         _devicePicker.SelectionChanged += (_, _) => RefreshChannelPicker();
         _waveform.ViewRangeRequested += QueueViewportLoad;
         _waveform.ProbeChanged += text => SetStatus(text);
-        _timeSlider.PropertyChanged += (_, e) =>
-        {
-            if (_suppressSliderChange || e.Property != RangeBase.ValueProperty)
-            {
-                return;
-            }
-
-            double windowSeconds = ParseDouble(_windowSeconds.Text, Math.Min(10, _fullDurationSeconds));
-            QueueViewportLoad(_timeSlider.Value, _timeSlider.Value + windowSeconds);
-        };
+        _overviewSlider.RangeRequested += QueueViewportLoad;
         _autoY.IsCheckedChanged += (_, _) =>
         {
             bool auto = _autoY.IsChecked == true;
@@ -227,7 +218,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
             ColumnSpacing = 12,
             Children =
             {
-                _timeSlider,
+                _overviewSlider,
                 _rangeText
             }
         };
@@ -347,11 +338,23 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
     private async Task OpenPathAsync(string path)
     {
         SetBusy(true, "Opening data source...");
+        _loadCts?.Cancel();
+        _rangeCts?.Cancel();
+        _overviewCts?.Cancel();
         try
         {
             TdmsFileReader reader = await Task.Run(() => TdmsFileReader.Open(path, _tdmRuntimeDir));
-            _reader?.Dispose();
-            _reader = reader;
+            await _readerReadGate.WaitAsync();
+            try
+            {
+                _reader?.Dispose();
+                _reader = reader;
+            }
+            finally
+            {
+                _readerReadGate.Release();
+            }
+
             _envelopeCache.Clear();
             PopulateChannels(reader.FileInfo);
             _fileText.Text = reader.Path;
@@ -360,7 +363,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
             _exportTdmsButton.IsEnabled = _channels.Count > 0;
             SetDefaultRange(reader.FileInfo);
             SetStatus("Data source opened.");
-            await LoadSelectedAsync();
+            await LoadSelectedAndOverviewAsync();
         }
         catch (Exception ex)
         {
@@ -438,7 +441,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         UpdateLoadButtonState();
         if (!_suppressAutoLoad)
         {
-            await LoadSelectedAsync();
+            await LoadSelectedAndOverviewAsync();
         }
     }
 
@@ -542,6 +545,12 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         await LoadSelectedRangeAsync(startSeconds, windowSeconds, updateInputs: true, showBusy: true);
     }
 
+    private async Task LoadSelectedAndOverviewAsync()
+    {
+        await LoadSelectedAsync();
+        QueueOverviewLoad();
+    }
+
     private async Task LoadSelectedRangeAsync(double startSeconds, double windowSeconds, bool updateInputs, bool showBusy)
     {
         TdmsFileReader? reader = _reader;
@@ -555,6 +564,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         {
             SetStatus("No channel selected.");
             _waveform.SetSeries(Array.Empty<TdmsChannelEnvelope>(), 0, 1);
+            _overviewSlider.SetOverview(Array.Empty<TdmsChannelEnvelope>(), _fullDurationSeconds);
             return;
         }
 
@@ -564,7 +574,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         }
 
         (startSeconds, windowSeconds) = ClampRange(startSeconds, windowSeconds);
-        UpdateTimeSlider(startSeconds, windowSeconds);
+        UpdateOverviewRange(startSeconds, windowSeconds);
         if (updateInputs)
         {
             _startSeconds.Text = startSeconds.ToString("0.######", CultureInfo.InvariantCulture);
@@ -584,20 +594,30 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         }
         try
         {
-            List<TdmsChannelEnvelope> envelopes = await Task.Run(() =>
+            await _readerReadGate.WaitAsync(token);
+            List<TdmsChannelEnvelope> envelopes;
+            try
             {
-                var output = new List<TdmsChannelEnvelope>(selected.Count);
-                foreach (TdmsChannelInfo channel in selected)
+                envelopes = await Task.Run(() =>
                 {
-                    token.ThrowIfCancellationRequested();
-                    ulong startSample = SecondsToSample(startSeconds, channel.SampleRate);
-                    ulong sampleCount = SecondsToSample(windowSeconds, channel.SampleRate);
-                    output.Add(ReadEnvelopeCached(reader, channel, startSample, sampleCount, buckets, token));
-                }
+                    var output = new List<TdmsChannelEnvelope>(selected.Count);
+                    foreach (TdmsChannelInfo channel in selected)
+                    {
+                        token.ThrowIfCancellationRequested();
+                        ulong startSample = SecondsToSample(startSeconds, channel.SampleRate);
+                        ulong sampleCount = SecondsToSample(windowSeconds, channel.SampleRate);
+                        output.Add(ReadEnvelopeCached(reader, channel, startSample, sampleCount, buckets, token));
+                    }
 
-                return output;
-            }, token);
+                    return output;
+                }, token);
+            }
+            finally
+            {
+                _readerReadGate.Release();
+            }
 
+            token.ThrowIfCancellationRequested();
             double endSeconds = startSeconds + windowSeconds;
             _waveform.SetSeries(envelopes, startSeconds, endSeconds);
             ulong readSamples = envelopes.Aggregate(0UL, (sum, item) => sum + item.SampleCount);
@@ -627,7 +647,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
     {
         double windowSeconds = Math.Max(0.000001, endSeconds - startSeconds);
         (startSeconds, windowSeconds) = ClampRange(startSeconds, windowSeconds);
-        UpdateTimeSlider(startSeconds, windowSeconds);
+        UpdateOverviewRange(startSeconds, windowSeconds);
         _startSeconds.Text = startSeconds.ToString("0.######", CultureInfo.InvariantCulture);
         _windowSeconds.Text = windowSeconds.ToString("0.######", CultureInfo.InvariantCulture);
 
@@ -647,6 +667,69 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
             {
             }
         }, CancellationToken.None);
+    }
+
+    private void QueueOverviewLoad()
+    {
+        _overviewCts?.Cancel();
+        _overviewCts?.Dispose();
+        _overviewCts = null;
+
+        TdmsFileReader? reader = _reader;
+        List<TdmsChannelInfo> selected = SelectedChannels();
+        if (reader is null || selected.Count == 0)
+        {
+            _overviewSlider.SetOverview(Array.Empty<TdmsChannelEnvelope>(), _fullDurationSeconds);
+            return;
+        }
+
+        _overviewCts = new CancellationTokenSource();
+        CancellationToken token = _overviewCts.Token;
+        int buckets = QuantizeOverviewBuckets(_overviewSlider.Bounds.Width > 0 ? _overviewSlider.Bounds.Width : 1600);
+        _ = LoadOverviewAsync(reader, selected, buckets, token);
+    }
+
+    private async Task LoadOverviewAsync(
+        TdmsFileReader reader,
+        IReadOnlyList<TdmsChannelInfo> selected,
+        int buckets,
+        CancellationToken token)
+    {
+        try
+        {
+            await _readerReadGate.WaitAsync(token);
+            List<TdmsChannelEnvelope> envelopes;
+            try
+            {
+                envelopes = await Task.Run(() =>
+                {
+                    var output = new List<TdmsChannelEnvelope>(selected.Count);
+                    foreach (TdmsChannelInfo channel in selected)
+                    {
+                        token.ThrowIfCancellationRequested();
+                        output.Add(ReadEnvelopeCached(reader, channel, 0, channel.SampleCount, buckets, token));
+                    }
+
+                    return output;
+                }, token);
+            }
+            finally
+            {
+                _readerReadGate.Release();
+            }
+
+            if (!token.IsCancellationRequested)
+            {
+                Dispatcher.UIThread.Post(() => _overviewSlider.SetOverview(envelopes, _fullDurationSeconds));
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            SetStatus("Overview failed: " + ex.Message);
+        }
     }
 
     private TdmsChannelEnvelope ReadEnvelopeCached(
@@ -691,19 +774,10 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         return (startSeconds, windowSeconds);
     }
 
-    private void UpdateTimeSlider(double startSeconds, double windowSeconds)
+    private void UpdateOverviewRange(double startSeconds, double windowSeconds)
     {
-        double maxStart = Math.Max(0, _fullDurationSeconds - Math.Max(0.000001, windowSeconds));
-        _suppressSliderChange = true;
-        _timeSlider.Minimum = 0;
-        _timeSlider.Maximum = maxStart;
-        _timeSlider.SmallChange = Math.Max(windowSeconds / 20, 0.000001);
-        _timeSlider.LargeChange = Math.Max(windowSeconds * 0.8, _timeSlider.SmallChange);
-        _timeSlider.Value = Math.Clamp(startSeconds, 0, maxStart);
-        _timeSlider.IsEnabled = _reader is not null && maxStart > 0.000001;
-        _suppressSliderChange = false;
-
         double endSeconds = Math.Min(_fullDurationSeconds, startSeconds + windowSeconds);
+        _overviewSlider.SetView(startSeconds, endSeconds, _fullDurationSeconds);
         _rangeText.Text = $"{FormatTime(startSeconds)} - {FormatTime(endSeconds)} / {FormatTime(_fullDurationSeconds)}";
     }
 
@@ -712,6 +786,18 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         int target = (int)Math.Clamp(width * 1.35, 512, 8192);
         int power = 512;
         while (power < target && power < 8192)
+        {
+            power <<= 1;
+        }
+
+        return power;
+    }
+
+    private static int QuantizeOverviewBuckets(double width)
+    {
+        int target = (int)Math.Clamp(width * 1.2, 512, 4096);
+        int power = 512;
+        while (power < target && power < 4096)
         {
             power <<= 1;
         }
@@ -770,7 +856,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         _suppressAutoLoad = false;
         UpdateSelectedChannelsText();
         UpdateLoadButtonState();
-        _ = LoadSelectedAsync();
+        _ = LoadSelectedAndOverviewAsync();
     }
 
     private void UpdateLoadButtonState()
@@ -816,14 +902,25 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         _rangeCts?.Cancel();
         _rangeCts?.Dispose();
         _rangeCts = null;
+        _overviewCts?.Cancel();
+        _overviewCts?.Dispose();
+        _overviewCts = null;
         _loadCts?.Cancel();
         _loadCts?.Dispose();
         _loadCts = null;
         _exportCts?.Cancel();
         _exportCts?.Dispose();
         _exportCts = null;
-        _reader?.Dispose();
-        _reader = null;
+        _readerReadGate.Wait();
+        try
+        {
+            _reader?.Dispose();
+            _reader = null;
+        }
+        finally
+        {
+            _readerReadGate.Release();
+        }
     }
 
     private void SetStatus(string text)
