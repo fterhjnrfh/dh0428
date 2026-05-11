@@ -311,7 +311,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
             Title = "Open data file",
             FileTypeFilter = new[]
             {
-                new FilePickerFileType("Capture Data") { Patterns = new[] { "*.tdms", "*.tdms.dhc", "*.dhcap" } },
+                new FilePickerFileType("Capture Data") { Patterns = new[] { "*.tdms", "*.dhcap" } },
                 FilePickerFileTypes.All
             }
         });
@@ -1033,7 +1033,6 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
 
         bool sourceIsCaptureSet = Directory.Exists(sourcePath) ||
                                   sourcePath.EndsWith(".dhcap", StringComparison.OrdinalIgnoreCase) ||
-                                  sourcePath.EndsWith(".tdms.dhc", StringComparison.OrdinalIgnoreCase) ||
                                   IsDashCaptureContainerFile(sourcePath);
         string sourceDirectory = Directory.Exists(sourcePath)
             ? Path.GetFullPath(sourcePath)

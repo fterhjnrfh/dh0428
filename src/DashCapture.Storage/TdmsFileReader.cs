@@ -50,7 +50,7 @@ public sealed class TdmsFileReader : IDisposable
 
         if (files.Length == 0)
         {
-            throw new FileNotFoundException("Folder does not contain any .tdms, .tdms.dhc, or .dhcap files.", path);
+            throw new FileNotFoundException("Folder does not contain any .tdms or .dhcap files.", path);
         }
 
         NativeBootstrap.AddSearchDirectory(tdmRuntimeDir);
@@ -82,16 +82,15 @@ public sealed class TdmsFileReader : IDisposable
             return CompressedCaptureSegment.Open(path);
         }
 
-        MaterializedTdmsFile materialized = CompressedTdmsCodec.MaterializeForRead(path);
         IntPtr file = IntPtr.Zero;
         try
         {
             TdmNative.ThrowIfError(
-                TdmNative.DDC_OpenFileEx(materialized.Path, TdmNative.TdmsFileType, readOnly: 1, out file),
+                TdmNative.DDC_OpenFileEx(path, TdmNative.TdmsFileType, readOnly: 1, out file),
                 "DDC_OpenFileEx");
             Dictionary<TdmsChannelKey, IntPtr> handles = new();
             List<TdmsGroupInfo> groups = ReadGroups(file, handles);
-            return new DdcTdmsSegment(path, new TdmsFileInfo(path, groups), file, handles, materialized);
+            return new DdcTdmsSegment(path, new TdmsFileInfo(path, groups), file, handles);
         }
         catch
         {
@@ -100,7 +99,6 @@ public sealed class TdmsFileReader : IDisposable
                 TdmNative.DDC_CloseFile(file);
             }
 
-            materialized.Dispose();
             throw;
         }
     }
@@ -109,12 +107,10 @@ public sealed class TdmsFileReader : IDisposable
     {
         return Directory
             .EnumerateFiles(path, "*.tdms", SearchOption.TopDirectoryOnly)
-            .Concat(Directory.EnumerateFiles(path, "*.tdms" + CompressedTdmsCodec.Extension, SearchOption.TopDirectoryOnly))
             .Concat(Directory.EnumerateFiles(path, "*" + CompressedCaptureFormat.Extension, SearchOption.TopDirectoryOnly))
             .GroupBy(SegmentIdentity, StringComparer.OrdinalIgnoreCase)
             .Select(group => group
-                .OrderBy(file => CompressedTdmsCodec.IsCompressedFile(file) ? 1 : 0)
-                .ThenBy(file => file, StringComparer.OrdinalIgnoreCase)
+                .OrderBy(file => file, StringComparer.OrdinalIgnoreCase)
                 .First())
             .OrderBy(file => SegmentIdentity(file), StringComparer.OrdinalIgnoreCase)
             .ToArray();
@@ -122,10 +118,8 @@ public sealed class TdmsFileReader : IDisposable
 
     private static string SegmentIdentity(string path)
     {
-        return CompressedTdmsCodec.IsCompressedFile(path)
-            ? path[..^CompressedTdmsCodec.Extension.Length]
-            : CompressedCaptureFormat.IsCompressedCaptureFile(path)
-                ? CompressedCaptureIdentity(path)
+        return CompressedCaptureFormat.IsCompressedCaptureFile(path)
+            ? CompressedCaptureIdentity(path)
             : path;
     }
 
@@ -664,20 +658,16 @@ public sealed class TdmsFileReader : IDisposable
 
     private sealed class DdcTdmsSegment : IReadableSegment
     {
-        private readonly MaterializedTdmsFile _materialized;
-
         public DdcTdmsSegment(
             string path,
             TdmsFileInfo fileInfo,
             IntPtr file,
-            Dictionary<TdmsChannelKey, IntPtr> channelHandles,
-            MaterializedTdmsFile materialized)
+            Dictionary<TdmsChannelKey, IntPtr> channelHandles)
         {
             Path = path;
             FileInfo = fileInfo;
             File = file;
             ChannelHandles = channelHandles;
-            _materialized = materialized;
             Channels = fileInfo.Groups
                 .SelectMany(group => group.Channels)
                 .ToDictionary(channel => channel.Key, channel => channel);
@@ -758,7 +748,6 @@ public sealed class TdmsFileReader : IDisposable
 
             ChannelHandles.Clear();
             Channels.Clear();
-            _materialized.Dispose();
         }
     }
 

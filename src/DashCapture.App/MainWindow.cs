@@ -1424,7 +1424,6 @@ public sealed class MainWindow : Window
         compression.Enabled = _compressionEnabledCheck.IsChecked == true;
         compression.Algorithm = SelectedValue(_compressionAlgorithmCombo, compression.Algorithm);
         compression.Preprocessor = SelectedValue(_compressionPreprocessorCombo, compression.Preprocessor);
-        compression.DeleteSourceAfterCompression = false;
         compression.ZstdLevel = SliderInt(_compressionZstdLevel, -5, 22);
         compression.ZstdWindowLog = SliderInt(_compressionZstdWindowLog, 0, 31);
         compression.Lz4HcLevel = SliderInt(_compressionLz4HcLevel, 3, 12);

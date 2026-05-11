@@ -1,4 +1,3 @@
-using System.Text;
 using DashCapture.Core.Configuration;
 using ICSharpCode.SharpZipLib.BZip2;
 using ICSharpCode.SharpZipLib.Zip.Compression;
@@ -12,228 +11,7 @@ namespace DashCapture.Storage;
 
 internal static class CompressedTdmsCodec
 {
-    private static readonly byte[] Magic = Encoding.ASCII.GetBytes("DHCMP01\0");
-    private const int Version = 1;
     private const byte StoredChunk = 1;
-    public const string Extension = ".dhc";
-
-    public static bool IsCompressedFile(string path)
-    {
-        return path.EndsWith(".tdms" + Extension, StringComparison.OrdinalIgnoreCase);
-    }
-
-    public static string CompressedPathFor(string tdmsPath)
-    {
-        return tdmsPath + Extension;
-    }
-
-    public static string CompressFile(string sourcePath, CompressionSettings settings)
-    {
-        if (!File.Exists(sourcePath))
-        {
-            throw new FileNotFoundException("TDMS segment was not found.", sourcePath);
-        }
-
-        string targetPath = CompressedPathFor(sourcePath);
-        string tempPath = targetPath + ".tmp";
-        File.Delete(tempPath);
-
-        int chunkSize = Math.Clamp(settings.ChunkSizeMb, 1, 256) * 1024 * 1024;
-        using (var input = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-        using (var output = new FileStream(tempPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-        using (var writer = new BinaryWriter(output, Encoding.UTF8, leaveOpen: true))
-        {
-            WriteHeader(writer, sourcePath, input.Length, chunkSize, settings);
-            byte[] buffer = new byte[chunkSize];
-            int read;
-            while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
-            {
-                byte[] transformed = buffer.AsSpan(0, read).ToArray();
-                Preprocess(transformed, settings.Preprocessor, settings.LpcOrder);
-                byte[] compressed = CompressChunk(transformed, settings);
-                bool storePlain = compressed.Length >= transformed.Length;
-                byte[] payload = storePlain ? transformed : compressed;
-
-                writer.Write(read);
-                writer.Write(transformed.Length);
-                writer.Write(payload.Length);
-                writer.Write(storePlain ? StoredChunk : (byte)0);
-                writer.Write(payload);
-            }
-        }
-
-        if (File.Exists(targetPath))
-        {
-            File.Delete(targetPath);
-        }
-
-        File.Move(tempPath, targetPath);
-        if (settings.DeleteSourceAfterCompression)
-        {
-            File.Delete(sourcePath);
-        }
-
-        return targetPath;
-    }
-
-    public static MaterializedTdmsFile MaterializeForRead(string path)
-    {
-        if (!IsCompressedFile(path))
-        {
-            return new MaterializedTdmsFile(path, null);
-        }
-
-        string cacheDir = Path.Combine(Path.GetTempPath(), "DashCapture", "tdms-cache");
-        Directory.CreateDirectory(cacheDir);
-        string fileName = Path.GetFileNameWithoutExtension(path);
-        string tempPath = Path.Combine(cacheDir, $"{fileName}_{Guid.NewGuid():N}.tdms");
-        DecompressFile(path, tempPath);
-        return new MaterializedTdmsFile(tempPath, tempPath);
-    }
-
-    public static void DecompressFile(string sourcePath, string targetPath)
-    {
-        string tempPath = targetPath + ".tmp";
-        File.Delete(tempPath);
-
-        using (var input = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-        using (var output = new FileStream(tempPath, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-        using (var reader = new BinaryReader(input, Encoding.UTF8, leaveOpen: true))
-        {
-            CompressionHeader header = ReadHeader(reader);
-            long written = 0;
-            while (input.Position < input.Length)
-            {
-                int originalLength = reader.ReadInt32();
-                int transformedLength = reader.ReadInt32();
-                int payloadLength = reader.ReadInt32();
-                byte flags = reader.ReadByte();
-
-                if (originalLength < 0 || transformedLength < 0 || payloadLength < 0)
-                {
-                    throw new InvalidDataException("Compressed TDMS chunk has invalid lengths.");
-                }
-
-                byte[] payload = ReadBytesExact(reader, payloadLength);
-                byte[] transformed = DecodePayload(
-                    payload,
-                    header.Algorithm,
-                    header.Preprocessor,
-                    header.LpcOrder,
-                    originalLength,
-                    transformedLength,
-                    flags);
-
-                output.Write(transformed, 0, transformed.Length);
-                written += transformed.Length;
-            }
-
-            if (written != header.OriginalLength)
-            {
-                throw new InvalidDataException("Compressed TDMS file restored to an unexpected length.");
-            }
-        }
-
-        if (File.Exists(targetPath))
-        {
-            File.Delete(targetPath);
-        }
-
-        File.Move(tempPath, targetPath);
-    }
-
-    public static string Describe(CompressionSettings settings)
-    {
-        if (!settings.Enabled)
-        {
-            return "未启用";
-        }
-
-        string preprocessor = settings.Preprocessor == CompressionPreprocessor.None ? "无预处理" : PreprocessorName(settings.Preprocessor);
-        return $"{preprocessor} + {AlgorithmName(settings.Algorithm)}";
-    }
-
-    private static void WriteHeader(BinaryWriter writer, string sourcePath, long sourceLength, int chunkSize, CompressionSettings settings)
-    {
-        writer.Write(Magic);
-        writer.Write(Version);
-        writer.Write(Path.GetFileName(sourcePath));
-        writer.Write(sourceLength);
-        writer.Write(chunkSize);
-        writer.Write((byte)settings.Algorithm);
-        writer.Write((byte)settings.Preprocessor);
-        writer.Write(Math.Clamp(settings.ZstdLevel, -5, 22));
-        writer.Write(Math.Clamp(settings.ZstdWindowLog, 0, 31));
-        writer.Write(Math.Clamp(settings.Lz4Level, 0, 12));
-        writer.Write(Math.Clamp(settings.Lz4HcLevel, 3, 12));
-        writer.Write(Math.Clamp(settings.ZlibLevel, 0, 9));
-        writer.Write(Math.Clamp(settings.BZip2BlockSize, 1, 9));
-        writer.Write(Math.Clamp(settings.LpcOrder, 1, 4));
-        writer.Write(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
-    }
-
-    private static CompressionHeader ReadHeader(BinaryReader reader)
-    {
-        byte[] magic = ReadBytesExact(reader, Magic.Length);
-        if (!magic.SequenceEqual(Magic))
-        {
-            throw new InvalidDataException("The file is not a DASH compressed TDMS segment.");
-        }
-
-        int version = reader.ReadInt32();
-        if (version != Version)
-        {
-            throw new InvalidDataException($"Unsupported compressed TDMS version {version}.");
-        }
-
-        string originalFileName = reader.ReadString();
-        long originalLength = reader.ReadInt64();
-        int chunkSize = reader.ReadInt32();
-        var algorithm = (CompressionAlgorithm)reader.ReadByte();
-        var preprocessor = (CompressionPreprocessor)reader.ReadByte();
-        int zstdLevel = reader.ReadInt32();
-        int zstdWindowLog = reader.ReadInt32();
-        int lz4Level = reader.ReadInt32();
-        int lz4HcLevel = reader.ReadInt32();
-        int zlibLevel = reader.ReadInt32();
-        int bzip2BlockSize = reader.ReadInt32();
-        int lpcOrder = reader.ReadInt32();
-        long createdAtUnixMs = reader.ReadInt64();
-
-        if (originalLength < 0 || chunkSize <= 0)
-        {
-            throw new InvalidDataException("Compressed TDMS header is invalid.");
-        }
-
-        return new CompressionHeader(
-            originalFileName,
-            originalLength,
-            chunkSize,
-            algorithm,
-            preprocessor,
-            zstdLevel,
-            zstdWindowLog,
-            lz4Level,
-            lz4HcLevel,
-            zlibLevel,
-            bzip2BlockSize,
-            lpcOrder,
-            createdAtUnixMs);
-    }
-
-    private static byte[] CompressChunk(byte[] input, CompressionSettings settings)
-    {
-        return settings.Algorithm switch
-        {
-            CompressionAlgorithm.Zstd => CompressZstd(input, Math.Clamp(settings.ZstdLevel, -5, 22), Math.Clamp(settings.ZstdWindowLog, 0, 31)),
-            CompressionAlgorithm.Lz4 => CompressLz4(input, LZ4Level.L00_FAST),
-            CompressionAlgorithm.Snappy => Snappy.CompressToArray(input),
-            CompressionAlgorithm.Zlib => CompressZlib(input, Math.Clamp(settings.ZlibLevel, 0, 9)),
-            CompressionAlgorithm.Lz4Hc => CompressLz4(input, ToLz4Level(Math.Clamp(settings.Lz4HcLevel, 3, 12))),
-            CompressionAlgorithm.BZip2 => CompressBZip2(input, Math.Clamp(settings.BZip2BlockSize, 1, 9)),
-            _ => throw new NotSupportedException($"Compression algorithm {settings.Algorithm} is not supported.")
-        };
-    }
 
     internal static byte[] EncodePayload(byte[] input, CompressionSettings settings, out int transformedLength, out byte flags)
     {
@@ -273,9 +51,18 @@ internal static class CompressedTdmsCodec
         return transformed;
     }
 
-    private static byte[] DecompressChunk(byte[] input, CompressionHeader header, int outputLength)
+    private static byte[] CompressChunk(byte[] input, CompressionSettings settings)
     {
-        return DecompressChunk(input, header.Algorithm, outputLength);
+        return settings.Algorithm switch
+        {
+            CompressionAlgorithm.Zstd => CompressZstd(input, Math.Clamp(settings.ZstdLevel, -5, 22), Math.Clamp(settings.ZstdWindowLog, 0, 31)),
+            CompressionAlgorithm.Lz4 => CompressLz4(input, LZ4Level.L00_FAST),
+            CompressionAlgorithm.Snappy => Snappy.CompressToArray(input),
+            CompressionAlgorithm.Zlib => CompressZlib(input, Math.Clamp(settings.ZlibLevel, 0, 9)),
+            CompressionAlgorithm.Lz4Hc => CompressLz4(input, ToLz4Level(Math.Clamp(settings.Lz4HcLevel, 3, 12))),
+            CompressionAlgorithm.BZip2 => CompressBZip2(input, Math.Clamp(settings.BZip2BlockSize, 1, 9)),
+            _ => throw new NotSupportedException($"Compression algorithm {settings.Algorithm} is not supported.")
+        };
     }
 
     private static byte[] DecompressChunk(byte[] input, CompressionAlgorithm algorithm, int outputLength)
@@ -513,17 +300,6 @@ internal static class CompressedTdmsCodec
             : 2 * data[index - 1] - data[index - 2];
     }
 
-    private static byte[] ReadBytesExact(BinaryReader reader, int count)
-    {
-        byte[] data = reader.ReadBytes(count);
-        if (data.Length != count)
-        {
-            throw new EndOfStreamException("Unexpected end of compressed TDMS file.");
-        }
-
-        return data;
-    }
-
     private static LZ4Level ToLz4Level(int level)
     {
         return level switch
@@ -539,65 +315,5 @@ internal static class CompressedTdmsCodec
             11 => LZ4Level.L11_OPT,
             _ => LZ4Level.L12_MAX
         };
-    }
-
-    private static string AlgorithmName(CompressionAlgorithm algorithm)
-    {
-        return algorithm switch
-        {
-            CompressionAlgorithm.Zstd => "ZSTD",
-            CompressionAlgorithm.Lz4 => "LZ4",
-            CompressionAlgorithm.Snappy => "Snappy",
-            CompressionAlgorithm.Zlib => "Zlib",
-            CompressionAlgorithm.Lz4Hc => "LZ4 HC",
-            CompressionAlgorithm.BZip2 => "BZip2",
-            _ => algorithm.ToString()
-        };
-    }
-
-    private static string PreprocessorName(CompressionPreprocessor preprocessor)
-    {
-        return preprocessor switch
-        {
-            CompressionPreprocessor.Delta1 => "一阶差分",
-            CompressionPreprocessor.Delta2 => "二阶差分",
-            CompressionPreprocessor.Lpc => "LPC",
-            _ => "无预处理"
-        };
-    }
-
-    private sealed record CompressionHeader(
-        string OriginalFileName,
-        long OriginalLength,
-        int ChunkSize,
-        CompressionAlgorithm Algorithm,
-        CompressionPreprocessor Preprocessor,
-        int ZstdLevel,
-        int ZstdWindowLog,
-        int Lz4Level,
-        int Lz4HcLevel,
-        int ZlibLevel,
-        int BZip2BlockSize,
-        int LpcOrder,
-        long CreatedAtUnixMs);
-}
-
-internal sealed record MaterializedTdmsFile(string Path, string? TempPath) : IDisposable
-{
-    public void Dispose()
-    {
-        if (string.IsNullOrWhiteSpace(TempPath))
-        {
-            return;
-        }
-
-        try
-        {
-            File.Delete(TempPath);
-        }
-        catch
-        {
-            // Temporary cache cleanup is best effort.
-        }
     }
 }

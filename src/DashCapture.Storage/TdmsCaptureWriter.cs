@@ -16,9 +16,6 @@ public sealed class TdmsCaptureWriter : ICaptureStorageWriter
     private readonly Dictionary<int, float> _latestSampleRates = new();
     private readonly DateTimeOffset _startedAt = DateTimeOffset.Now;
     private readonly int _totalChannelCount;
-    private readonly List<Task> _compressionTasks = new();
-    private readonly SemaphoreSlim _compressionSemaphore;
-    private readonly object _compressionSync = new();
     private IntPtr _file;
     private RawBlockAuditWriter? _auditWriter;
     private int _fileIndex;
@@ -33,7 +30,6 @@ public sealed class TdmsCaptureWriter : ICaptureStorageWriter
         _settings = settings;
         _devices = devices;
         _totalChannelCount = devices.Sum(d => d.Channels.Count);
-        _compressionSemaphore = new SemaphoreSlim(Math.Max(1, settings.Compression.MaxParallelFiles));
         NativeBootstrap.AddSearchDirectory(settings.TdmRuntimeDir);
         Directory.CreateDirectory(settings.RootPath);
         _runStem = CreateRunStem();
@@ -44,7 +40,6 @@ public sealed class TdmsCaptureWriter : ICaptureStorageWriter
     public string CurrentPath => _currentPath;
     public string CurrentFolder => _runFolder;
     public string CurrentAuditPath => _auditWriter?.CurrentPath ?? string.Empty;
-    public event Action<Exception, string>? CompressionFaulted;
     public event Action<Exception, string>? Faulted;
 
     public void AppendBlock(AcquisitionBlock block)
@@ -163,9 +158,7 @@ public sealed class TdmsCaptureWriter : ICaptureStorageWriter
 
     public void Dispose()
     {
-        FinalizeCurrentFile(scheduleCompression: true);
-        WaitForCompressionTasks();
-        _compressionSemaphore.Dispose();
+        FinalizeCurrentFile();
     }
 
     private bool AllExpectedChannelsInitialized => _totalChannelCount == 0 || _initializedChannels.Count >= _totalChannelCount;
@@ -194,7 +187,7 @@ public sealed class TdmsCaptureWriter : ICaptureStorageWriter
 
     private void OpenNextFile()
     {
-        FinalizeCurrentFile(scheduleCompression: true);
+        FinalizeCurrentFile();
         _groups.Clear();
         _channels.Clear();
         _initializedChannels.Clear();
@@ -244,7 +237,7 @@ public sealed class TdmsCaptureWriter : ICaptureStorageWriter
         long splitBytes = SplitBytes();
         if (_segmentPayloadBytes >= splitBytes)
         {
-            FinalizeCurrentFile(scheduleCompression: true);
+            FinalizeCurrentFile();
             _rollPending = true;
         }
     }
@@ -315,77 +308,39 @@ public sealed class TdmsCaptureWriter : ICaptureStorageWriter
         return Math.Max(1L, _settings.FileSplitGb) * 1024L * 1024L * 1024L;
     }
 
-    private void FinalizeCurrentFile(bool scheduleCompression)
+    private void FinalizeCurrentFile()
     {
         if (_file == IntPtr.Zero)
         {
             return;
         }
 
-        TdmNative.DDC_SaveFile(_file);
-        TdmNative.DDC_CloseFile(_file);
-        _file = IntPtr.Zero;
-        _auditWriter?.Dispose();
-        _auditWriter = null;
-
-        if (scheduleCompression)
+        Exception? failure = null;
+        try
         {
-            QueueCompression(_currentPath);
+            TdmNative.ThrowIfError(TdmNative.DDC_SaveFile(_file), "DDC_SaveFile");
         }
-    }
-
-    private void QueueCompression(string path)
-    {
-        if (!_settings.Compression.Enabled || string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+        catch (Exception ex)
         {
-            return;
-        }
-
-        Task task = Task.Run(async () =>
-        {
-            await _compressionSemaphore.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                CompressedTdmsCodec.CompressFile(path, _settings.Compression);
-            }
-            catch (Exception ex)
-            {
-                CompressionFaulted?.Invoke(ex, path);
-                Faulted?.Invoke(ex, path);
-            }
-            finally
-            {
-                _compressionSemaphore.Release();
-            }
-        });
-
-        lock (_compressionSync)
-        {
-            _compressionTasks.RemoveAll(task => task.IsCompleted);
-            _compressionTasks.Add(task);
-        }
-    }
-
-    private void WaitForCompressionTasks()
-    {
-        Task[] tasks;
-        lock (_compressionSync)
-        {
-            tasks = _compressionTasks.ToArray();
-            _compressionTasks.Clear();
+            failure = ex;
         }
 
         try
         {
-            Task.WaitAll(tasks);
+            TdmNative.ThrowIfError(TdmNative.DDC_CloseFile(_file), "DDC_CloseFile");
         }
-        catch (AggregateException ex)
+        catch (Exception ex)
         {
-            foreach (Exception inner in ex.Flatten().InnerExceptions)
-            {
-                CompressionFaulted?.Invoke(inner, _runFolder);
-                Faulted?.Invoke(inner, _runFolder);
-            }
+            failure ??= ex;
+        }
+
+        _file = IntPtr.Zero;
+        _auditWriter?.Dispose();
+        _auditWriter = null;
+
+        if (failure is not null)
+        {
+            Faulted?.Invoke(failure, _currentPath);
         }
     }
 

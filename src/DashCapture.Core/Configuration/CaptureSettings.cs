@@ -49,8 +49,6 @@ public sealed class CompressionSettings
     public CompressionAlgorithm Algorithm { get; set; } = CompressionAlgorithm.Zstd;
     public CompressionPreprocessor Preprocessor { get; set; } = CompressionPreprocessor.None;
     public int ChunkSizeMb { get; set; } = 4;
-    public int MaxParallelFiles { get; set; } = 1;
-    public bool DeleteSourceAfterCompression { get; set; } = true;
     public int ZstdLevel { get; set; } = 3;
     public int ZstdWindowLog { get; set; } = 0;
     public int Lz4Level { get; set; } = 0;

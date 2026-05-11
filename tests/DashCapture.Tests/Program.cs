@@ -60,17 +60,12 @@ try
     {
         foreach (CompressionPreprocessor preprocessor in Enum.GetValues<CompressionPreprocessor>())
         {
-            string source = Path.Combine(tempDir, $"{algorithm}_{preprocessor}.tdms");
-            string restored = Path.Combine(tempDir, $"{algorithm}_{preprocessor}.restored.tdms");
-            File.WriteAllBytes(source, payload);
-
             var settings = new CompressionSettings
             {
                 Enabled = true,
                 Algorithm = algorithm,
                 Preprocessor = preprocessor,
                 ChunkSizeMb = 1,
-                DeleteSourceAfterCompression = true,
                 ZstdLevel = 3,
                 Lz4HcLevel = 9,
                 ZlibLevel = 6,
@@ -78,10 +73,16 @@ try
                 LpcOrder = 2
             };
 
-            string compressed = CompressedTdmsCodec.CompressFile(source, settings);
-            Assert(!File.Exists(source), "Compression must remove source when configured.");
-            CompressedTdmsCodec.DecompressFile(compressed, restored);
-            Assert(File.ReadAllBytes(restored).SequenceEqual(payload), $"{algorithm}+{preprocessor} must round-trip losslessly.");
+            byte[] encoded = CompressedTdmsCodec.EncodePayload(payload, settings, out int transformedLength, out byte flags);
+            byte[] restored = CompressedTdmsCodec.DecodePayload(
+                encoded,
+                algorithm,
+                preprocessor,
+                settings.LpcOrder,
+                payload.Length,
+                transformedLength,
+                flags);
+            Assert(restored.SequenceEqual(payload), $"{algorithm}+{preprocessor} must round-trip losslessly.");
         }
     }
 
