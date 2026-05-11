@@ -4,6 +4,8 @@ using DashCapture.Core.Memory;
 using DashCapture.Core.Models;
 using DashCapture.Storage;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.Json;
 
 static void Assert(bool condition, string message)
 {
@@ -11,6 +13,31 @@ static void Assert(bool condition, string message)
     {
         throw new InvalidOperationException(message);
     }
+}
+
+static (CompressedCaptureManifest Manifest, CompressedCaptureIndex Index) ReadDhcapMetadata(string path)
+{
+    using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+    using var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
+    byte[] magic = reader.ReadBytes(CompressedCaptureFormat.Magic.Length);
+    Assert(magic.SequenceEqual(CompressedCaptureFormat.Magic), "DHCAP file must contain the expected magic header.");
+    int version = reader.ReadInt32();
+    Assert(version == CompressedCaptureFormat.Version, "DHCAP file must be written with the current format version.");
+    int manifestLength = reader.ReadInt32();
+    byte[] manifestBytes = reader.ReadBytes(manifestLength);
+    CompressedCaptureManifest manifest = JsonSerializer.Deserialize<CompressedCaptureManifest>(manifestBytes, CompressedCaptureFormat.JsonOptions)
+        ?? throw new InvalidOperationException("DHCAP manifest must deserialize.");
+
+    stream.Position = stream.Length - CompressedCaptureFormat.FooterMagic.Length;
+    byte[] footerMagic = reader.ReadBytes(CompressedCaptureFormat.FooterMagic.Length);
+    Assert(footerMagic.SequenceEqual(CompressedCaptureFormat.FooterMagic), "DHCAP file must end with a v3 footer index marker.");
+    stream.Position = stream.Length - CompressedCaptureFormat.FooterMagic.Length - sizeof(int);
+    int indexLength = reader.ReadInt32();
+    stream.Position = stream.Length - CompressedCaptureFormat.FooterMagic.Length - sizeof(int) - indexLength;
+    byte[] indexBytes = reader.ReadBytes(indexLength);
+    CompressedCaptureIndex index = JsonSerializer.Deserialize<CompressedCaptureIndex>(indexBytes, CompressedCaptureFormat.JsonOptions)
+        ?? throw new InvalidOperationException("DHCAP index must deserialize.");
+    return (manifest, index);
 }
 
 float[] spike = new float[10_000];
@@ -49,7 +76,7 @@ Assert(snapshot.DisplaySampleRate == 4000, "Waveform store must expose a separat
 Assert(snapshot.Points[0].Minimum == -5 && snapshot.Points[0].Maximum == 7, "Waveform store must keep envelope extrema.");
 Assert(store.SnapshotSeries(Array.Empty<ChannelDescriptor>()).Count == 0, "Empty monitor views must not render all channels.");
 
-byte[] payload = Enumerable.Range(0, 8192)
+byte[] payload = Enumerable.Range(0, 8195)
     .Select(i => (byte)((i * 17 + i / 11) & 0xFF))
     .ToArray();
 string tempDir = Path.Combine(Path.GetTempPath(), "DashCaptureCompressionTests", Guid.NewGuid().ToString("N"));
@@ -85,6 +112,25 @@ try
             Assert(restored.SequenceEqual(payload), $"{algorithm}+{preprocessor} must round-trip losslessly.");
         }
     }
+
+    var rawSettings = new CompressionSettings
+    {
+        Enabled = false,
+        Algorithm = CompressionAlgorithm.Zstd,
+        Preprocessor = CompressionPreprocessor.FloatXorDelta,
+        LpcOrder = 2
+    };
+    byte[] rawEncoded = CompressedTdmsCodec.EncodePayload(payload, rawSettings, out int rawTransformedLength, out byte rawFlags);
+    byte[] rawRestored = CompressedTdmsCodec.DecodePayload(
+        rawEncoded,
+        rawSettings.Algorithm,
+        rawSettings.Preprocessor,
+        rawSettings.LpcOrder,
+        payload.Length,
+        rawTransformedLength,
+        rawFlags);
+    Assert(rawEncoded.SequenceEqual(payload), "Disabled compression must store original bytes without preprocessing.");
+    Assert(rawRestored.SequenceEqual(payload), "Disabled compression .dhcap records must restore original bytes.");
 
     string streamRoot = Path.Combine(tempDir, "streaming");
     Directory.CreateDirectory(streamRoot);
@@ -135,18 +181,69 @@ try
             BlockIndex: 1,
             DataPointer: rented.Pointer);
         var block = new AcquisitionBlock(rented, header, channelCount: 2);
+        string compressedRunFolder;
+        string compressedCurrentPath;
+        CaptureStorageStatistics compressedStats;
         using (var writer = new CompressedCaptureWriter(streamSettings, devices))
         {
             writer.AppendBlock(block);
             writer.Save();
-            string runFolder = writer.CurrentFolder;
+            compressedRunFolder = writer.CurrentFolder;
+            compressedCurrentPath = writer.CurrentPath;
+            compressedStats = writer.Statistics;
             block.Release();
+        }
 
-            using TdmsFileReader reader = TdmsFileReader.Open(runFolder, string.Empty);
+        var compressedMetadata = ReadDhcapMetadata(compressedCurrentPath);
+        Assert(compressedMetadata.Manifest.EffectiveCodec == CompressionAlgorithm.Zstd, "Compressed DHCAP manifest must record the effective codec.");
+        Assert(compressedMetadata.Manifest.EffectivePreprocessor == CompressionPreprocessor.Delta1, "Compressed DHCAP manifest must record the effective preprocessor.");
+        Assert(compressedMetadata.Manifest.RawType == "float32", "DHCAP manifest must record raw type.");
+        Assert(!string.IsNullOrWhiteSpace(compressedMetadata.Manifest.ByteOrder), "DHCAP manifest must record byte order.");
+        Assert(compressedMetadata.Manifest.CallbackBlockSchema.Contains("SdkSampleData", StringComparison.Ordinal), "DHCAP manifest must describe original callback block metadata.");
+        Assert(compressedMetadata.Index.Records.All(record => record.Codec == CompressionAlgorithm.Zstd), "DHCAP index records must carry block-level codec.");
+        Assert(compressedMetadata.Index.Records.All(record => record.Preprocessor == CompressionPreprocessor.Delta1), "DHCAP index records must carry block-level preprocessor.");
+        Assert(compressedMetadata.Index.Records.All(record => record.CallbackBlocks.Count > 0), "DHCAP index records must preserve source callback block info.");
+        Assert(compressedStats.RawBytes > 0 && compressedStats.WrittenBytes > 0, "Storage statistics must expose raw and written sizes.");
+
+        using (TdmsFileReader reader = TdmsFileReader.Open(compressedRunFolder, string.Empty))
+        {
             TdmsChannelInfo firstChannel = reader.FileInfo.Groups.Single().Channels.First();
             TdmsChannelEnvelope streamEnvelope = reader.ReadEnvelope(firstChannel, 0, firstChannel.SampleCount, 4, CancellationToken.None);
             Assert(firstChannel.SampleCount == 4, "Streaming compressed capture must preserve channel sample count.");
             Assert(streamEnvelope.Points.Select(point => point.Maximum).SequenceEqual(new[] { 1f, 2f, 3f, 4f }), "Streaming compressed capture must restore exact float values.");
+        }
+
+        RentedNativeBuffer rawRented = pool.Rent(interleaved.Length * sizeof(float));
+        Marshal.Copy(interleaved, 0, rawRented.Pointer, interleaved.Length);
+        var rawHeader = header with { DataPointer = rawRented.Pointer, BlockIndex = 2 };
+        var rawBlock = new AcquisitionBlock(rawRented, rawHeader, channelCount: 2);
+        streamSettings.Compression.Enabled = false;
+        streamSettings.Compression.Preprocessor = CompressionPreprocessor.FloatXorDelta;
+        string rawRunFolder;
+        string rawCurrentPath;
+        using (var writer = new CompressedCaptureWriter(streamSettings, devices))
+        {
+            writer.AppendBlock(rawBlock);
+            writer.Save();
+            rawRunFolder = writer.CurrentFolder;
+            rawCurrentPath = writer.CurrentPath;
+            rawBlock.Release();
+        }
+
+        Assert(Path.GetExtension(rawCurrentPath).Equals(".dhcap", StringComparison.OrdinalIgnoreCase), "Capture storage must use .dhcap even when compression is disabled.");
+        byte[] rawFileBytes = File.ReadAllBytes(rawCurrentPath);
+        Assert(rawFileBytes.AsSpan(rawFileBytes.Length - CompressedCaptureFormat.FooterMagic.Length).SequenceEqual(CompressedCaptureFormat.FooterMagic), "DHCAP v3 files must end with a footer index marker.");
+        var rawMetadata = ReadDhcapMetadata(rawCurrentPath);
+        Assert(rawMetadata.Manifest.EffectiveCodec == CompressionAlgorithm.None, "Raw DHCAP manifest must record Codec=None.");
+        Assert(rawMetadata.Manifest.EffectivePreprocessor == CompressionPreprocessor.None, "Raw DHCAP manifest must record Pre=None.");
+        Assert(rawMetadata.Index.Records.All(record => record.Codec == CompressionAlgorithm.None), "Raw DHCAP index records must carry Codec=None.");
+        Assert(rawMetadata.Index.Records.All(record => record.Preprocessor == CompressionPreprocessor.None), "Raw DHCAP index records must carry Pre=None.");
+        using (TdmsFileReader reader = TdmsFileReader.Open(rawRunFolder, string.Empty))
+        {
+            TdmsChannelInfo firstChannel = reader.FileInfo.Groups.Single().Channels.First();
+            TdmsChannelEnvelope streamEnvelope = reader.ReadEnvelope(firstChannel, 0, firstChannel.SampleCount, 4, CancellationToken.None);
+            Assert(firstChannel.SampleCount == 4, "Streaming raw .dhcap capture must preserve channel sample count.");
+            Assert(streamEnvelope.Points.Select(point => point.Maximum).SequenceEqual(new[] { 1f, 2f, 3f, 4f }), "Streaming raw .dhcap capture must restore exact float values.");
         }
     }
 }

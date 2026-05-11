@@ -25,6 +25,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
     public string CurrentFolder => _writer?.CurrentFolder ?? string.Empty;
     public string CurrentAuditPath => _writer?.CurrentAuditPath ?? string.Empty;
     public bool IsRunning => _worker is not null && !_worker.IsCompleted;
+    public CaptureStorageStatistics? GetStatistics() => _writer?.Statistics;
 
     public Task StartAsync(IReadOnlyList<DeviceDescriptor> devices, CancellationToken cancellationToken)
     {
@@ -33,9 +34,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
             return Task.CompletedTask;
         }
 
-        _writer = _settings.Compression.Enabled
-            ? new CompressedCaptureWriter(_settings, devices)
-            : new TdmsCaptureWriter(_settings, devices);
+        _writer = new CompressedCaptureWriter(_settings, devices);
         _writer.Faulted += OnWriterFaulted;
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         _worker = Task.Run(() => ConsumeAsync(_cts.Token), CancellationToken.None);
@@ -87,7 +86,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
         {
             Faulted?.Invoke(new AcquisitionFault(
                 DateTimeOffset.UtcNow,
-                "TDMS_DRAIN_TIMEOUT",
+                "STORAGE_DRAIN_TIMEOUT",
                 $"Storage queue still has {remaining} block(s) after waiting for drain timeout."));
         }
     }

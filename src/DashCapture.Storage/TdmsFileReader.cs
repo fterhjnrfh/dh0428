@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using DashCapture.Core.Configuration;
 using DashCapture.Native;
 
 namespace DashCapture.Storage;
@@ -753,18 +754,22 @@ public sealed class TdmsFileReader : IDisposable
 
     private sealed class CompressedCaptureSegment : IReadableSegment
     {
-        private const int RecordHeaderSize = sizeof(int) + sizeof(ulong) + sizeof(int) + sizeof(int) + sizeof(int) + sizeof(int) + sizeof(byte);
+        private const int RecordHeaderSizeV1 = sizeof(int) + sizeof(ulong) + sizeof(int) + sizeof(int) + sizeof(int) + sizeof(int) + sizeof(byte);
+        private const int RecordHeaderSizeV2 = RecordHeaderSizeV1 + sizeof(uint) + sizeof(uint) + (sizeof(float) * 4);
+        private const int RecordHeaderSizeV3 = sizeof(int) + sizeof(ulong) + sizeof(int) + sizeof(int) + sizeof(byte) + sizeof(byte) + sizeof(int) + sizeof(int) + sizeof(byte) + sizeof(uint) + sizeof(uint) + (sizeof(float) * 4);
         private readonly FileStream _stream;
         private readonly object _streamSync = new();
         private readonly CompressedCaptureManifest _manifest;
+        private readonly int _formatVersion;
         private readonly Dictionary<int, CompressedCaptureChannelManifest> _channelsByOrdinal;
-        private readonly Dictionary<TdmsChannelKey, List<CompressedRecordIndex>> _recordsByChannel = new();
+        private readonly Dictionary<TdmsChannelKey, List<CompressedCaptureRecordIndex>> _recordsByChannel = new();
 
-        private CompressedCaptureSegment(string path, FileStream stream, CompressedCaptureManifest manifest)
+        private CompressedCaptureSegment(string path, FileStream stream, CompressedCaptureManifest manifest, int formatVersion)
         {
             Path = path;
             _stream = stream;
             _manifest = manifest;
+            _formatVersion = formatVersion;
             _channelsByOrdinal = manifest.Channels.ToDictionary(channel => channel.Ordinal, channel => channel);
             Channels = new Dictionary<TdmsChannelKey, TdmsChannelInfo>();
             FileInfo = new TdmsFileInfo(path, Array.Empty<TdmsGroupInfo>());
@@ -787,7 +792,7 @@ public sealed class TdmsFileReader : IDisposable
                 }
 
                 int version = reader.ReadInt32();
-                if (version != CompressedCaptureFormat.Version)
+                if (version < CompressedCaptureFormat.MinSupportedVersion || version > CompressedCaptureFormat.Version)
                 {
                     throw new InvalidDataException($"Unsupported compressed capture version {version}.");
                 }
@@ -808,8 +813,18 @@ public sealed class TdmsFileReader : IDisposable
                     JsonSerializer.Deserialize<CompressedCaptureManifest>(manifestBytes, CompressedCaptureFormat.JsonOptions) ??
                     throw new InvalidDataException("Compressed capture manifest is invalid.");
 
-                var segment = new CompressedCaptureSegment(path, stream, manifest);
-                segment.ScanRecords(reader);
+                var segment = new CompressedCaptureSegment(path, stream, manifest, version);
+                long dataStart = stream.Position;
+                if (version >= 2 && TryReadFooterIndex(reader, dataStart, out CompressedCaptureIndex? index, out long dataEnd) && index is not null)
+                {
+                    segment.LoadIndex(index);
+                }
+                else
+                {
+                    stream.Position = dataStart;
+                    segment.ScanRecords(reader, stream.Length);
+                }
+
                 segment.BuildFileInfo();
                 return segment;
             }
@@ -830,17 +845,22 @@ public sealed class TdmsFileReader : IDisposable
             float[] buffer,
             CancellationToken cancellationToken)
         {
-            if (!_recordsByChannel.TryGetValue(key, out List<CompressedRecordIndex>? records))
+            if (!_recordsByChannel.TryGetValue(key, out List<CompressedCaptureRecordIndex>? records))
             {
                 return;
             }
 
             ulong requestEnd = segmentStart + segmentCount;
-            foreach (CompressedRecordIndex record in records)
+            foreach (CompressedCaptureRecordIndex record in records)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 ulong recordEnd = record.SampleStart + (ulong)record.SampleCount;
                 if (recordEnd <= segmentStart || record.SampleStart >= requestEnd)
+                {
+                    continue;
+                }
+
+                if (TryAccumulateRecordSummary(record, segmentStart, requestEnd, outputOffset, totalSampleCount, accumulators))
                 {
                     continue;
                 }
@@ -865,7 +885,7 @@ public sealed class TdmsFileReader : IDisposable
             float[] buffer,
             CancellationToken cancellationToken)
         {
-            if (!_recordsByChannel.TryGetValue(key, out List<CompressedRecordIndex>? records) || sampleCount <= 0)
+            if (!_recordsByChannel.TryGetValue(key, out List<CompressedCaptureRecordIndex>? records) || sampleCount <= 0)
             {
                 return 0;
             }
@@ -873,7 +893,7 @@ public sealed class TdmsFileReader : IDisposable
             Array.Clear(buffer, 0, sampleCount);
             ulong requestEnd = segmentStart + (ulong)sampleCount;
             int copied = 0;
-            foreach (CompressedRecordIndex record in records)
+            foreach (CompressedCaptureRecordIndex record in records)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 ulong recordEnd = record.SampleStart + (ulong)record.SampleCount;
@@ -902,11 +922,16 @@ public sealed class TdmsFileReader : IDisposable
             _recordsByChannel.Clear();
         }
 
-        private void ScanRecords(BinaryReader reader)
+        private void ScanRecords(BinaryReader reader, long dataEnd)
         {
-            while (_stream.Position < _stream.Length)
+            int headerSize = _formatVersion >= 3
+                ? RecordHeaderSizeV3
+                : _formatVersion >= 2
+                    ? RecordHeaderSizeV2
+                    : RecordHeaderSizeV1;
+            while (_stream.Position < dataEnd)
             {
-                if (_stream.Length - _stream.Position < RecordHeaderSize)
+                if (dataEnd - _stream.Position < headerSize)
                 {
                     break;
                 }
@@ -915,9 +940,45 @@ public sealed class TdmsFileReader : IDisposable
                 ulong sampleStart = reader.ReadUInt64();
                 int sampleCount = reader.ReadInt32();
                 int originalLength = reader.ReadInt32();
-                int transformedLength = reader.ReadInt32();
-                int payloadLength = reader.ReadInt32();
-                byte flags = reader.ReadByte();
+                CompressionPreprocessor preprocessor = _manifest.Preprocessor;
+                CompressionAlgorithm codec = _manifest.Algorithm;
+                int transformedLength;
+                int payloadLength;
+                byte flags;
+                if (_formatVersion >= 3)
+                {
+                    preprocessor = (CompressionPreprocessor)reader.ReadByte();
+                    codec = (CompressionAlgorithm)reader.ReadByte();
+                    transformedLength = reader.ReadInt32();
+                    payloadLength = reader.ReadInt32();
+                    flags = reader.ReadByte();
+                }
+                else
+                {
+                    transformedLength = reader.ReadInt32();
+                    payloadLength = reader.ReadInt32();
+                    flags = reader.ReadByte();
+                    if ((flags & CompressedCaptureFormat.RawStoredChunkFlag) != 0)
+                    {
+                        codec = CompressionAlgorithm.None;
+                        preprocessor = CompressionPreprocessor.None;
+                    }
+                }
+                uint rawCrc32 = 0;
+                uint payloadCrc32 = 0;
+                float first = float.NaN;
+                float last = float.NaN;
+                float minimum = float.NaN;
+                float maximum = float.NaN;
+                if (_formatVersion >= 2)
+                {
+                    rawCrc32 = reader.ReadUInt32();
+                    payloadCrc32 = reader.ReadUInt32();
+                    first = reader.ReadSingle();
+                    last = reader.ReadSingle();
+                    minimum = reader.ReadSingle();
+                    maximum = reader.ReadSingle();
+                }
 
                 if (!_channelsByOrdinal.TryGetValue(channelOrdinal, out CompressedCaptureChannelManifest? channel) ||
                     sampleCount <= 0 ||
@@ -928,7 +989,7 @@ public sealed class TdmsFileReader : IDisposable
                     throw new InvalidDataException("Compressed capture record header is invalid.");
                 }
 
-                if (_stream.Length - _stream.Position < payloadLength)
+                if (dataEnd - _stream.Position < payloadLength)
                 {
                     break;
                 }
@@ -936,13 +997,13 @@ public sealed class TdmsFileReader : IDisposable
                 long payloadOffset = _stream.Position;
                 _stream.Position += payloadLength;
                 var key = new TdmsChannelKey(channel.GroupName, channel.ChannelName);
-                if (!_recordsByChannel.TryGetValue(key, out List<CompressedRecordIndex>? records))
+                if (!_recordsByChannel.TryGetValue(key, out List<CompressedCaptureRecordIndex>? records))
                 {
-                    records = new List<CompressedRecordIndex>();
+                    records = new List<CompressedCaptureRecordIndex>();
                     _recordsByChannel[key] = records;
                 }
 
-                records.Add(new CompressedRecordIndex(
+                records.Add(new CompressedCaptureRecordIndex(
                     channelOrdinal,
                     sampleStart,
                     sampleCount,
@@ -950,8 +1011,115 @@ public sealed class TdmsFileReader : IDisposable
                     transformedLength,
                     payloadLength,
                     flags,
-                    payloadOffset));
+                    payloadOffset,
+                    codec,
+                    preprocessor,
+                    rawCrc32,
+                    payloadCrc32,
+                    first,
+                    last,
+                    minimum,
+                    maximum,
+                    Array.Empty<CompressedCaptureCallbackBlockInfo>()));
             }
+        }
+
+        private static bool TryReadFooterIndex(
+            BinaryReader reader,
+            long dataStart,
+            out CompressedCaptureIndex? index,
+            out long dataEnd)
+        {
+            index = null;
+            dataEnd = reader.BaseStream.Length;
+            long footerSize = sizeof(int) + CompressedCaptureFormat.FooterMagic.Length;
+            if (reader.BaseStream.Length < dataStart + footerSize)
+            {
+                return false;
+            }
+
+            reader.BaseStream.Position = reader.BaseStream.Length - CompressedCaptureFormat.FooterMagic.Length;
+            byte[] magic = reader.ReadBytes(CompressedCaptureFormat.FooterMagic.Length);
+            if (!magic.SequenceEqual(CompressedCaptureFormat.FooterMagic) &&
+                !magic.SequenceEqual(CompressedCaptureFormat.FooterMagicV2))
+            {
+                return false;
+            }
+
+            reader.BaseStream.Position = reader.BaseStream.Length - CompressedCaptureFormat.FooterMagic.Length - sizeof(int);
+            int indexLength = reader.ReadInt32();
+            if (indexLength <= 0 || indexLength > 128 * 1024 * 1024)
+            {
+                return false;
+            }
+
+            long indexStart = reader.BaseStream.Length - CompressedCaptureFormat.FooterMagic.Length - sizeof(int) - indexLength;
+            if (indexStart < dataStart)
+            {
+                return false;
+            }
+
+            reader.BaseStream.Position = indexStart;
+            byte[] indexBytes = reader.ReadBytes(indexLength);
+            if (indexBytes.Length != indexLength)
+            {
+                return false;
+            }
+
+            index = JsonSerializer.Deserialize<CompressedCaptureIndex>(indexBytes, CompressedCaptureFormat.JsonOptions);
+            if (index is null || index.Version < 2)
+            {
+                return false;
+            }
+
+            dataEnd = indexStart;
+            return true;
+        }
+
+        private void LoadIndex(CompressedCaptureIndex index)
+        {
+            foreach (CompressedCaptureRecordIndex item in index.Records)
+            {
+                CompressedCaptureRecordIndex record = NormalizeRecordIndex(item);
+                if (!_channelsByOrdinal.TryGetValue(record.ChannelOrdinal, out CompressedCaptureChannelManifest? channel) ||
+                    record.SampleCount <= 0 ||
+                    record.OriginalLength != record.SampleCount * sizeof(float) ||
+                    record.TransformedLength < 0 ||
+                    record.PayloadLength < 0 ||
+                    record.PayloadOffset < 0 ||
+                    record.PayloadOffset + record.PayloadLength > _stream.Length)
+                {
+                    throw new InvalidDataException("Compressed capture footer index is invalid.");
+                }
+
+                var key = new TdmsChannelKey(channel.GroupName, channel.ChannelName);
+                if (!_recordsByChannel.TryGetValue(key, out List<CompressedCaptureRecordIndex>? records))
+                {
+                    records = new List<CompressedCaptureRecordIndex>();
+                    _recordsByChannel[key] = records;
+                }
+
+                records.Add(record);
+            }
+        }
+
+        private CompressedCaptureRecordIndex NormalizeRecordIndex(CompressedCaptureRecordIndex record)
+        {
+            CompressionAlgorithm codec = record.Codec;
+            CompressionPreprocessor preprocessor = record.Preprocessor;
+            if (_formatVersion < 3)
+            {
+                bool rawStored = (record.Flags & CompressedCaptureFormat.RawStoredChunkFlag) != 0;
+                codec = rawStored ? CompressionAlgorithm.None : _manifest.Algorithm;
+                preprocessor = rawStored ? CompressionPreprocessor.None : _manifest.Preprocessor;
+            }
+
+            return record with
+            {
+                Codec = codec,
+                Preprocessor = preprocessor,
+                CallbackBlocks = record.CallbackBlocks ?? Array.Empty<CompressedCaptureCallbackBlockInfo>()
+            };
         }
 
         private void BuildFileInfo()
@@ -966,7 +1134,7 @@ public sealed class TdmsFileReader : IDisposable
                     .Select(channel =>
                     {
                         var key = new TdmsChannelKey(channel.GroupName, channel.ChannelName);
-                        ulong sampleCount = _recordsByChannel.TryGetValue(key, out List<CompressedRecordIndex>? records)
+                        ulong sampleCount = _recordsByChannel.TryGetValue(key, out List<CompressedCaptureRecordIndex>? records)
                             ? records.Aggregate(0UL, (max, record) => Math.Max(max, record.SampleStart + (ulong)record.SampleCount))
                             : 0;
                         return new TdmsChannelInfo(
@@ -995,7 +1163,7 @@ public sealed class TdmsFileReader : IDisposable
                 .ToDictionary(channel => channel.Key, channel => channel);
         }
 
-        private byte[] ReadRecord(CompressedRecordIndex record)
+        private byte[] ReadRecord(CompressedCaptureRecordIndex record)
         {
             byte[] payload = new byte[record.PayloadLength];
             lock (_streamSync)
@@ -1014,14 +1182,73 @@ public sealed class TdmsFileReader : IDisposable
                 }
             }
 
-            return CompressedTdmsCodec.DecodePayload(
+            if (_formatVersion >= 2)
+            {
+                uint actualPayloadCrc32 = Crc32.Compute(payload);
+                if (actualPayloadCrc32 != record.PayloadCrc32)
+                {
+                    throw new InvalidDataException("Compressed capture payload CRC check failed.");
+                }
+            }
+
+            byte[] raw = CompressedTdmsCodec.DecodePayload(
                 payload,
-                _manifest.Algorithm,
-                _manifest.Preprocessor,
+                record.Codec,
+                record.Preprocessor,
                 _manifest.LpcOrder,
                 record.OriginalLength,
                 record.TransformedLength,
                 record.Flags);
+
+            if (_formatVersion >= 2)
+            {
+                uint actualRawCrc32 = Crc32.Compute(raw);
+                if (actualRawCrc32 != record.RawCrc32)
+                {
+                    throw new InvalidDataException("Compressed capture raw CRC check failed.");
+                }
+            }
+
+            return raw;
+        }
+
+        private static bool TryAccumulateRecordSummary(
+            CompressedCaptureRecordIndex record,
+            ulong segmentStart,
+            ulong requestEnd,
+            ulong outputOffset,
+            ulong totalSampleCount,
+            TdmsEnvelopeAccumulator[] accumulators)
+        {
+            if (!HasSummary(record) || record.SampleStart < segmentStart || record.SampleStart + (ulong)record.SampleCount > requestEnd)
+            {
+                return false;
+            }
+
+            ulong relativeStart = outputOffset + record.SampleStart - segmentStart;
+            ulong relativeEnd = relativeStart + (ulong)record.SampleCount;
+            if (relativeEnd == 0)
+            {
+                return false;
+            }
+
+            int firstBucket = BucketIndex(relativeStart, totalSampleCount, accumulators.Length);
+            int lastBucket = BucketIndex(relativeEnd - 1, totalSampleCount, accumulators.Length);
+            if (firstBucket != lastBucket)
+            {
+                return false;
+            }
+
+            accumulators[firstBucket].AddSummary(record.First, record.Last, record.Minimum, record.Maximum);
+            return true;
+        }
+
+        private static bool HasSummary(CompressedCaptureRecordIndex record)
+        {
+            return !float.IsNaN(record.First) &&
+                   !float.IsNaN(record.Last) &&
+                   !float.IsNaN(record.Minimum) &&
+                   !float.IsNaN(record.Maximum);
         }
 
         private static int BucketIndex(ulong relative, ulong totalSampleCount, int bucketCount)
@@ -1035,15 +1262,6 @@ public sealed class TdmsFileReader : IDisposable
             return Math.Clamp(bucket, 0, bucketCount - 1);
         }
 
-        private readonly record struct CompressedRecordIndex(
-            int ChannelOrdinal,
-            ulong SampleStart,
-            int SampleCount,
-            int OriginalLength,
-            int TransformedLength,
-            int PayloadLength,
-            byte Flags,
-            long PayloadOffset);
     }
 }
 

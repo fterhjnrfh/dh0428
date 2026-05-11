@@ -45,9 +45,9 @@ public enum FileNamingMode
 
 public sealed class CompressionSettings
 {
-    public bool Enabled { get; set; }
+    public bool Enabled { get; set; } = true;
     public CompressionAlgorithm Algorithm { get; set; } = CompressionAlgorithm.Zstd;
-    public CompressionPreprocessor Preprocessor { get; set; } = CompressionPreprocessor.None;
+    public CompressionPreprocessor Preprocessor { get; set; } = CompressionPreprocessor.ByteShuffle;
     public int ChunkSizeMb { get; set; } = 4;
     public int ZstdLevel { get; set; } = 3;
     public int ZstdWindowLog { get; set; } = 0;
@@ -60,6 +60,7 @@ public sealed class CompressionSettings
 
 public enum CompressionAlgorithm
 {
+    None,
     Zstd,
     Lz4,
     Snappy,
@@ -73,7 +74,11 @@ public enum CompressionPreprocessor
     None,
     Delta1,
     Delta2,
-    Lpc
+    Lpc,
+    ByteShuffle,
+    FloatXorDelta,
+    DeltaFloatPredictor,
+    IntDeltaZigZag
 }
 
 public sealed class DisplaySettings

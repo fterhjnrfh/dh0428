@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using DashCapture.Core.Configuration;
 using ICSharpCode.SharpZipLib.BZip2;
 using ICSharpCode.SharpZipLib.Zip.Compression;
@@ -11,16 +12,28 @@ namespace DashCapture.Storage;
 
 internal static class CompressedTdmsCodec
 {
-    private const byte StoredChunk = 1;
+    private const int Float32ByteCount = sizeof(float);
 
     internal static byte[] EncodePayload(byte[] input, CompressionSettings settings, out int transformedLength, out byte flags)
     {
+        if (!settings.Enabled || settings.Algorithm == CompressionAlgorithm.None)
+        {
+            transformedLength = input.Length;
+            flags = CompressedCaptureFormat.StoredChunkFlag | CompressedCaptureFormat.RawStoredChunkFlag;
+            return input.ToArray();
+        }
+
         byte[] transformed = input.ToArray();
         Preprocess(transformed, settings.Preprocessor, settings.LpcOrder);
         byte[] compressed = CompressChunk(transformed, settings);
         bool storePlain = compressed.Length >= transformed.Length;
         transformedLength = transformed.Length;
-        flags = storePlain ? StoredChunk : (byte)0;
+        flags = storePlain ? CompressedCaptureFormat.StoredChunkFlag : (byte)0;
+        if (settings.Preprocessor != CompressionPreprocessor.None)
+        {
+            flags |= CompressedCaptureFormat.PreprocessedChunkFlag;
+        }
+
         return storePlain ? transformed : compressed;
     }
 
@@ -33,7 +46,8 @@ internal static class CompressedTdmsCodec
         int transformedLength,
         byte flags)
     {
-        byte[] transformed = (flags & StoredChunk) != 0
+        bool rawStored = (flags & CompressedCaptureFormat.RawStoredChunkFlag) != 0;
+        byte[] transformed = rawStored || (flags & CompressedCaptureFormat.StoredChunkFlag) != 0
             ? payload.ToArray()
             : DecompressChunk(payload, algorithm, transformedLength);
 
@@ -42,7 +56,11 @@ internal static class CompressedTdmsCodec
             throw new InvalidDataException("Compressed chunk decompressed to an unexpected length.");
         }
 
-        ReversePreprocess(transformed, preprocessor, lpcOrder);
+        if (!rawStored)
+        {
+            ReversePreprocess(transformed, preprocessor, lpcOrder);
+        }
+
         if (transformed.Length != originalLength)
         {
             throw new InvalidDataException("Compressed chunk restored to an unexpected length.");
@@ -210,6 +228,18 @@ internal static class CompressedTdmsCodec
             case CompressionPreprocessor.Lpc:
                 LpcEncode(data, Math.Clamp(lpcOrder, 1, 4));
                 return;
+            case CompressionPreprocessor.ByteShuffle:
+                ByteShuffleEncode(data);
+                return;
+            case CompressionPreprocessor.FloatXorDelta:
+                FloatXorDeltaEncode(data);
+                return;
+            case CompressionPreprocessor.DeltaFloatPredictor:
+                DeltaFloatPredictorEncode(data);
+                return;
+            case CompressionPreprocessor.IntDeltaZigZag:
+                IntDeltaZigZagEncode(data);
+                return;
             default:
                 throw new NotSupportedException($"Preprocessor {preprocessor} is not supported.");
         }
@@ -230,6 +260,18 @@ internal static class CompressedTdmsCodec
                 return;
             case CompressionPreprocessor.Lpc:
                 LpcDecode(data, Math.Clamp(lpcOrder, 1, 4));
+                return;
+            case CompressionPreprocessor.ByteShuffle:
+                ByteShuffleDecode(data);
+                return;
+            case CompressionPreprocessor.FloatXorDelta:
+                FloatXorDeltaDecode(data);
+                return;
+            case CompressionPreprocessor.DeltaFloatPredictor:
+                DeltaFloatPredictorDecode(data);
+                return;
+            case CompressionPreprocessor.IntDeltaZigZag:
+                IntDeltaZigZagDecode(data);
                 return;
             default:
                 throw new NotSupportedException($"Preprocessor {preprocessor} is not supported.");
@@ -298,6 +340,144 @@ internal static class CompressedTdmsCodec
         return order <= 1
             ? data[index - 1]
             : 2 * data[index - 1] - data[index - 2];
+    }
+
+    private static void ByteShuffleEncode(byte[] data)
+    {
+        int sampleCount = data.Length / Float32ByteCount;
+        if (sampleCount <= 1)
+        {
+            return;
+        }
+
+        byte[] original = data.ToArray();
+        for (int byteIndex = 0; byteIndex < Float32ByteCount; byteIndex++)
+        {
+            int destinationBase = byteIndex * sampleCount;
+            for (int sample = 0; sample < sampleCount; sample++)
+            {
+                data[destinationBase + sample] = original[(sample * Float32ByteCount) + byteIndex];
+            }
+        }
+    }
+
+    private static void ByteShuffleDecode(byte[] data)
+    {
+        int sampleCount = data.Length / Float32ByteCount;
+        if (sampleCount <= 1)
+        {
+            return;
+        }
+
+        byte[] shuffled = data.ToArray();
+        for (int byteIndex = 0; byteIndex < Float32ByteCount; byteIndex++)
+        {
+            int sourceBase = byteIndex * sampleCount;
+            for (int sample = 0; sample < sampleCount; sample++)
+            {
+                data[(sample * Float32ByteCount) + byteIndex] = shuffled[sourceBase + sample];
+            }
+        }
+    }
+
+    private static void FloatXorDeltaEncode(byte[] data)
+    {
+        int sampleCount = data.Length / Float32ByteCount;
+        for (int sample = sampleCount - 1; sample > 0; sample--)
+        {
+            int offset = sample * Float32ByteCount;
+            int previousOffset = offset - Float32ByteCount;
+            uint current = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(offset, Float32ByteCount));
+            uint previous = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(previousOffset, Float32ByteCount));
+            BinaryPrimitives.WriteUInt32LittleEndian(data.AsSpan(offset, Float32ByteCount), current ^ previous);
+        }
+    }
+
+    private static void FloatXorDeltaDecode(byte[] data)
+    {
+        int sampleCount = data.Length / Float32ByteCount;
+        if (sampleCount <= 1)
+        {
+            return;
+        }
+
+        uint previous = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(0, Float32ByteCount));
+        for (int sample = 1; sample < sampleCount; sample++)
+        {
+            int offset = sample * Float32ByteCount;
+            uint encoded = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(offset, Float32ByteCount));
+            uint restored = encoded ^ previous;
+            BinaryPrimitives.WriteUInt32LittleEndian(data.AsSpan(offset, Float32ByteCount), restored);
+            previous = restored;
+        }
+    }
+
+    private static void DeltaFloatPredictorEncode(byte[] data)
+    {
+        int sampleCount = data.Length / Float32ByteCount;
+        for (int sample = sampleCount - 1; sample >= 2; sample--)
+        {
+            int offset = sample * Float32ByteCount;
+            uint current = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(offset, Float32ByteCount));
+            uint previous = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(offset - Float32ByteCount, Float32ByteCount));
+            uint previous2 = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(offset - (2 * Float32ByteCount), Float32ByteCount));
+            uint predicted = unchecked((2u * previous) - previous2);
+            BinaryPrimitives.WriteUInt32LittleEndian(data.AsSpan(offset, Float32ByteCount), unchecked(current - predicted));
+        }
+    }
+
+    private static void DeltaFloatPredictorDecode(byte[] data)
+    {
+        int sampleCount = data.Length / Float32ByteCount;
+        for (int sample = 2; sample < sampleCount; sample++)
+        {
+            int offset = sample * Float32ByteCount;
+            uint encoded = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(offset, Float32ByteCount));
+            uint previous = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(offset - Float32ByteCount, Float32ByteCount));
+            uint previous2 = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(offset - (2 * Float32ByteCount), Float32ByteCount));
+            uint predicted = unchecked((2u * previous) - previous2);
+            BinaryPrimitives.WriteUInt32LittleEndian(data.AsSpan(offset, Float32ByteCount), unchecked(encoded + predicted));
+        }
+    }
+
+    private static void IntDeltaZigZagEncode(byte[] data)
+    {
+        int sampleCount = data.Length / Float32ByteCount;
+        if (sampleCount <= 1)
+        {
+            return;
+        }
+
+        int previous = BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(0, Float32ByteCount));
+        for (int sample = 1; sample < sampleCount; sample++)
+        {
+            int offset = sample * Float32ByteCount;
+            int current = BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(offset, Float32ByteCount));
+            int delta = unchecked(current - previous);
+            uint zigZag = unchecked((uint)((delta << 1) ^ (delta >> 31)));
+            BinaryPrimitives.WriteUInt32LittleEndian(data.AsSpan(offset, Float32ByteCount), zigZag);
+            previous = current;
+        }
+    }
+
+    private static void IntDeltaZigZagDecode(byte[] data)
+    {
+        int sampleCount = data.Length / Float32ByteCount;
+        if (sampleCount <= 1)
+        {
+            return;
+        }
+
+        int previous = BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(0, Float32ByteCount));
+        for (int sample = 1; sample < sampleCount; sample++)
+        {
+            int offset = sample * Float32ByteCount;
+            uint zigZag = BinaryPrimitives.ReadUInt32LittleEndian(data.AsSpan(offset, Float32ByteCount));
+            int delta = unchecked((int)((zigZag >> 1) ^ (uint)-(int)(zigZag & 1)));
+            int restored = unchecked(previous + delta);
+            BinaryPrimitives.WriteInt32LittleEndian(data.AsSpan(offset, Float32ByteCount), restored);
+            previous = restored;
+        }
     }
 
     private static LZ4Level ToLz4Level(int level)

@@ -51,6 +51,14 @@ public sealed class MainWindow : Window
     private readonly TextBlock _status = new();
     private readonly TextBlock _metrics = new();
     private readonly TextBlock _storagePreview = new();
+    private readonly TextBlock _storageRawSizeValue = new();
+    private readonly TextBlock _storageWrittenSizeValue = new();
+    private readonly TextBlock _storagePayloadSizeValue = new();
+    private readonly TextBlock _storageRatioValue = new();
+    private readonly TextBlock _storageBlockStateValue = new();
+    private readonly TextBlock _storageCodecValue = new();
+    private readonly TextBlock _storagePreprocessorValue = new();
+    private readonly TextBlock _storageWriteThroughputValue = new();
     private readonly TextBlock _captureTimerText = new();
     private readonly Button _connectButton = new() { Content = "\u8fde\u63a5\u8bbe\u5907" };
     private readonly Button _startButton = new() { Content = "\u5f00\u59cb\u91c7\u96c6", IsEnabled = false };
@@ -279,6 +287,7 @@ public sealed class MainWindow : Window
 
         OptionItem<CompressionAlgorithm>[] algorithms =
         {
+            new(CompressionAlgorithm.None, "None"),
             new(CompressionAlgorithm.Zstd, "ZSTD"),
             new(CompressionAlgorithm.Lz4, "LZ4"),
             new(CompressionAlgorithm.Snappy, "Snappy"),
@@ -294,7 +303,11 @@ public sealed class MainWindow : Window
             new(CompressionPreprocessor.None, "\u65e0"),
             new(CompressionPreprocessor.Delta1, "\u4e00\u9636\u5dee\u5206"),
             new(CompressionPreprocessor.Delta2, "\u4e8c\u9636\u5dee\u5206"),
-            new(CompressionPreprocessor.Lpc, "LPC")
+            new(CompressionPreprocessor.Lpc, "LPC"),
+            new(CompressionPreprocessor.ByteShuffle, "\u5b57\u8282\u91cd\u6392"),
+            new(CompressionPreprocessor.FloatXorDelta, "\u6d6e\u70b9 XOR \u5dee\u5206"),
+            new(CompressionPreprocessor.DeltaFloatPredictor, "\u6d6e\u70b9\u7ebf\u6027\u9884\u6d4b"),
+            new(CompressionPreprocessor.IntDeltaZigZag, "\u6574\u6570\u5dee\u5206 ZigZag")
         };
         _compressionPreprocessorCombo.ItemsSource = preprocessors;
         _compressionPreprocessorCombo.SelectedItem = preprocessors.FirstOrDefault(item => item.Value == compression.Preprocessor) ?? preprocessors[0];
@@ -618,7 +631,20 @@ public sealed class MainWindow : Window
         Grid.SetRow(storageGrid.Children[2], 2);
         Grid.SetColumn(((Grid)storageGrid.Children[2]).Children[1], 1);
 
-        Control storageModule = StorageModule("\u5b58\u50a8", storageGrid);
+        _storagePreview.TextWrapping = TextWrapping.Wrap;
+        _storagePreview.Foreground = TextPrimary;
+        _storagePreview.FontSize = 13;
+        var storageContent = new StackPanel
+        {
+            Spacing = 10,
+            Children =
+            {
+                storageGrid,
+                StorageField("\u4fdd\u5b58\u9884\u89c8", _storagePreview)
+            }
+        };
+
+        Control storageModule = StorageModule("\u5b58\u50a8", storageContent);
         Grid.SetColumn(storageModule, 0);
         Grid.SetRow(storageModule, 0);
         root.Children.Add(storageModule);
@@ -628,33 +654,11 @@ public sealed class MainWindow : Window
         Grid.SetRow(compressionModule, 0);
         root.Children.Add(compressionModule);
 
-        var previewBlock = new StackPanel
-        {
-            Spacing = 10,
-            Children =
-            {
-                _storagePreview
-            }
-        };
-        Control previewModule = StorageModule("\u9884\u89c8", previewBlock);
-        Grid.SetColumn(previewModule, 0);
-        Grid.SetRow(previewModule, 1);
-        root.Children.Add(previewModule);
-
-        var runtimeGrid = new Grid
-        {
-            RowDefinitions = new RowDefinitions("Auto,Auto"),
-            RowSpacing = 10,
-            Children =
-            {
-                StorageValue("\u5206\u6587\u4ef6", $"{FormatFileSplitSize()}    Flush {_settings.Storage.FlushIntervalMs} ms"),
-                StorageValue("TDMS DLL", _settings.Storage.TdmRuntimeDir)
-            }
-        };
-        Grid.SetRow(runtimeGrid.Children[1], 1);
-        Control runtimeModule = StorageModule("\u8fd0\u884c\u53c2\u6570", runtimeGrid);
-        Grid.SetColumn(runtimeModule, 1);
+        UpdateStorageStatsFields(null);
+        Control runtimeModule = StorageModule("\u8fd0\u884c\u53c2\u6570", BuildRuntimeParametersPanel());
+        Grid.SetColumn(runtimeModule, 0);
         Grid.SetRow(runtimeModule, 1);
+        Grid.SetColumnSpan(runtimeModule, 2);
         root.Children.Add(runtimeModule);
 
         return new ScrollViewer
@@ -714,6 +718,80 @@ public sealed class MainWindow : Window
                 Children = { switches, options, _compressionAlgorithmParams, _compressionPreprocessorParams }
             }
         };
+    }
+
+    private Control BuildRuntimeParametersPanel()
+    {
+        Control[] parameters =
+        {
+            RuntimeParameter("\u5206\u6587\u4ef6\u5927\u5c0f", FormatFileSplitSize()),
+            RuntimeParameter("\u5237\u76d8\u95f4\u9694", $"{_settings.Storage.FlushIntervalMs} \u6beb\u79d2"),
+            RuntimeParameter("\u805a\u5408\u5757\u5927\u5c0f", $"{Math.Clamp(_settings.Storage.Compression.ChunkSizeMb, 1, 256)} MB"),
+            RuntimeParameter("TDMS \u5bfc\u51fa\u5e93", _settings.Storage.TdmRuntimeDir),
+            RuntimeParameter("\u539f\u59cb\u5927\u5c0f", _storageRawSizeValue),
+            RuntimeParameter("\u5199\u5165\u5927\u5c0f", _storageWrittenSizeValue),
+            RuntimeParameter("\u8f7d\u8377\u5927\u5c0f", _storagePayloadSizeValue),
+            RuntimeParameter("\u538b\u7f29\u500d\u7387", _storageRatioValue),
+            RuntimeParameter("\u5757\u72b6\u6001", _storageBlockStateValue),
+            RuntimeParameter("\u5199\u5165\u541e\u5410", _storageWriteThroughputValue),
+            RuntimeParameter("\u5f53\u524d\u7b97\u6cd5", _storageCodecValue),
+            RuntimeParameter("\u5f53\u524d\u9884\u5904\u7406", _storagePreprocessorValue)
+        };
+
+        var grid = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitions("*,*"),
+            ColumnSpacing = 16,
+            RowSpacing = 10
+        };
+
+        for (int index = 0; index < parameters.Length; index++)
+        {
+            if (index % 2 == 0)
+            {
+                grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
+            }
+
+            Control parameter = parameters[index];
+            Grid.SetRow(parameter, index / 2);
+            Grid.SetColumn(parameter, index % 2);
+            grid.Children.Add(parameter);
+        }
+
+        return grid;
+    }
+
+    private static Control RuntimeParameter(string label, string value)
+    {
+        return RuntimeParameter(label, new TextBlock { Text = value });
+    }
+
+    private static Control RuntimeParameter(string label, TextBlock valueBlock)
+    {
+        valueBlock.Foreground = TextPrimary;
+        valueBlock.FontSize = 13;
+        valueBlock.TextWrapping = TextWrapping.Wrap;
+        valueBlock.VerticalAlignment = VerticalAlignment.Center;
+
+        var grid = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitions("104,*"),
+            ColumnSpacing = 10,
+            MinHeight = 38,
+            Children =
+            {
+                new TextBlock
+                {
+                    Text = label,
+                    Foreground = TextSecondary,
+                    FontSize = 13,
+                    VerticalAlignment = VerticalAlignment.Center
+                },
+                valueBlock
+            }
+        };
+        Grid.SetColumn(valueBlock, 1);
+        return grid;
     }
 
     private static Control StorageModule(string title, Control content)
@@ -977,7 +1055,7 @@ public sealed class MainWindow : Window
         _storageEnabledCheck.IsEnabled = false;
         _storageTabEnabledCheck.IsEnabled = false;
         _status.Text = storageEnabled
-            ? (_settings.Storage.Compression.Enabled ? "\u91c7\u96c6\u4e2d\uff0c\u6b63\u5728\u5199\u5165\u539f\u751f\u538b\u7f29\u6587\u4ef6" : "\u91c7\u96c6\u4e2d\uff0c\u6b63\u5728\u4fdd\u5b58 TDMS")
+            ? (_settings.Storage.Compression.Enabled && _settings.Storage.Compression.Algorithm != CompressionAlgorithm.None ? "\u91c7\u96c6\u4e2d\uff0c\u6b63\u5728\u5199\u5165\u538b\u7f29 .dhcap" : "\u91c7\u96c6\u4e2d\uff0c\u6b63\u5728\u5199\u5165 Codec=None \u539f\u59cb .dhcap")
             : "\u91c7\u96c6\u4e2d\uff0c\u4ec5\u663e\u793a\u4e0d\u4fdd\u5b58";
     }
 
@@ -1423,7 +1501,9 @@ public sealed class MainWindow : Window
     private void UpdateTelemetry(CaptureTelemetry telemetry)
     {
         double mb = telemetry.BytesReceived / 1024.0 / 1024.0;
-        _metrics.Text = $"Blocks {telemetry.BlocksReceived}    Data {mb:0.0} MB    StorageQ {telemetry.StorageQueueDepth}    DisplayQ {telemetry.DisplayQueueDepth}    Drops {telemetry.DisplayDrops}    {telemetry.BackpressureLevel}";
+        CaptureStorageStatistics? storageStats = _storageService?.GetStatistics();
+        _metrics.Text = $"Blocks {telemetry.BlocksReceived}    Data {mb:0.0} MB    StorageQ {telemetry.StorageQueueDepth}    DisplayQ {telemetry.DisplayQueueDepth}    Drops {telemetry.DisplayDrops}    {telemetry.BackpressureLevel}    {FormatStorageStatsShort(storageStats)}";
+        UpdateStorageStatsFields(storageStats);
         if (!string.IsNullOrWhiteSpace(telemetry.Status))
         {
             _status.Text = TranslateStatus(telemetry.Status);
@@ -1440,6 +1520,51 @@ public sealed class MainWindow : Window
 
         RuntimeUsageSnapshot usage = _runtimeUsageSampler.Sample();
         Title = $"DASH Capture | FPS {displayFps:0.0} | CPU App {FormatPercent(usage.ProcessCpuPercent)} Sys {FormatPercent(usage.SystemCpuPercent)} | {FormatGpuUsage(usage)}";
+        UpdateStorageStatsFields(_storageService?.GetStatistics());
+    }
+
+    private static string FormatStorageStatsShort(CaptureStorageStatistics? stats)
+    {
+        if (stats is null || stats.RawBytes <= 0)
+        {
+            return "\u5b58\u50a8\u5f85\u91c7\u96c6";
+        }
+
+        double ratio = stats.WrittenBytes > 0 ? (double)stats.RawBytes / stats.WrittenBytes : 0;
+        return $"\u7f16\u7801 {stats.Codec}/{stats.Preprocessor}    \u538b\u7f29 {ratio:0.00}x    \u5199\u5165 {stats.WriteThroughputMbPerSecond:0.0} MB/s";
+    }
+
+    private void UpdateStorageStatsFields(CaptureStorageStatistics? stats)
+    {
+        if (stats is null || stats.RawBytes <= 0)
+        {
+            _storageRawSizeValue.Text = "0.0 MB";
+            _storageWrittenSizeValue.Text = "0.0 MB";
+            _storagePayloadSizeValue.Text = "0.0 MB";
+            _storageRatioValue.Text = "\u5f85\u91c7\u96c6";
+            _storageBlockStateValue.Text = "\u5f85\u91c7\u96c6";
+            _storageWriteThroughputValue.Text = "0.0 MB/s";
+            _storageCodecValue.Text = "\u5f85\u91c7\u96c6";
+            _storagePreprocessorValue.Text = "\u5f85\u91c7\u96c6";
+            return;
+        }
+
+        double ratio = stats.WrittenBytes > 0 ? (double)stats.RawBytes / stats.WrittenBytes : 0;
+        double storedPercent = stats.TotalBlocks > 0 ? stats.StoredBlocks * 100.0 / stats.TotalBlocks : 0;
+        double compressedPercent = stats.TotalBlocks > 0 ? stats.CompressedBlocks * 100.0 / stats.TotalBlocks : 0;
+        _storageRawSizeValue.Text = FormatStorageBytes(stats.RawBytes);
+        _storageWrittenSizeValue.Text = FormatStorageBytes(stats.WrittenBytes);
+        _storagePayloadSizeValue.Text = FormatStorageBytes(stats.PayloadBytes);
+        _storageRatioValue.Text = $"{ratio:0.00}x";
+        _storageBlockStateValue.Text = $"\u603b {stats.TotalBlocks}    \u538b\u7f29 {compressedPercent:0.#}%    \u76f4\u5b58 {storedPercent:0.#}%";
+        _storageWriteThroughputValue.Text = $"{stats.WriteThroughputMbPerSecond:0.0} MB/s";
+        _storageCodecValue.Text = stats.Codec;
+        _storagePreprocessorValue.Text = stats.Preprocessor;
+    }
+
+    private static string FormatStorageBytes(long bytes)
+    {
+        return $"{bytes / 1024.0 / 1024.0:0.0} MB";
     }
 
     private static string FormatGpuUsage(RuntimeUsageSnapshot usage)
@@ -1526,7 +1651,7 @@ public sealed class MainWindow : Window
         _customFileName.IsEnabled = custom;
         string folder = string.IsNullOrWhiteSpace(_storagePath.Text) ? _settings.Storage.RootPath : _storagePath.Text.Trim();
         string baseName = string.IsNullOrWhiteSpace(_customFileName.Text) ? "DashCapture" : _customFileName.Text.Trim();
-        string extension = _compressionEnabledCheck.IsChecked == true ? ".dhcap" : ".tdms";
+        const string extension = ".dhcap";
         string preview = custom
             ? $"{baseName}_0001{extension}\uff1b\u82e5\u91cd\u540d\u5219\u81ea\u52a8\u4f7f\u7528 {baseName}_001\\..."
             : $"DashCapture_yyyyMMdd_HHmmss_0001{extension}";
@@ -1539,13 +1664,18 @@ public sealed class MainWindow : Window
     {
         if (_compressionEnabledCheck.IsChecked != true)
         {
-            return "\u672a\u542f\u7528";
+            return ".dhcap Codec=None\uff0cPre=None\uff0c\u4fdd\u5b58\u539f\u59cb float32 \u5b57\u8282\uff0c\u53ef\u5bfc\u51fa TDMS";
+        }
+
+        if (SelectedValue(_compressionAlgorithmCombo, CompressionAlgorithm.Zstd) == CompressionAlgorithm.None)
+        {
+            return ".dhcap Codec=None\uff0cPre=None\uff0c\u4fdd\u5b58\u539f\u59cb float32 \u5b57\u8282";
         }
 
         string preprocessor = SelectedValue(_compressionPreprocessorCombo, CompressionPreprocessor.None) == CompressionPreprocessor.None
             ? "\u65e0\u9884\u5904\u7406"
             : SelectedLabel(_compressionPreprocessorCombo);
-        return $"\u539f\u751f\u538b\u7f29 .dhcap\uff0c\u53ef\u5728\u67e5\u770b\u9875\u5bfc\u51fa TDMS    {preprocessor} + {SelectedLabel(_compressionAlgorithmCombo)}";
+        return $".dhcap Codec={SelectedLabel(_compressionAlgorithmCombo)}\uff0cPre={preprocessor}\uff0c\u53ef\u5bfc\u51fa TDMS";
     }
 
     private void UpdateCompressionSliderTexts()
@@ -1564,19 +1694,20 @@ public sealed class MainWindow : Window
         CompressionAlgorithm algorithm = SelectedValue(_compressionAlgorithmCombo, CompressionAlgorithm.Zstd);
         CompressionPreprocessor preprocessor = SelectedValue(_compressionPreprocessorCombo, CompressionPreprocessor.None);
 
-        SetVisible(_compressionZstdLevelField, enabled && algorithm == CompressionAlgorithm.Zstd);
-        SetVisible(_compressionZstdWindowLogField, enabled && algorithm == CompressionAlgorithm.Zstd);
-        SetVisible(_compressionLz4HcField, enabled && algorithm == CompressionAlgorithm.Lz4Hc);
-        SetVisible(_compressionZlibField, enabled && algorithm == CompressionAlgorithm.Zlib);
-        SetVisible(_compressionBZip2Field, enabled && algorithm == CompressionAlgorithm.BZip2);
-        SetVisible(_compressionLpcField, enabled && preprocessor == CompressionPreprocessor.Lpc);
+        bool compressionActive = enabled && algorithm != CompressionAlgorithm.None;
+        SetVisible(_compressionZstdLevelField, compressionActive && algorithm == CompressionAlgorithm.Zstd);
+        SetVisible(_compressionZstdWindowLogField, compressionActive && algorithm == CompressionAlgorithm.Zstd);
+        SetVisible(_compressionLz4HcField, compressionActive && algorithm == CompressionAlgorithm.Lz4Hc);
+        SetVisible(_compressionZlibField, compressionActive && algorithm == CompressionAlgorithm.Zlib);
+        SetVisible(_compressionBZip2Field, compressionActive && algorithm == CompressionAlgorithm.BZip2);
+        SetVisible(_compressionLpcField, compressionActive && preprocessor == CompressionPreprocessor.Lpc);
 
         _compressionAlgorithmParams.IsVisible =
-            enabled && (algorithm == CompressionAlgorithm.Zstd ||
+            compressionActive && (algorithm == CompressionAlgorithm.Zstd ||
                         algorithm == CompressionAlgorithm.Lz4Hc ||
                         algorithm == CompressionAlgorithm.Zlib ||
                         algorithm == CompressionAlgorithm.BZip2);
-        _compressionPreprocessorParams.IsVisible = enabled && preprocessor == CompressionPreprocessor.Lpc;
+        _compressionPreprocessorParams.IsVisible = compressionActive && preprocessor == CompressionPreprocessor.Lpc;
     }
 
     private static void SetVisible(Control? control, bool visible)
