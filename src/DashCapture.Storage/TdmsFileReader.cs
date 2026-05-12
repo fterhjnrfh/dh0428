@@ -990,7 +990,7 @@ public sealed class TdmsFileReader : IDisposable
                     transformedLength < 0 ||
                     payloadLength < 0)
                 {
-                    throw new InvalidDataException("Compressed capture record header is invalid.");
+                    break;
                 }
 
                 if (dataEnd - _stream.Position < payloadLength)

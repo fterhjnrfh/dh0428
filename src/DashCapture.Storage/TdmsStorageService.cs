@@ -27,6 +27,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
     public string CurrentAuditPath => _writer?.CurrentAuditPath ?? string.Empty;
     public bool IsRunning => _worker is not null && !_worker.IsCompleted;
     public CaptureStorageStatistics? GetStatistics() => _writer?.Statistics ?? _lastStatistics;
+    private int DurabilityCheckpointIntervalMs => Math.Clamp(_settings.FlushIntervalMs, 100, 1000);
 
     public Task StartAsync(IReadOnlyList<DeviceDescriptor> devices, CancellationToken cancellationToken)
     {
@@ -36,6 +37,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
         }
 
         _lastStatistics = null;
+        _lastSave = DateTimeOffset.MinValue;
         _writer = new CompressedCaptureWriter(_settings, devices);
         _writer.Faulted += OnWriterFaulted;
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -113,7 +115,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
                 _writer.UpdateDeviceRates(_acquisition.Devices);
                 _writer.AppendBlock(block);
                 DateTimeOffset now = DateTimeOffset.UtcNow;
-                if ((now - _lastSave).TotalMilliseconds >= _settings.FlushIntervalMs)
+                if ((now - _lastSave).TotalMilliseconds >= DurabilityCheckpointIntervalMs)
                 {
                     _writer.Save();
                     _lastSave = now;

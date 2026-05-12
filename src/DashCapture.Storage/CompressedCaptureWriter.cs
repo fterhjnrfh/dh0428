@@ -47,6 +47,9 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     private long _rawStoredBlocks;
     private long _queuedCompressionJobs;
     private long _writtenCompressionJobs;
+    private long _lastDurableRawBytes;
+    private long _lastDurableWrittenBytes;
+    private long _lastDurableCheckpointTicks;
     private int _compressionQueueDepth;
     private int _writeQueueDepth;
     private Exception? _pipelineFault;
@@ -128,11 +131,15 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     {
         ThrowIfPipelineFault();
         FlushAllChannelBuffers();
+        long checkpointTarget = Volatile.Read(ref _queuedCompressionJobs);
+        long checkpointRawBytes = ReadTotalRawBytes();
         _auditWriter?.Flush();
+        DrainPipelineTo(checkpointTarget);
         lock (_writeSync)
         {
             _writer?.Flush();
-            _stream?.Flush(flushToDisk: false);
+            _stream?.Flush(flushToDisk: true);
+            UpdateDurableCheckpoint(checkpointRawBytes);
         }
     }
 
@@ -289,6 +296,9 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         _writer.Write(CompressedCaptureFormat.Version);
         _writer.Write(manifestJson.Length);
         _writer.Write(manifestJson);
+        _writer.Flush();
+        _stream.Flush(flushToDisk: true);
+        UpdateDurableCheckpoint(ReadTotalRawBytes());
     }
 
     private CompressedCaptureManifest CreateManifest()
@@ -382,7 +392,8 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
             {
                 WriteFooter();
                 _writer?.Flush();
-                _stream?.Flush(flushToDisk: false);
+                _stream?.Flush(flushToDisk: true);
+                UpdateDurableCheckpoint(ReadTotalRawBytes());
                 if (_stream is not null)
                 {
                     lock (_statsSync)
@@ -626,6 +637,11 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     private void DrainPipeline()
     {
         long target = Volatile.Read(ref _queuedCompressionJobs);
+        DrainPipelineTo(target);
+    }
+
+    private void DrainPipelineTo(long target)
+    {
         while (Volatile.Read(ref _writtenCompressionJobs) < target)
         {
             ThrowIfPipelineFault();
@@ -753,6 +769,25 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         }
     }
 
+    private long ReadTotalRawBytes()
+    {
+        lock (_statsSync)
+        {
+            return _totalRawBytes;
+        }
+    }
+
+    private void UpdateDurableCheckpoint(long durableRawBytes)
+    {
+        long activeFileBytes = _stream?.Position ?? 0;
+        lock (_statsSync)
+        {
+            _lastDurableRawBytes = Math.Max(_lastDurableRawBytes, durableRawBytes);
+            _lastDurableWrittenBytes = Math.Max(_lastDurableWrittenBytes, _completedFileBytes + activeFileBytes);
+            _lastDurableCheckpointTicks = DateTimeOffset.UtcNow.UtcTicks;
+        }
+    }
+
     private CaptureStorageStatistics CreateStatistics()
     {
         long activeFileBytes = 0;
@@ -772,6 +807,10 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         {
             double elapsedSeconds = Math.Max(0.001, (DateTimeOffset.UtcNow - _startedAt).TotalSeconds);
             long writtenBytes = _completedFileBytes + activeFileBytes;
+            long checkpointTicks = _lastDurableCheckpointTicks;
+            double durableLagSeconds = checkpointTicks > 0
+                ? Math.Max(0, (DateTimeOffset.UtcNow - new DateTimeOffset(checkpointTicks, TimeSpan.Zero)).TotalSeconds)
+                : elapsedSeconds;
             return new CaptureStorageStatistics(
                 _totalRawBytes,
                 writtenBytes,
@@ -785,7 +824,10 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
                 writtenBytes / 1024.0 / 1024.0 / elapsedSeconds,
                 Math.Max(0, Volatile.Read(ref _compressionQueueDepth)),
                 Math.Max(0, Volatile.Read(ref _writeQueueDepth)),
-                _compressionWorkers.Length);
+                _compressionWorkers.Length,
+                _lastDurableRawBytes,
+                _lastDurableWrittenBytes,
+                durableLagSeconds);
         }
     }
 

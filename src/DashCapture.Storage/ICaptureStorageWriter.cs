@@ -29,4 +29,7 @@ public sealed record CaptureStorageStatistics(
     double WriteThroughputMbPerSecond,
     int CompressionQueueDepth = 0,
     int WriteQueueDepth = 0,
-    int CompressionWorkerCount = 0);
+    int CompressionWorkerCount = 0,
+    long DurableRawBytes = 0,
+    long DurableWrittenBytes = 0,
+    double DurableLagSeconds = 0);

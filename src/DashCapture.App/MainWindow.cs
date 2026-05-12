@@ -59,6 +59,7 @@ public sealed class MainWindow : Window
     private readonly TextBlock _storageCodecValue = new();
     private readonly TextBlock _storagePreprocessorValue = new();
     private readonly TextBlock _storageWriteThroughputValue = new();
+    private readonly TextBlock _storageDurabilityValue = new();
     private readonly TextBlock _captureTimerText = new();
     private readonly Button _connectButton = new() { Content = "\u8fde\u63a5\u8bbe\u5907" };
     private readonly Button _startButton = new() { Content = "\u5f00\u59cb\u91c7\u96c6", IsEnabled = false };
@@ -102,6 +103,8 @@ public sealed class MainWindow : Window
     private int _displayFrameCounter;
     private bool _captureUiRunning;
     private bool _captureCleanupInProgress;
+    private bool _closeConfirmed;
+    private bool _shutdownStarted;
     private string? _lastFaultMessage;
 
     public MainWindow()
@@ -268,24 +271,57 @@ public sealed class MainWindow : Window
         _runtimeStatsTimer.Start();
         UpdateRuntimeTitle();
 
-        Closing += async (_, _) =>
-        {
-            await StopAsync();
-            await _displayPipeline.DisposeAsync();
-            if (_storageService is not null)
-            {
-                await _storageService.DisposeAsync();
-            }
-
-            _tdmsViewer.Dispose();
-            _captureTimer.Stop();
-            _renderTimer.Stop();
-            _runtimeStatsTimer.Stop();
-            _runtimeUsageSampler.Dispose();
-            await _acquisition.DisposeAsync();
-        };
+        Closing += OnWindowClosing;
 
         UpdateStoragePreview();
+    }
+
+    private async void OnWindowClosing(object? sender, WindowClosingEventArgs e)
+    {
+        if (_closeConfirmed)
+        {
+            return;
+        }
+
+        e.Cancel = true;
+        if (_shutdownStarted)
+        {
+            return;
+        }
+
+        _shutdownStarted = true;
+        _status.Text = "\u6b63\u5728\u505c\u6b62\u91c7\u96c6\u5e76\u5b8c\u6210\u843d\u76d8...";
+        try
+        {
+            await ShutdownAsync();
+        }
+        catch (Exception ex)
+        {
+            _status.Text = $"\u5173\u95ed\u65f6\u843d\u76d8\u5f02\u5e38\uff1a{ex.Message}";
+        }
+        finally
+        {
+            _closeConfirmed = true;
+            Close();
+        }
+    }
+
+    private async Task ShutdownAsync()
+    {
+        await StopAsync();
+        await _displayPipeline.DisposeAsync();
+        if (_storageService is not null)
+        {
+            await _storageService.DisposeAsync();
+            _storageService = null;
+        }
+
+        _tdmsViewer.Dispose();
+        _captureTimer.Stop();
+        _renderTimer.Stop();
+        _runtimeStatsTimer.Stop();
+        _runtimeUsageSampler.Dispose();
+        await _acquisition.DisposeAsync();
     }
 
     private void InitializeCompressionControls()
@@ -733,7 +769,7 @@ public sealed class MainWindow : Window
         Control[] parameters =
         {
             RuntimeParameter("\u5206\u6587\u4ef6\u5927\u5c0f", FormatFileSplitSize()),
-            RuntimeParameter("\u5237\u76d8\u95f4\u9694", $"{_settings.Storage.FlushIntervalMs} \u6beb\u79d2"),
+            RuntimeParameter("\u5237\u76d8\u95f4\u9694", $"{Math.Clamp(_settings.Storage.FlushIntervalMs, 100, 1000)} \u6beb\u79d2"),
             RuntimeParameter("\u805a\u5408\u5757\u5927\u5c0f", $"{Math.Clamp(_settings.Storage.Compression.ChunkSizeMb, 1, 256)} MB"),
             RuntimeParameter("TDMS \u5bfc\u51fa\u5e93", _settings.Storage.TdmRuntimeDir),
             RuntimeParameter("\u539f\u59cb\u5927\u5c0f", _storageRawSizeValue),
@@ -742,6 +778,8 @@ public sealed class MainWindow : Window
             RuntimeParameter("\u538b\u7f29\u500d\u7387", _storageRatioValue),
             RuntimeParameter("\u5757\u72b6\u6001", _storageBlockStateValue),
             RuntimeParameter("\u5199\u5165\u541e\u5410", _storageWriteThroughputValue),
+            RuntimeParameter("\u65ad\u7535\u4fdd\u62a4", _storageDurabilityValue),
+            RuntimeParameter("\u4fdd\u62a4\u7a97\u53e3", "< 2 \u79d2"),
             RuntimeParameter("\u5f53\u524d\u7b97\u6cd5", _storageCodecValue),
             RuntimeParameter("\u5f53\u524d\u9884\u5904\u7406", _storagePreprocessorValue)
         };
@@ -1081,6 +1119,11 @@ public sealed class MainWindow : Window
         _stopButton.IsEnabled = false;
         if (_captureCleanupInProgress)
         {
+            while (_captureCleanupInProgress)
+            {
+                await Task.Delay(50);
+            }
+
             return;
         }
 
@@ -1602,6 +1645,7 @@ public sealed class MainWindow : Window
             _storageRatioValue.Text = "\u5f85\u91c7\u96c6";
             _storageBlockStateValue.Text = "\u5f85\u91c7\u96c6";
             _storageWriteThroughputValue.Text = "0.0 MB/s";
+            _storageDurabilityValue.Text = "\u5f85\u91c7\u96c6";
             _storageCodecValue.Text = "\u5f85\u91c7\u96c6";
             _storagePreprocessorValue.Text = "\u5f85\u91c7\u96c6";
             return;
@@ -1616,6 +1660,7 @@ public sealed class MainWindow : Window
         _storageRatioValue.Text = $"{ratio:0.00}x";
         _storageBlockStateValue.Text = $"\u603b {stats.TotalBlocks}    \u538b\u7f29 {compressedPercent:0.#}%    \u76f4\u5b58 {storedPercent:0.#}%    \u961f\u5217 {stats.CompressionQueueDepth}/{stats.WriteQueueDepth}    \u7ebf\u7a0b {stats.CompressionWorkerCount}";
         _storageWriteThroughputValue.Text = $"{stats.WriteThroughputMbPerSecond:0.0} MB/s";
+        _storageDurabilityValue.Text = $"\u5df2\u843d\u76d8 {FormatStorageBytes(stats.DurableRawBytes)}    \u6ede\u540e {stats.DurableLagSeconds:0.0} s";
         _storageCodecValue.Text = stats.Codec;
         _storagePreprocessorValue.Text = stats.Preprocessor;
     }
