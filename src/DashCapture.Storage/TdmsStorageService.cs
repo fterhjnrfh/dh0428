@@ -12,6 +12,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
     private CancellationTokenSource? _cts;
     private Task? _worker;
     private ICaptureStorageWriter? _writer;
+    private CaptureStorageStatistics? _lastStatistics;
     private DateTimeOffset _lastSave = DateTimeOffset.MinValue;
 
     public TdmsStorageService(AcquisitionService acquisition, StorageSettings settings)
@@ -25,7 +26,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
     public string CurrentFolder => _writer?.CurrentFolder ?? string.Empty;
     public string CurrentAuditPath => _writer?.CurrentAuditPath ?? string.Empty;
     public bool IsRunning => _worker is not null && !_worker.IsCompleted;
-    public CaptureStorageStatistics? GetStatistics() => _writer?.Statistics;
+    public CaptureStorageStatistics? GetStatistics() => _writer?.Statistics ?? _lastStatistics;
 
     public Task StartAsync(IReadOnlyList<DeviceDescriptor> devices, CancellationToken cancellationToken)
     {
@@ -34,6 +35,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
             return Task.CompletedTask;
         }
 
+        _lastStatistics = null;
         _writer = new CompressedCaptureWriter(_settings, devices);
         _writer.Faulted += OnWriterFaulted;
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -61,6 +63,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
         {
             _writer.Faulted -= OnWriterFaulted;
             _writer.Dispose();
+            _lastStatistics = _writer.Statistics;
             _writer = null;
         }
         _cts?.Dispose();

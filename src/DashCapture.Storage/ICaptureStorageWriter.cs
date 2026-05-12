@@ -26,4 +26,7 @@ public sealed record CaptureStorageStatistics(
     long RawStoredBlocks,
     string Codec,
     string Preprocessor,
-    double WriteThroughputMbPerSecond);
+    double WriteThroughputMbPerSecond,
+    int CompressionQueueDepth = 0,
+    int WriteQueueDepth = 0,
+    int CompressionWorkerCount = 0);

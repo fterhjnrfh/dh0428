@@ -124,7 +124,13 @@ public sealed class AcquisitionService : IAsyncDisposable
             await _source.StopAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        _status = "Stopped";
+        if (string.Equals(_status, "Sampling", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(_status, "Idle", StringComparison.OrdinalIgnoreCase) ||
+            _status.StartsWith("Connected", StringComparison.OrdinalIgnoreCase))
+        {
+            _status = "Stopped";
+        }
+
         PublishTelemetry();
     }
 

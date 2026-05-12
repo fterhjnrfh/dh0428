@@ -27,9 +27,12 @@ public sealed class StorageSettings
     public bool Enabled { get; set; } = true;
     public string RootPath { get; set; } = @".\Data";
     public int FileSplitGb { get; set; } = 8;
-    public int FileSplitMb { get; set; } = 1024;
+    public int FileSplitMb { get; set; } = 65536;
     public int FlushIntervalMs { get; set; } = 1000;
     public int DrainTimeoutMs { get; set; } = 300000;
+    public int CompressionWorkerCount { get; set; }
+    public int CompressionQueueCapacityBlocks { get; set; } = 128;
+    public int WriteQueueCapacityBlocks { get; set; } = 128;
     public string TdmRuntimeDir { get; set; } = ".\\TDM C DLL[\u5B98\u65B9\u6E90\u6587\u4EF6]\\dev\\bin\\64-bit";
     public bool EnableRawBlockAudit { get; set; } = true;
     public FileNamingMode NamingMode { get; set; } = FileNamingMode.Time;

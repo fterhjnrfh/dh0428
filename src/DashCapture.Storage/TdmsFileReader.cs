@@ -286,7 +286,11 @@ public sealed class TdmsFileReader : IDisposable
                 {
                     TdmsChannelInfo first = channelSet.First();
                     ulong sampleCount = channelSet.Aggregate(0UL, (sum, channel) => sum + channel.SampleCount);
-                    return first with { SampleCount = sampleCount };
+                    double durationSeconds = channelSet.Sum(channel => channel.DurationSeconds);
+                    double sampleRate = durationSeconds > 0 && sampleCount > 0
+                        ? sampleCount / durationSeconds
+                        : first.SampleRate;
+                    return first with { SampleCount = sampleCount, SampleRate = sampleRate };
                 })
                 .OrderBy(channel => channel.LocalDataIndex)
                 .ThenBy(channel => channel.Name, StringComparer.OrdinalIgnoreCase)
@@ -1134,9 +1138,13 @@ public sealed class TdmsFileReader : IDisposable
                     .Select(channel =>
                     {
                         var key = new TdmsChannelKey(channel.GroupName, channel.ChannelName);
-                        ulong sampleCount = _recordsByChannel.TryGetValue(key, out List<CompressedCaptureRecordIndex>? records)
+                        List<CompressedCaptureRecordIndex>? records = _recordsByChannel.TryGetValue(key, out List<CompressedCaptureRecordIndex>? recordList)
+                            ? recordList
+                            : null;
+                        ulong sampleCount = records is not null
                             ? records.Aggregate(0UL, (max, record) => Math.Max(max, record.SampleStart + (ulong)record.SampleCount))
                             : 0;
+                        double sampleRate = ResolveEffectiveSampleRate(channel.SampleRate, sampleCount, records);
                         return new TdmsChannelInfo(
                             key,
                             channel.DeviceId,
@@ -1148,7 +1156,7 @@ public sealed class TdmsFileReader : IDisposable
                             channel.DataIndex,
                             channel.LocalDataIndex,
                             sampleCount,
-                            channel.SampleRate);
+                            sampleRate);
                     })
                     .OrderBy(channel => channel.LocalDataIndex)
                     .ThenBy(channel => channel.Name, StringComparer.OrdinalIgnoreCase)
@@ -1161,6 +1169,73 @@ public sealed class TdmsFileReader : IDisposable
             Channels = groups
                 .SelectMany(group => group.Channels)
                 .ToDictionary(channel => channel.Key, channel => channel);
+        }
+
+        private static double ResolveEffectiveSampleRate(
+            double nominalSampleRate,
+            ulong sampleCount,
+            IReadOnlyList<CompressedCaptureRecordIndex>? records)
+        {
+            if (sampleCount == 0 || !IsValidSampleRate(nominalSampleRate) || records is null || records.Count == 0)
+            {
+                return nominalSampleRate;
+            }
+
+            double? observedDuration = TryGetObservedDurationSeconds(records, nominalSampleRate);
+            if (!observedDuration.HasValue || observedDuration.Value <= 0)
+            {
+                return nominalSampleRate;
+            }
+
+            double effectiveSampleRate = sampleCount / observedDuration.Value;
+            if (!IsValidSampleRate(effectiveSampleRate))
+            {
+                return nominalSampleRate;
+            }
+
+            double nominalDuration = sampleCount / nominalSampleRate;
+            double relativeDifference = nominalDuration <= 0
+                ? 0
+                : Math.Abs(observedDuration.Value - nominalDuration) / nominalDuration;
+            if (relativeDifference < 0.005)
+            {
+                return nominalSampleRate;
+            }
+
+            return effectiveSampleRate;
+        }
+
+        private static double? TryGetObservedDurationSeconds(
+            IReadOnlyList<CompressedCaptureRecordIndex> records,
+            double nominalSampleRate)
+        {
+            CompressedCaptureCallbackBlockInfo? first = null;
+            CompressedCaptureCallbackBlockInfo? last = null;
+            foreach (CompressedCaptureCallbackBlockInfo block in records
+                .SelectMany(record => record.CallbackBlocks ?? Array.Empty<CompressedCaptureCallbackBlockInfo>())
+                .Where(block => block.SampleTime > 0)
+                .OrderBy(block => block.SampleTime))
+            {
+                first ??= block;
+                last = block;
+            }
+
+            if (first is null || last is null)
+            {
+                return null;
+            }
+
+            double observedSeconds = Math.Max(0, (last.SampleTime - first.SampleTime) / 1000.0);
+            double lastBlockSeconds = last.DataCountPerChannel > 0
+                ? last.DataCountPerChannel / nominalSampleRate
+                : 0;
+            double duration = observedSeconds + lastBlockSeconds;
+            return duration > 0 ? duration : null;
+        }
+
+        private static bool IsValidSampleRate(double sampleRate)
+        {
+            return sampleRate > 0 && !double.IsNaN(sampleRate) && !double.IsInfinity(sampleRate);
         }
 
         private byte[] ReadRecord(CompressedCaptureRecordIndex record)

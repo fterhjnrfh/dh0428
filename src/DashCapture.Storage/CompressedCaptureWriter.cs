@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
@@ -10,6 +11,7 @@ namespace DashCapture.Storage;
 public sealed class CompressedCaptureWriter : ICaptureStorageWriter
 {
     private readonly StorageSettings _settings;
+    private readonly CompressionSettings _compressionSettings;
     private readonly IReadOnlyList<DeviceDescriptor> _devices;
     private readonly Dictionary<ChannelKey, CompressedCaptureChannelManifest> _channels = new();
     private readonly Dictionary<ChannelKey, ChannelWriteBuffer> _pendingBuffers = new();
@@ -18,6 +20,13 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     private readonly List<CompressedCaptureRecordIndex> _recordIndex = new();
     private readonly Dictionary<int, float> _latestSampleRates = new();
     private readonly object _statsSync = new();
+    private readonly object _writeSync = new();
+    private readonly object _faultSync = new();
+    private readonly BlockingCollection<ChannelCompressionJob> _compressionQueue;
+    private readonly BlockingCollection<CompressedChannelChunk> _writeQueue;
+    private readonly CancellationTokenSource _pipelineCts = new();
+    private readonly Task[] _compressionWorkers;
+    private readonly Task _writeWorker;
     private readonly DateTimeOffset _startedAt = DateTimeOffset.Now;
     private readonly int _totalChannelCount;
     private BinaryWriter? _writer;
@@ -36,18 +45,29 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     private long _compressedBlocks;
     private long _storedBlocks;
     private long _rawStoredBlocks;
+    private long _queuedCompressionJobs;
+    private long _writtenCompressionJobs;
+    private int _compressionQueueDepth;
+    private int _writeQueueDepth;
+    private Exception? _pipelineFault;
     private bool _footerWritten;
     private bool _rollPending;
+    private bool _disposed;
 
     public CompressedCaptureWriter(StorageSettings settings, IReadOnlyList<DeviceDescriptor> devices)
     {
         _settings = settings;
+        _compressionSettings = CloneCompressionSettings(settings.Compression);
         _devices = devices;
         _totalChannelCount = devices.Sum(device => device.Channels.Count);
+        _compressionQueue = new BlockingCollection<ChannelCompressionJob>(QueueCapacity(settings.CompressionQueueCapacityBlocks));
+        _writeQueue = new BlockingCollection<CompressedChannelChunk>(QueueCapacity(settings.WriteQueueCapacityBlocks));
         Directory.CreateDirectory(settings.RootPath);
         _runStem = CreateRunStem();
         _runFolder = CreateUniqueDirectory(settings.RootPath, _runStem);
         OpenNextFile();
+        _compressionWorkers = StartCompressionWorkers();
+        _writeWorker = Task.Run(WriteLoop);
     }
 
     public string CurrentPath => _currentPath;
@@ -58,6 +78,7 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
 
     public void AppendBlock(AcquisitionBlock block)
     {
+        ThrowIfPipelineFault();
         if (_rollPending)
         {
             OpenNextFile();
@@ -105,20 +126,59 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
 
     public void Save()
     {
+        ThrowIfPipelineFault();
         FlushAllChannelBuffers();
         _auditWriter?.Flush();
-        _writer?.Flush();
-        _stream?.Flush(flushToDisk: false);
+        lock (_writeSync)
+        {
+            _writer?.Flush();
+            _stream?.Flush(flushToDisk: false);
+        }
     }
 
     public void Dispose()
     {
-        FinalizeCurrentFile();
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        try
+        {
+            FinalizeCurrentFile();
+        }
+        finally
+        {
+            StopPipeline();
+            _pipelineCts.Dispose();
+        }
     }
 
-    private void AppendGlobalBlock(AcquisitionBlock block, int sampleCount)
+    private unsafe void AppendGlobalBlock(AcquisitionBlock block, int sampleCount)
     {
         int channelCount = Math.Max(1, block.ChannelCount);
+        if (block.Header.Layout == SampleDataLayout.ChannelContiguousFloat32)
+        {
+            float* source = (float*)block.DataPointer.ToPointer();
+            foreach (DeviceDescriptor device in _devices)
+            {
+                foreach (ChannelDescriptor channel in device.Channels)
+                {
+                    int dataIndex = channel.DataIndex;
+                    if (dataIndex < 0 || dataIndex >= channelCount)
+                    {
+                        continue;
+                    }
+
+                    AppendChannel(channel, new ReadOnlySpan<float>(source + (dataIndex * sampleCount), sampleCount), block);
+                }
+            }
+
+            RollFileIfNeeded();
+            return;
+        }
+
         float[] scratch = new float[sampleCount];
 
         foreach (DeviceDescriptor device in _devices)
@@ -139,9 +199,26 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         RollFileIfNeeded();
     }
 
-    private void AppendDeviceBlock(AcquisitionBlock block, DeviceDescriptor device, int sampleCount)
+    private unsafe void AppendDeviceBlock(AcquisitionBlock block, DeviceDescriptor device, int sampleCount)
     {
         int channelCount = Math.Max(1, block.ChannelCount);
+        if (block.Header.Layout == SampleDataLayout.ChannelContiguousFloat32)
+        {
+            float* source = (float*)block.DataPointer.ToPointer();
+            foreach (ChannelDescriptor channel in device.Channels)
+            {
+                int dataIndex = ResolveDataIndex(block, channel);
+                if (dataIndex < 0 || dataIndex >= channelCount)
+                {
+                    continue;
+                }
+
+                AppendChannel(channel, new ReadOnlySpan<float>(source + (dataIndex * sampleCount), sampleCount), block);
+            }
+
+            return;
+        }
+
         float[] scratch = new float[sampleCount];
 
         foreach (ChannelDescriptor channel in device.Channels)
@@ -186,7 +263,11 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
 
     private void OpenNextFile()
     {
-        FinalizeCurrentFile();
+        if (_writer is not null || _stream is not null)
+        {
+            FinalizeCurrentFile();
+        }
+
         _channels.Clear();
         _pendingBuffers.Clear();
         _sampleCounts.Clear();
@@ -251,23 +332,23 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
             _fileIndex,
             _startedAt,
             DateTimeOffset.Now,
-            _settings.Compression.Enabled,
+            _compressionSettings.Enabled,
             EffectiveCodec(),
             EffectiveCodec().ToString(),
             EffectivePreprocessor(),
             "float32",
             BitConverter.IsLittleEndian ? "LittleEndian" : "BigEndian",
             "SdkSampleData: BlockIndex, MessageType, GroupId, MachineId, TotalDataCount, DataCountPerChannel, BufferCount, ChannelCount, Layout",
-            _settings.Compression.Algorithm,
-            _settings.Compression.Preprocessor,
-            Math.Clamp(_settings.Compression.ChunkSizeMb, 1, 256),
-            Math.Clamp(_settings.Compression.ZstdLevel, -5, 22),
-            Math.Clamp(_settings.Compression.ZstdWindowLog, 0, 31),
-            Math.Clamp(_settings.Compression.Lz4Level, 0, 12),
-            Math.Clamp(_settings.Compression.Lz4HcLevel, 3, 12),
-            Math.Clamp(_settings.Compression.ZlibLevel, 0, 9),
-            Math.Clamp(_settings.Compression.BZip2BlockSize, 1, 9),
-            Math.Clamp(_settings.Compression.LpcOrder, 1, 4),
+            _compressionSettings.Algorithm,
+            _compressionSettings.Preprocessor,
+            Math.Clamp(_compressionSettings.ChunkSizeMb, 1, 256),
+            Math.Clamp(_compressionSettings.ZstdLevel, -5, 22),
+            Math.Clamp(_compressionSettings.ZstdWindowLog, 0, 31),
+            Math.Clamp(_compressionSettings.Lz4Level, 0, 12),
+            Math.Clamp(_compressionSettings.Lz4HcLevel, 3, 12),
+            Math.Clamp(_compressionSettings.ZlibLevel, 0, 9),
+            Math.Clamp(_compressionSettings.BZip2BlockSize, 1, 9),
+            Math.Clamp(_compressionSettings.LpcOrder, 1, 4),
             channels);
     }
 
@@ -288,17 +369,26 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
 
     private void FinalizeCurrentFile()
     {
+        if (_writer is null && _stream is null)
+        {
+            return;
+        }
+
         try
         {
             FlushAllChannelBuffers();
-            WriteFooter();
-            _writer?.Flush();
-            _stream?.Flush(flushToDisk: false);
-            if (_stream is not null)
+            DrainPipeline();
+            lock (_writeSync)
             {
-                lock (_statsSync)
+                WriteFooter();
+                _writer?.Flush();
+                _stream?.Flush(flushToDisk: false);
+                if (_stream is not null)
                 {
-                    _completedFileBytes += _stream.Length;
+                    lock (_statsSync)
+                    {
+                        _completedFileBytes += _stream.Length;
+                    }
                 }
             }
         }
@@ -308,12 +398,15 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         }
         finally
         {
-            _writer?.Dispose();
-            _writer = null;
-            _stream?.Dispose();
-            _stream = null;
-            _auditWriter?.Dispose();
-            _auditWriter = null;
+            lock (_writeSync)
+            {
+                _writer?.Dispose();
+                _writer = null;
+                _stream?.Dispose();
+                _stream = null;
+                _auditWriter?.Dispose();
+                _auditWriter = null;
+            }
         }
     }
 
@@ -358,52 +451,256 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
 
         ReadOnlySpan<float> values = buffer.Values.AsSpan(0, buffer.Count);
         byte[] raw = MemoryMarshal.AsBytes(values).ToArray();
-        uint rawCrc32 = Crc32.Compute(raw);
-        CaptureBlockSummary summary = CaptureBlockSummary.From(values);
-        byte[] payload = CompressedTdmsCodec.EncodePayload(raw, _settings.Compression, out int transformedLength, out byte flags);
-        uint payloadCrc32 = Crc32.Compute(payload);
-        CompressionAlgorithm codec = EffectiveCodec();
-        CompressionPreprocessor preprocessor = EffectivePreprocessor();
-
-        _writer.Write(channelInfo.Ordinal);
-        _writer.Write(buffer.SampleStart);
-        _writer.Write(buffer.Count);
-        _writer.Write(raw.Length);
-        _writer.Write((byte)preprocessor);
-        _writer.Write((byte)codec);
-        _writer.Write(transformedLength);
-        _writer.Write(payload.Length);
-        _writer.Write(flags);
-        _writer.Write(rawCrc32);
-        _writer.Write(payloadCrc32);
-        _writer.Write(summary.First);
-        _writer.Write(summary.Last);
-        _writer.Write(summary.Minimum);
-        _writer.Write(summary.Maximum);
-        long payloadOffset = _stream.Position;
-        _writer.Write(payload);
-
-        _segmentStoredBytes += payload.Length;
-        _recordIndex.Add(new CompressedCaptureRecordIndex(
+        var job = new ChannelCompressionJob(
             channelInfo.Ordinal,
             buffer.SampleStart,
             buffer.Count,
             raw.Length,
+            EffectiveCodec(),
+            EffectivePreprocessor(),
+            CloneCompressionSettings(_compressionSettings),
+            raw,
+            buffer.CallbackBlocks.ToArray());
+        EnqueueCompressionJob(job);
+        AddRawBytes(raw.Length);
+        buffer.Clear();
+    }
+
+    private Task[] StartCompressionWorkers()
+    {
+        int workerCount = ResolveCompressionWorkerCount();
+        var workers = new Task[workerCount];
+        for (int index = 0; index < workers.Length; index++)
+        {
+            workers[index] = Task.Run(CompressionLoop);
+        }
+
+        return workers;
+    }
+
+    private void CompressionLoop()
+    {
+        try
+        {
+            foreach (ChannelCompressionJob job in _compressionQueue.GetConsumingEnumerable(_pipelineCts.Token))
+            {
+                Interlocked.Decrement(ref _compressionQueueDepth);
+                CompressedChannelChunk chunk = CompressJob(job);
+                EnqueueCompressedChunk(chunk);
+            }
+        }
+        catch (OperationCanceledException) when (_pipelineCts.IsCancellationRequested)
+        {
+        }
+        catch (Exception ex)
+        {
+            RecordPipelineFault(ex);
+        }
+    }
+
+    private void WriteLoop()
+    {
+        try
+        {
+            foreach (CompressedChannelChunk chunk in _writeQueue.GetConsumingEnumerable(_pipelineCts.Token))
+            {
+                Interlocked.Decrement(ref _writeQueueDepth);
+                WriteCompressedChunk(chunk);
+                Interlocked.Increment(ref _writtenCompressionJobs);
+            }
+        }
+        catch (OperationCanceledException) when (_pipelineCts.IsCancellationRequested)
+        {
+        }
+        catch (Exception ex)
+        {
+            RecordPipelineFault(ex);
+        }
+    }
+
+    private void EnqueueCompressionJob(ChannelCompressionJob job)
+    {
+        ThrowIfPipelineFault();
+        Interlocked.Increment(ref _queuedCompressionJobs);
+        Interlocked.Increment(ref _compressionQueueDepth);
+        try
+        {
+            _compressionQueue.Add(job, _pipelineCts.Token);
+        }
+        catch
+        {
+            Interlocked.Decrement(ref _compressionQueueDepth);
+            Interlocked.Decrement(ref _queuedCompressionJobs);
+            throw;
+        }
+    }
+
+    private void EnqueueCompressedChunk(CompressedChannelChunk chunk)
+    {
+        Interlocked.Increment(ref _writeQueueDepth);
+        try
+        {
+            _writeQueue.Add(chunk, _pipelineCts.Token);
+        }
+        catch
+        {
+            Interlocked.Decrement(ref _writeQueueDepth);
+            throw;
+        }
+    }
+
+    private CompressedChannelChunk CompressJob(ChannelCompressionJob job)
+    {
+        ReadOnlySpan<float> values = MemoryMarshal.Cast<byte, float>(job.Raw);
+        CaptureBlockSummary summary = CaptureBlockSummary.From(values);
+        uint rawCrc32 = Crc32.Compute(job.Raw);
+        byte[] payload = CompressedTdmsCodec.EncodePayload(job.Raw, job.Settings, out int transformedLength, out byte flags);
+        uint payloadCrc32 = Crc32.Compute(payload);
+
+        return new CompressedChannelChunk(
+            job.ChannelOrdinal,
+            job.SampleStart,
+            job.SampleCount,
+            job.OriginalLength,
             transformedLength,
-            payload.Length,
+            payload,
             flags,
-            payloadOffset,
-            codec,
-            preprocessor,
+            job.Codec,
+            job.Preprocessor,
             rawCrc32,
             payloadCrc32,
-            summary.First,
-            summary.Last,
-            summary.Minimum,
-            summary.Maximum,
-            buffer.CallbackBlocks.ToArray()));
-        UpdateStatistics(raw.Length, payload.Length, flags);
-        buffer.Clear();
+            summary,
+            job.CallbackBlocks);
+    }
+
+    private void WriteCompressedChunk(CompressedChannelChunk chunk)
+    {
+        lock (_writeSync)
+        {
+            if (_writer is null || _stream is null)
+            {
+                throw new ObjectDisposedException(nameof(CompressedCaptureWriter));
+            }
+
+            _writer.Write(chunk.ChannelOrdinal);
+            _writer.Write(chunk.SampleStart);
+            _writer.Write(chunk.SampleCount);
+            _writer.Write(chunk.OriginalLength);
+            _writer.Write((byte)chunk.Preprocessor);
+            _writer.Write((byte)chunk.Codec);
+            _writer.Write(chunk.TransformedLength);
+            _writer.Write(chunk.Payload.Length);
+            _writer.Write(chunk.Flags);
+            _writer.Write(chunk.RawCrc32);
+            _writer.Write(chunk.PayloadCrc32);
+            _writer.Write(chunk.Summary.First);
+            _writer.Write(chunk.Summary.Last);
+            _writer.Write(chunk.Summary.Minimum);
+            _writer.Write(chunk.Summary.Maximum);
+            long payloadOffset = _stream.Position;
+            _writer.Write(chunk.Payload);
+
+            _segmentStoredBytes += chunk.Payload.Length;
+            _recordIndex.Add(new CompressedCaptureRecordIndex(
+                chunk.ChannelOrdinal,
+                chunk.SampleStart,
+                chunk.SampleCount,
+                chunk.OriginalLength,
+                chunk.TransformedLength,
+                chunk.Payload.Length,
+                chunk.Flags,
+                payloadOffset,
+                chunk.Codec,
+                chunk.Preprocessor,
+                chunk.RawCrc32,
+                chunk.PayloadCrc32,
+                chunk.Summary.First,
+                chunk.Summary.Last,
+                chunk.Summary.Minimum,
+                chunk.Summary.Maximum,
+                chunk.CallbackBlocks));
+            UpdateStatistics(chunk.OriginalLength, chunk.Payload.Length, chunk.Flags);
+        }
+    }
+
+    private void DrainPipeline()
+    {
+        long target = Volatile.Read(ref _queuedCompressionJobs);
+        while (Volatile.Read(ref _writtenCompressionJobs) < target)
+        {
+            ThrowIfPipelineFault();
+            Thread.Sleep(5);
+        }
+
+        ThrowIfPipelineFault();
+    }
+
+    private void StopPipeline()
+    {
+        try
+        {
+            _compressionQueue.CompleteAdding();
+            Task.WaitAll(_compressionWorkers);
+        }
+        catch (AggregateException ex)
+        {
+            RecordPipelineFault(ex.Flatten().InnerExceptions.FirstOrDefault() ?? ex);
+        }
+        finally
+        {
+            _writeQueue.CompleteAdding();
+        }
+
+        try
+        {
+            _writeWorker.Wait();
+        }
+        catch (AggregateException ex)
+        {
+            RecordPipelineFault(ex.Flatten().InnerExceptions.FirstOrDefault() ?? ex);
+        }
+        finally
+        {
+            _compressionQueue.Dispose();
+            _writeQueue.Dispose();
+        }
+    }
+
+    private void ThrowIfPipelineFault()
+    {
+        Exception? fault;
+        lock (_faultSync)
+        {
+            fault = _pipelineFault;
+        }
+
+        if (fault is not null)
+        {
+            throw new InvalidOperationException("Storage pipeline failed.", fault);
+        }
+    }
+
+    private void RecordPipelineFault(Exception exception)
+    {
+        lock (_faultSync)
+        {
+            if (_pipelineFault is not null)
+            {
+                return;
+            }
+
+            _pipelineFault = exception;
+        }
+
+        try
+        {
+            _pipelineCts.Cancel();
+        }
+        catch (ObjectDisposedException)
+        {
+        }
+
+        Faulted?.Invoke(exception, _currentPath);
     }
 
     private void WriteFooter()
@@ -430,7 +727,6 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     {
         lock (_statsSync)
         {
-            _totalRawBytes += rawLength;
             _totalPayloadBytes += payloadLength;
             _totalBlocks++;
             if ((flags & CompressedCaptureFormat.RawStoredChunkFlag) != 0)
@@ -449,12 +745,23 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         }
     }
 
+    private void AddRawBytes(int rawLength)
+    {
+        lock (_statsSync)
+        {
+            _totalRawBytes += rawLength;
+        }
+    }
+
     private CaptureStorageStatistics CreateStatistics()
     {
         long activeFileBytes = 0;
         try
         {
-            activeFileBytes = _stream?.Position ?? 0;
+            lock (_writeSync)
+            {
+                activeFileBytes = _stream?.Position ?? 0;
+            }
         }
         catch (ObjectDisposedException)
         {
@@ -475,20 +782,63 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
                 _rawStoredBlocks,
                 EffectiveCodec().ToString(),
                 EffectivePreprocessor().ToString(),
-                writtenBytes / 1024.0 / 1024.0 / elapsedSeconds);
+                writtenBytes / 1024.0 / 1024.0 / elapsedSeconds,
+                Math.Max(0, Volatile.Read(ref _compressionQueueDepth)),
+                Math.Max(0, Volatile.Read(ref _writeQueueDepth)),
+                _compressionWorkers.Length);
         }
     }
 
     private CompressionAlgorithm EffectiveCodec()
     {
-        return _settings.Compression.Enabled ? _settings.Compression.Algorithm : CompressionAlgorithm.None;
+        return _compressionSettings.Enabled ? _compressionSettings.Algorithm : CompressionAlgorithm.None;
     }
 
     private CompressionPreprocessor EffectivePreprocessor()
     {
         return EffectiveCodec() == CompressionAlgorithm.None
             ? CompressionPreprocessor.None
-            : _settings.Compression.Preprocessor;
+            : _compressionSettings.Preprocessor;
+    }
+
+    private int ResolveCompressionWorkerCount()
+    {
+        if (_settings.CompressionWorkerCount > 0)
+        {
+            return Math.Clamp(_settings.CompressionWorkerCount, 1, 16);
+        }
+
+        if (!_compressionSettings.Enabled || _compressionSettings.Algorithm == CompressionAlgorithm.None)
+        {
+            return 1;
+        }
+
+        int reservedCores = Environment.ProcessorCount >= 8 ? 2 : 1;
+        int availableCores = Math.Max(1, Environment.ProcessorCount - reservedCores);
+        return Math.Clamp(Math.Min(availableCores, 16), 1, 16);
+    }
+
+    private static int QueueCapacity(int configured)
+    {
+        return Math.Clamp(configured <= 0 ? 128 : configured, 16, 4096);
+    }
+
+    private static CompressionSettings CloneCompressionSettings(CompressionSettings source)
+    {
+        return new CompressionSettings
+        {
+            Enabled = source.Enabled,
+            Algorithm = source.Algorithm,
+            Preprocessor = source.Preprocessor,
+            ChunkSizeMb = source.ChunkSizeMb,
+            ZstdLevel = source.ZstdLevel,
+            ZstdWindowLog = source.ZstdWindowLog,
+            Lz4Level = source.Lz4Level,
+            Lz4HcLevel = source.Lz4HcLevel,
+            ZlibLevel = source.ZlibLevel,
+            BZip2BlockSize = source.BZip2BlockSize,
+            LpcOrder = source.LpcOrder
+        };
     }
 
     private static CompressedCaptureCallbackBlockInfo CreateCallbackBlockInfo(AcquisitionBlock block)
@@ -502,7 +852,8 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
             block.Header.DataCountPerChannel,
             block.Header.BufferCount,
             block.ChannelCount,
-            block.Header.Layout.ToString());
+            block.Header.Layout.ToString(),
+            block.Header.SampleTime);
     }
 
     private bool AllExpectedChannelsInitialized => _totalChannelCount == 0 || _initializedChannels.Count >= _totalChannelCount;
@@ -521,7 +872,7 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     {
         return checked((int)Math.Min(
             256L * 1024L * 1024L,
-            Math.Max(1L, _settings.Compression.ChunkSizeMb) * 1024L * 1024L));
+            Math.Max(1L, _compressionSettings.ChunkSizeMb) * 1024L * 1024L));
     }
 
     private int ResolveDataIndex(AcquisitionBlock block, ChannelDescriptor channel)
@@ -602,6 +953,32 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         return value.Replace('.', '_').Replace(':', '_');
     }
 }
+
+internal sealed record ChannelCompressionJob(
+    int ChannelOrdinal,
+    ulong SampleStart,
+    int SampleCount,
+    int OriginalLength,
+    CompressionAlgorithm Codec,
+    CompressionPreprocessor Preprocessor,
+    CompressionSettings Settings,
+    byte[] Raw,
+    IReadOnlyList<CompressedCaptureCallbackBlockInfo> CallbackBlocks);
+
+internal sealed record CompressedChannelChunk(
+    int ChannelOrdinal,
+    ulong SampleStart,
+    int SampleCount,
+    int OriginalLength,
+    int TransformedLength,
+    byte[] Payload,
+    byte Flags,
+    CompressionAlgorithm Codec,
+    CompressionPreprocessor Preprocessor,
+    uint RawCrc32,
+    uint PayloadCrc32,
+    CaptureBlockSummary Summary,
+    IReadOnlyList<CompressedCaptureCallbackBlockInfo> CallbackBlocks);
 
 internal sealed class ChannelWriteBuffer
 {
@@ -795,7 +1172,8 @@ internal sealed record CompressedCaptureCallbackBlockInfo(
     int DataCountPerChannel,
     int BufferCount,
     int ChannelCount,
-    string Layout);
+    string Layout,
+    long SampleTime = 0);
 
 internal sealed record CompressedCaptureChannelManifest(
     int Ordinal,

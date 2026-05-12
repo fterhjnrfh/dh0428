@@ -90,6 +90,7 @@ public sealed class MainWindow : Window
     private Control? _compressionBZip2Field;
     private Control? _compressionLpcField;
     private readonly TdmsViewerControl _tdmsViewer;
+    private CaptureStorageStatistics? _lastStorageStats;
     private readonly DispatcherTimer _renderTimer;
     private readonly DispatcherTimer _captureTimer;
     private readonly DispatcherTimer _runtimeStatsTimer;
@@ -99,6 +100,9 @@ public sealed class MainWindow : Window
     private DateTimeOffset _lastRuntimeStatsAt = DateTimeOffset.UtcNow;
     private int _activeViewIndex;
     private int _displayFrameCounter;
+    private bool _captureUiRunning;
+    private bool _captureCleanupInProgress;
+    private string? _lastFaultMessage;
 
     public MainWindow()
     {
@@ -235,7 +239,11 @@ public sealed class MainWindow : Window
             };
         }
 
-        _acquisition.Faulted += fault => Dispatcher.UIThread.Post(() => _status.Text = fault.Message);
+        _acquisition.Faulted += fault => Dispatcher.UIThread.Post(() =>
+        {
+            _lastFaultMessage = fault.Message;
+            _status.Text = fault.Message;
+        });
         _acquisition.TelemetryUpdated += telemetry => Dispatcher.UIThread.Post(() => UpdateTelemetry(telemetry));
 
         _renderTimer = new DispatcherTimer
@@ -1034,6 +1042,9 @@ public sealed class MainWindow : Window
         bool storageEnabled = _settings.Storage.Enabled;
         _acquisition.SetStorageEnabled(storageEnabled);
         _waveformStore.Clear();
+        _lastStorageStats = null;
+        _lastFaultMessage = null;
+        UpdateStorageStatsFields(null);
 
         if (_storageService is not null)
         {
@@ -1051,6 +1062,7 @@ public sealed class MainWindow : Window
         await _displayPipeline.StartAsync(CancellationToken.None);
         await _acquisition.StartAsync(CancellationToken.None);
         StartCaptureTimer();
+        _captureUiRunning = true;
         SetButtons(connect: false, start: false, stop: true);
         _storageEnabledCheck.IsEnabled = false;
         _storageTabEnabledCheck.IsEnabled = false;
@@ -1061,30 +1073,57 @@ public sealed class MainWindow : Window
 
     private async Task StopAsync()
     {
+        await CompleteCaptureStopAsync(requestAcquisitionStop: true, null);
+    }
+
+    private async Task CompleteCaptureStopAsync(bool requestAcquisitionStop, string? stopReason)
+    {
         _stopButton.IsEnabled = false;
+        if (_captureCleanupInProgress)
+        {
+            return;
+        }
+
+        _captureCleanupInProgress = true;
         StopCaptureTimer();
-        await _acquisition.StopAsync(CancellationToken.None);
-
-        DateTimeOffset deadline = DateTimeOffset.UtcNow.AddSeconds(3);
-        while ((_acquisition.GetTelemetry().StorageQueueDepth > 0 || _acquisition.GetTelemetry().DisplayQueueDepth > 0) && DateTimeOffset.UtcNow < deadline)
+        try
         {
-            await Task.Delay(50);
+            if (requestAcquisitionStop && _acquisition.IsRunning)
+            {
+                await _acquisition.StopAsync(CancellationToken.None);
+            }
+
+            DateTimeOffset deadline = DateTimeOffset.UtcNow.AddSeconds(3);
+            while ((_acquisition.GetTelemetry().StorageQueueDepth > 0 || _acquisition.GetTelemetry().DisplayQueueDepth > 0) && DateTimeOffset.UtcNow < deadline)
+            {
+                await Task.Delay(50);
+            }
+
+            await _displayPipeline.StopAsync();
+            if (_storageService is not null)
+            {
+                await _storageService.StopAsync();
+                _lastStorageStats = _storageService.GetStatistics();
+                UpdateStorageStatsFields(_lastStorageStats);
+                _storageService = null;
+            }
+            _acquisition.ReleaseQueuedBlocks();
+
+            SetButtons(connect: true, start: _acquisition.Devices.Count > 0, stop: false);
+            _storageEnabledCheck.IsEnabled = true;
+            _storageTabEnabledCheck.IsEnabled = true;
+            _captureUiRunning = false;
+            if (_acquisition.Devices.Count > 0)
+            {
+                string? reason = string.IsNullOrWhiteSpace(stopReason) ? _lastFaultMessage : stopReason;
+                _status.Text = string.IsNullOrWhiteSpace(reason) || string.Equals(reason, "Stopped", StringComparison.OrdinalIgnoreCase)
+                    ? "\u5df2\u505c\u6b62"
+                    : $"\u5df2\u505c\u6b62\uff1a{reason}";
+            }
         }
-
-        await _displayPipeline.StopAsync();
-        if (_storageService is not null)
+        finally
         {
-            await _storageService.StopAsync();
-            _storageService = null;
-        }
-        _acquisition.ReleaseQueuedBlocks();
-
-        SetButtons(connect: true, start: _acquisition.Devices.Count > 0, stop: false);
-        _storageEnabledCheck.IsEnabled = true;
-        _storageTabEnabledCheck.IsEnabled = true;
-        if (_acquisition.Devices.Count > 0)
-        {
-            _status.Text = "\u5df2\u505c\u6b62";
+            _captureCleanupInProgress = false;
         }
     }
 
@@ -1501,12 +1540,25 @@ public sealed class MainWindow : Window
     private void UpdateTelemetry(CaptureTelemetry telemetry)
     {
         double mb = telemetry.BytesReceived / 1024.0 / 1024.0;
-        CaptureStorageStatistics? storageStats = _storageService?.GetStatistics();
+        CaptureStorageStatistics? storageStats = _storageService?.GetStatistics() ?? _lastStorageStats;
+        if (_storageService is not null && storageStats is not null)
+        {
+            _lastStorageStats = storageStats;
+        }
+
         _metrics.Text = $"Blocks {telemetry.BlocksReceived}    Data {mb:0.0} MB    StorageQ {telemetry.StorageQueueDepth}    DisplayQ {telemetry.DisplayQueueDepth}    Drops {telemetry.DisplayDrops}    {telemetry.BackpressureLevel}    {FormatStorageStatsShort(storageStats)}";
         UpdateStorageStatsFields(storageStats);
         if (!string.IsNullOrWhiteSpace(telemetry.Status))
         {
             _status.Text = TranslateStatus(telemetry.Status);
+        }
+
+        if (_captureUiRunning && !_captureCleanupInProgress && !_acquisition.IsRunning)
+        {
+            string? reason = string.Equals(telemetry.Status, "Stopped", StringComparison.OrdinalIgnoreCase)
+                ? _lastFaultMessage
+                : telemetry.Status;
+            _ = CompleteCaptureStopAsync(requestAcquisitionStop: false, reason);
         }
     }
 
@@ -1520,7 +1572,13 @@ public sealed class MainWindow : Window
 
         RuntimeUsageSnapshot usage = _runtimeUsageSampler.Sample();
         Title = $"DASH Capture | FPS {displayFps:0.0} | CPU App {FormatPercent(usage.ProcessCpuPercent)} Sys {FormatPercent(usage.SystemCpuPercent)} | {FormatGpuUsage(usage)}";
-        UpdateStorageStatsFields(_storageService?.GetStatistics());
+        CaptureStorageStatistics? storageStats = _storageService?.GetStatistics() ?? _lastStorageStats;
+        if (_storageService is not null && storageStats is not null)
+        {
+            _lastStorageStats = storageStats;
+        }
+
+        UpdateStorageStatsFields(storageStats);
     }
 
     private static string FormatStorageStatsShort(CaptureStorageStatistics? stats)
@@ -1556,7 +1614,7 @@ public sealed class MainWindow : Window
         _storageWrittenSizeValue.Text = FormatStorageBytes(stats.WrittenBytes);
         _storagePayloadSizeValue.Text = FormatStorageBytes(stats.PayloadBytes);
         _storageRatioValue.Text = $"{ratio:0.00}x";
-        _storageBlockStateValue.Text = $"\u603b {stats.TotalBlocks}    \u538b\u7f29 {compressedPercent:0.#}%    \u76f4\u5b58 {storedPercent:0.#}%";
+        _storageBlockStateValue.Text = $"\u603b {stats.TotalBlocks}    \u538b\u7f29 {compressedPercent:0.#}%    \u76f4\u5b58 {storedPercent:0.#}%    \u961f\u5217 {stats.CompressionQueueDepth}/{stats.WriteQueueDepth}    \u7ebf\u7a0b {stats.CompressionWorkerCount}";
         _storageWriteThroughputValue.Text = $"{stats.WriteThroughputMbPerSecond:0.0} MB/s";
         _storageCodecValue.Text = stats.Codec;
         _storagePreprocessorValue.Text = stats.Preprocessor;
