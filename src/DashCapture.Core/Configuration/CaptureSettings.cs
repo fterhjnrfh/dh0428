@@ -31,10 +31,10 @@ public sealed class StorageSettings
     public int FlushIntervalMs { get; set; } = 1000;
     public int DrainTimeoutMs { get; set; } = 300000;
     public int CompressionWorkerCount { get; set; }
-    public int CompressionQueueCapacityBlocks { get; set; } = 128;
-    public int WriteQueueCapacityBlocks { get; set; } = 128;
+    public int CompressionQueueCapacityBlocks { get; set; } = 1024;
+    public int WriteQueueCapacityBlocks { get; set; } = 1024;
     public string TdmRuntimeDir { get; set; } = ".\\TDM C DLL[\u5B98\u65B9\u6E90\u6587\u4EF6]\\dev\\bin\\64-bit";
-    public bool EnableRawBlockAudit { get; set; } = true;
+    public bool EnableRawBlockAudit { get; set; } = false;
     public FileNamingMode NamingMode { get; set; } = FileNamingMode.Time;
     public string CustomFileName { get; set; } = "DashCapture";
     public CompressionSettings Compression { get; set; } = new();
@@ -49,7 +49,7 @@ public enum FileNamingMode
 public sealed class CompressionSettings
 {
     public bool Enabled { get; set; } = true;
-    public CompressionAlgorithm Algorithm { get; set; } = CompressionAlgorithm.Zstd;
+    public CompressionAlgorithm Algorithm { get; set; } = CompressionAlgorithm.Lz4;
     public CompressionPreprocessor Preprocessor { get; set; } = CompressionPreprocessor.ByteShuffle;
     public int ChunkSizeMb { get; set; } = 4;
     public int ZstdLevel { get; set; } = 3;

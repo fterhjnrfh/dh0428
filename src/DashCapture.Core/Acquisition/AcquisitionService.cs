@@ -230,10 +230,11 @@ public sealed class AcquisitionService : IAsyncDisposable
                 if (!_storageQueue.Writer.TryWrite(block))
                 {
                     block.Release();
+                    _backpressureLevel = BackpressureLevel.StopRequired;
                     PublishFault(new AcquisitionFault(
                         DateTimeOffset.UtcNow,
                         "STORAGE_QUEUE_FULL",
-                        "Storage queue is full. Sampling will stop to protect lossless capture.",
+                        "Storage queue is full. Sampling will stop to protect lossless storage.",
                         sample.MachineId));
                     _ = StopAsync(CancellationToken.None);
                     return;
@@ -333,23 +334,17 @@ public sealed class AcquisitionService : IAsyncDisposable
 
     private void UpdateBackpressure()
     {
-        int capacity = Math.Max(1, _settings.Queues.StorageCapacityBlocks);
-        double storageLoad = Math.Clamp((double)Volatile.Read(ref _storageDepth) / capacity, 0, 1);
+        int capacity = Math.Max(1, _settings.Queues.DisplayCapacityBlocks);
+        double displayLoad = Math.Clamp((double)Volatile.Read(ref _displayDepth) / capacity, 0, 1);
         BackpressureLevel next =
-            storageLoad >= 0.90 ? BackpressureLevel.StopRequired :
-            storageLoad >= 0.75 ? BackpressureLevel.PauseDisplay :
-            storageLoad >= 0.50 ? BackpressureLevel.ReduceDisplay :
+            displayLoad >= 0.90 ? BackpressureLevel.PauseDisplay :
+            displayLoad >= 0.60 ? BackpressureLevel.ReduceDisplay :
             BackpressureLevel.Normal;
 
         if (next != _backpressureLevel)
         {
             _backpressureLevel = next;
             PublishTelemetry();
-            if (next == BackpressureLevel.StopRequired)
-            {
-                PublishFault(new AcquisitionFault(DateTimeOffset.UtcNow, "BACKPRESSURE_STOP", "Storage queue pressure exceeded 90%."));
-                _ = StopAsync(CancellationToken.None);
-            }
         }
     }
 
