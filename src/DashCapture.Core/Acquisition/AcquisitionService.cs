@@ -82,7 +82,7 @@ public sealed class AcquisitionService : IAsyncDisposable
             return;
         }
 
-        _source = new DashSdkAcquisitionSource(_settings.Sdk);
+        _source = CreateSource();
         _source.SampleReceived += OnSampleReceived;
         await _source.ConnectAsync(cancellationToken).ConfigureAwait(false);
         SetDevices(_source.Devices);
@@ -304,6 +304,15 @@ public sealed class AcquisitionService : IAsyncDisposable
         DeviceDescriptor? device = Devices.FirstOrDefault(d => d.DeviceId == sample.GroupId) ??
                                    Devices.FirstOrDefault(d => d.DeviceId == sample.MachineId);
         return Math.Max(1, device?.Channels.Count ?? 1);
+    }
+
+    private IAcquisitionSource CreateSource()
+    {
+        return _settings.Acquisition.Source switch
+        {
+            AcquisitionSourceMode.RemoteDataSource => new RemoteDataSourceAcquisitionSource(_settings.DataSource),
+            _ => new DashSdkAcquisitionSource(_settings.Sdk)
+        };
     }
 
     private void SetDevices(IReadOnlyList<DeviceDescriptor> devices)

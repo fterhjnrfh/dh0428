@@ -2,10 +2,31 @@ namespace DashCapture.Core.Configuration;
 
 public sealed class CaptureSettings
 {
+    public AcquisitionSettings Acquisition { get; set; } = new();
     public SdkSettings Sdk { get; set; } = new();
+    public DataSourceClientSettings DataSource { get; set; } = new();
     public StorageSettings Storage { get; set; } = new();
     public DisplaySettings Display { get; set; } = new();
     public QueueSettings Queues { get; set; } = new();
+}
+
+public sealed class AcquisitionSettings
+{
+    public AcquisitionSourceMode Source { get; set; } = AcquisitionSourceMode.DashSdk;
+}
+
+public enum AcquisitionSourceMode
+{
+    DashSdk,
+    RemoteDataSource
+}
+
+public sealed class DataSourceClientSettings
+{
+    public string Host { get; set; } = "127.0.0.1";
+    public int Port { get; set; } = 5055;
+    public int ConnectTimeoutMs { get; set; } = 5000;
+    public int MaxMetadataBytes { get; set; } = 4 * 1024 * 1024;
 }
 
 public sealed class SdkSettings

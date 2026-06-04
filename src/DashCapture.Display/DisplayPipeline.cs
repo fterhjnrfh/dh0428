@@ -101,6 +101,7 @@ public sealed class DisplayPipeline : IAsyncDisposable
             ? null
             : devices.FirstOrDefault(d => d.DeviceId == block.Header.GroupId) ??
               devices.FirstOrDefault(d => d.DeviceId == block.Header.MachineId);
+        bool singleChannelBlock = !globalBlock && IsExplicitSingleChannelBlock(block);
 
         if (!globalBlock && device is null)
         {
@@ -114,8 +115,14 @@ public sealed class DisplayPipeline : IAsyncDisposable
                 continue;
             }
 
+            if (singleChannelBlock && channel.ChannelId != block.Header.ChannelId)
+            {
+                continue;
+            }
+
             int dataIndex = globalBlock
                 ? channel.DataIndex
+                : singleChannelBlock ? 0
                 : block.Header.Layout == SampleDataLayout.ChannelContiguousFloat32 ? channel.LocalDataIndex : channel.DataIndex;
             if (dataIndex < 0 || dataIndex >= channelCount)
             {
@@ -164,6 +171,11 @@ public sealed class DisplayPipeline : IAsyncDisposable
                (devices.Count > 1 &&
                 totalChannelCount > 0 &&
                 block.ChannelCount == totalChannelCount);
+    }
+
+    private static bool IsExplicitSingleChannelBlock(AcquisitionBlock block)
+    {
+        return block.ChannelCount == 1 && block.Header.ChannelId >= 0;
     }
 
     private static bool IsValidSampleRate(float sampleRate)

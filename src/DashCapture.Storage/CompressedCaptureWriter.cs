@@ -18,7 +18,7 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     private readonly Dictionary<ChannelKey, ulong> _sampleCounts = new();
     private readonly HashSet<ChannelKey> _initializedChannels = new();
     private readonly List<CompressedCaptureRecordIndex> _recordIndex = new();
-    private readonly Dictionary<int, float> _latestSampleRates = new();
+    private readonly Dictionary<ChannelKey, float> _latestChannelSampleRates = new();
     private readonly object _statsSync = new();
     private readonly object _writeSync = new();
     private readonly object _faultSync = new();
@@ -120,9 +120,12 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     {
         foreach (DeviceDescriptor device in devices)
         {
-            if (IsValidSampleRate(device.SampleRate))
+            foreach (ChannelDescriptor channel in device.Channels)
             {
-                _latestSampleRates[device.DeviceId] = device.SampleRate;
+                if (IsValidSampleRate(channel.SampleRate))
+                {
+                    _latestChannelSampleRates[new ChannelKey(channel)] = channel.SampleRate;
+                }
             }
         }
     }
@@ -307,20 +310,21 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         int ordinal = 0;
         foreach (DeviceDescriptor device in _devices)
         {
-            float sampleRate = SampleRateFor(device);
+            float deviceSampleRate = SampleRateFor(device);
             string groupName = $"Device_{device.DeviceId + 1:0000}_{Sanitize(device.IpAddress)}";
-            string groupDescription = $"DeviceId={device.DeviceId}; Ip={device.IpAddress}; SampleRate={sampleRate}";
+            string groupDescription = $"DeviceId={device.DeviceId}; Ip={device.IpAddress}; SampleRate={deviceSampleRate}";
 
             foreach (ChannelDescriptor channel in device.Channels)
             {
+                float channelSampleRate = SampleRateFor(channel);
                 string channelName = $"AI{channel.ChannelId + 1:000}";
-                string channelDescription = $"DeviceId={channel.DeviceId}; ChannelId={channel.ChannelId}; DataIndex={channel.DataIndex}; LocalDataIndex={channel.LocalDataIndex}; RawType=float32; ByteOrder={(BitConverter.IsLittleEndian ? "LittleEndian" : "BigEndian")}";
+                string channelDescription = $"DeviceId={channel.DeviceId}; ChannelId={channel.ChannelId}; DataIndex={channel.DataIndex}; LocalDataIndex={channel.LocalDataIndex}; SampleRate={channelSampleRate}; RawType=float32; ByteOrder={(BitConverter.IsLittleEndian ? "LittleEndian" : "BigEndian")}";
                 var item = new CompressedCaptureChannelManifest(
                     ordinal,
                     device.DeviceId,
                     groupName,
                     groupDescription,
-                    sampleRate,
+                    channelSampleRate,
                     "float32",
                     BitConverter.IsLittleEndian ? "LittleEndian" : "BigEndian",
                     channelName,
@@ -919,6 +923,11 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
 
     private int ResolveDataIndex(AcquisitionBlock block, ChannelDescriptor channel)
     {
+        if (IsExplicitSingleChannelBlock(block))
+        {
+            return channel.ChannelId == block.Header.ChannelId ? 0 : -1;
+        }
+
         return block.Header.Layout == SampleDataLayout.ChannelContiguousFloat32
             ? channel.LocalDataIndex
             : channel.DataIndex;
@@ -930,6 +939,11 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
                block.Header.GroupId < 0 ||
                block.Header.MachineId < 0 ||
                (_devices.Count > 1 && _totalChannelCount > 0 && block.ChannelCount == _totalChannelCount);
+    }
+
+    private static bool IsExplicitSingleChannelBlock(AcquisitionBlock block)
+    {
+        return block.ChannelCount == 1 && block.Header.ChannelId >= 0;
     }
 
     private DeviceDescriptor? ResolveDevice(SdkSampleData header)
@@ -975,9 +989,28 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
 
     private float SampleRateFor(DeviceDescriptor device)
     {
-        return _latestSampleRates.TryGetValue(device.DeviceId, out float latest) && IsValidSampleRate(latest)
+        if (IsValidSampleRate(device.SampleRate))
+        {
+            return device.SampleRate;
+        }
+
+        foreach (ChannelDescriptor channel in device.Channels)
+        {
+            float sampleRate = SampleRateFor(channel);
+            if (IsValidSampleRate(sampleRate))
+            {
+                return sampleRate;
+            }
+        }
+
+        return 1;
+    }
+
+    private float SampleRateFor(ChannelDescriptor channel)
+    {
+        return _latestChannelSampleRates.TryGetValue(new ChannelKey(channel), out float latest) && IsValidSampleRate(latest)
             ? latest
-            : device.SampleRate;
+            : channel.SampleRate;
     }
 
     private static bool IsValidSampleRate(float sampleRate)

@@ -1035,12 +1035,17 @@ public sealed class MainWindow : Window
 
     private async Task ShowConnectionFailureAsync(Exception ex)
     {
-        string message =
-            "\u8bbe\u5907\u8fde\u63a5\u5931\u8d25\u3002\n\n" +
-            $"\u9519\u8bef: {ex.Message}\n\n" +
-            $"DashRoot: {_settings.Sdk.DashRoot}\n" +
-            $"ConfigDir: {_settings.Sdk.ConfigDir}\n\n" +
-            "\u8bf7\u786e\u8ba4 DASH \u76ee\u5f55\u3001ConfigDir\u3001Serial \u914d\u7f6e\u3001\u8bbe\u5907\u7535\u6e90\u548c\u7f51\u7edc\u8fde\u63a5\u3002";
+        string message = _settings.Acquisition.Source == AcquisitionSourceMode.RemoteDataSource
+            ? "\u8fdc\u7a0b\u6570\u636e\u6e90\u8fde\u63a5\u5931\u8d25\u3002\n\n" +
+              $"\u9519\u8bef: {ex.Message}\n\n" +
+              $"Host: {_settings.DataSource.Host}\n" +
+              $"Port: {_settings.DataSource.Port}\n\n" +
+              "\u8bf7\u5148\u542f\u52a8 SyntheticDataSource\uff0c\u5e76\u786e\u8ba4 Host/Port \u4e0e appsettings.json \u4e00\u81f4\u3002"
+            : "\u8bbe\u5907\u8fde\u63a5\u5931\u8d25\u3002\n\n" +
+              $"\u9519\u8bef: {ex.Message}\n\n" +
+              $"DashRoot: {_settings.Sdk.DashRoot}\n" +
+              $"ConfigDir: {_settings.Sdk.ConfigDir}\n\n" +
+              "\u8bf7\u786e\u8ba4 DASH \u76ee\u5f55\u3001ConfigDir\u3001Serial \u914d\u7f6e\u3001\u8bbe\u5907\u7535\u6e90\u548c\u7f51\u7edc\u8fde\u63a5\u3002";
 
         await new Window
         {

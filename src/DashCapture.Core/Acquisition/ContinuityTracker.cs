@@ -9,7 +9,8 @@ public sealed class ContinuityTracker
 
     public AcquisitionFault? Validate(SdkSampleData sample)
     {
-        int key = sample.GroupId >= 0 ? sample.GroupId : sample.MachineId;
+        int deviceKey = sample.GroupId >= 0 ? sample.GroupId : sample.MachineId;
+        int key = sample.ChannelId >= 0 ? HashCode.Combine(deviceKey, sample.ChannelId) : deviceKey;
         bool mismatch = false;
         long expected = 0;
 
@@ -31,8 +32,10 @@ public sealed class ContinuityTracker
         return new AcquisitionFault(
             DateTimeOffset.UtcNow,
             "DATA_NOT_CONTINUOUS",
-            $"Device {key} data is not continuous. Expected {expected}, actual {sample.TotalDataCount}.",
-            key,
+            sample.ChannelId >= 0
+                ? $"Device {deviceKey} channel {sample.ChannelId} data is not continuous. Expected {expected}, actual {sample.TotalDataCount}."
+                : $"Device {deviceKey} data is not continuous. Expected {expected}, actual {sample.TotalDataCount}.",
+            deviceKey,
             expected,
             sample.TotalDataCount);
     }
