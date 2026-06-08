@@ -10,19 +10,23 @@ public sealed class TdmsOverviewSlider : Control
 {
     private static readonly IBrush TrackBrush = new SolidColorBrush(Color.FromRgb(236, 243, 252));
     private static readonly IBrush EmptyBrush = new SolidColorBrush(Color.FromRgb(190, 202, 220));
-    private static readonly IBrush OutlineBrush = new SolidColorBrush(Color.FromArgb(170, 38, 119, 220));
     private static readonly IBrush DimBrush = new SolidColorBrush(Color.FromArgb(40, 24, 35, 52));
     private static readonly IBrush WindowBrush = new SolidColorBrush(Color.FromArgb(82, 38, 119, 220));
     private static readonly IBrush HandleBrush = new SolidColorBrush(Color.FromArgb(190, 38, 119, 220));
     private static readonly Pen BorderPen = new(new SolidColorBrush(Color.FromRgb(199, 211, 228)), 1);
+    private static readonly Pen OverviewPen = new(new SolidColorBrush(Color.FromArgb(190, 38, 119, 220)), 1);
     private static readonly Pen WindowPen = new(new SolidColorBrush(Color.FromRgb(38, 119, 220)), 1.2);
     private static readonly Pen CenterPen = new(new SolidColorBrush(Color.FromArgb(90, 91, 108, 132)), 1);
 
     private IReadOnlyList<TdmsChannelEnvelope> _overview = Array.Empty<TdmsChannelEnvelope>();
+    private OverviewBin[] _overviewBins = Array.Empty<OverviewBin>();
     private Rect _lastTrack;
     private Point _dragStartPoint;
     private double _dragStartSeconds;
     private double _dragEndSeconds;
+    private double _overviewMin = -1;
+    private double _overviewMax = 1;
+    private bool _hasOverviewPoints;
     private DragMode _dragMode;
 
     public TdmsOverviewSlider()
@@ -41,6 +45,8 @@ public sealed class TdmsOverviewSlider : Control
     public void SetOverview(IReadOnlyList<TdmsChannelEnvelope> overview, double durationSeconds)
     {
         _overview = overview;
+        _overviewBins = Array.Empty<OverviewBin>();
+        _hasOverviewPoints = overview.Any(series => series.Points.Count > 0);
         DurationSeconds = Math.Max(0.000001, durationSeconds);
         SetView(ViewStartSeconds, ViewEndSeconds, DurationSeconds);
     }
@@ -49,7 +55,7 @@ public sealed class TdmsOverviewSlider : Control
     {
         DurationSeconds = Math.Max(0.000001, durationSeconds);
         (ViewStartSeconds, ViewEndSeconds) = ClampRange(startSeconds, endSeconds);
-        IsEnabled = _overview.Count > 0 && DurationSeconds > 0.000001;
+        IsEnabled = _hasOverviewPoints && DurationSeconds > 0.000001;
         InvalidateVisual();
     }
 
@@ -66,7 +72,7 @@ public sealed class TdmsOverviewSlider : Control
         context.FillRectangle(TrackBrush, _lastTrack);
         context.DrawRectangle(BorderPen, _lastTrack);
 
-        if (_overview.Count == 0 || _overview.All(series => series.Points.Count == 0))
+        if (_overview.Count == 0 || !_hasOverviewPoints)
         {
             double y = _lastTrack.Top + _lastTrack.Height * 0.5;
             context.DrawLine(new Pen(EmptyBrush, 1), new Point(_lastTrack.Left + 8, y), new Point(_lastTrack.Right - 8, y));
@@ -164,13 +170,48 @@ public sealed class TdmsOverviewSlider : Control
 
     private void DrawOverview(DrawingContext context, Rect track)
     {
-        (double min, double max) = FindRange();
+        EnsureOverviewBins(track);
+        if (_overviewBins.Length == 0)
+        {
+            double emptyY = track.Top + track.Height * 0.5;
+            context.DrawLine(new Pen(EmptyBrush, 1), new Point(track.Left + 8, emptyY), new Point(track.Right - 8, emptyY));
+            return;
+        }
+
+        double min = _overviewMin;
+        double max = _overviewMax;
         double range = Math.Max(0.000001, max - min);
-        int bins = (int)Math.Clamp(track.Width, 64, 1800);
-        var minimums = new double[bins];
-        var maximums = new double[bins];
-        Array.Fill(minimums, double.PositiveInfinity);
-        Array.Fill(maximums, double.NegativeInfinity);
+
+        double zeroRatio = Math.Clamp((0 - min) / range, 0, 1);
+        double zeroY = track.Bottom - zeroRatio * track.Height;
+        context.DrawLine(CenterPen, new Point(track.Left, zeroY), new Point(track.Right, zeroY));
+
+        for (int i = 0; i < _overviewBins.Length; i++)
+        {
+            OverviewBin bin = _overviewBins[i];
+            if (bin.Count == 0)
+            {
+                continue;
+            }
+
+            double x = track.Left + (i + 0.5) * track.Width / _overviewBins.Length;
+            double yMin = track.Bottom - ((bin.Minimum - min) / range) * track.Height;
+            double yMax = track.Bottom - ((bin.Maximum - min) / range) * track.Height;
+            context.DrawLine(OverviewPen, new Point(x, yMin), new Point(x, yMax));
+        }
+    }
+
+    private void EnsureOverviewBins(Rect track)
+    {
+        int binCount = (int)Math.Clamp(track.Width, 64, 1800);
+        if (_overviewBins.Length == binCount)
+        {
+            return;
+        }
+
+        var bins = new OverviewBin[binCount];
+        double min = double.PositiveInfinity;
+        double max = double.NegativeInfinity;
 
         foreach (TdmsChannelEnvelope series in _overview)
         {
@@ -182,30 +223,48 @@ public sealed class TdmsOverviewSlider : Control
 
             for (int i = 0; i < count; i++)
             {
-                int bin = Math.Clamp((int)((i + 0.5) / count * bins), 0, bins - 1);
                 TdmsEnvelopePoint point = series.Points[i];
-                if (point.Minimum < minimums[bin]) minimums[bin] = point.Minimum;
-                if (point.Maximum > maximums[bin]) maximums[bin] = point.Maximum;
+                if (!float.IsFinite(point.Minimum) || !float.IsFinite(point.Maximum))
+                {
+                    continue;
+                }
+
+                if (point.Minimum < min) min = point.Minimum;
+                if (point.Maximum > max) max = point.Maximum;
+                int binIndex = Math.Clamp((int)((i + 0.5) / count * binCount), 0, binCount - 1);
+                ref OverviewBin bin = ref bins[binIndex];
+                if (bin.Count == 0)
+                {
+                    bin.Minimum = point.Minimum;
+                    bin.Maximum = point.Maximum;
+                }
+                else
+                {
+                    if (point.Minimum < bin.Minimum) bin.Minimum = point.Minimum;
+                    if (point.Maximum > bin.Maximum) bin.Maximum = point.Maximum;
+                }
+
+                bin.Count++;
             }
         }
 
-        double zeroRatio = Math.Clamp((0 - min) / range, 0, 1);
-        double zeroY = track.Bottom - zeroRatio * track.Height;
-        context.DrawLine(CenterPen, new Point(track.Left, zeroY), new Point(track.Right, zeroY));
-
-        var pen = new Pen(OutlineBrush, 1);
-        for (int i = 0; i < bins; i++)
+        if (double.IsInfinity(min) || double.IsInfinity(max))
         {
-            if (double.IsInfinity(minimums[i]) || double.IsInfinity(maximums[i]))
-            {
-                continue;
-            }
-
-            double x = track.Left + (i + 0.5) * track.Width / bins;
-            double yMin = track.Bottom - ((minimums[i] - min) / range) * track.Height;
-            double yMax = track.Bottom - ((maximums[i] - min) / range) * track.Height;
-            context.DrawLine(pen, new Point(x, yMin), new Point(x, yMax));
+            _overviewBins = Array.Empty<OverviewBin>();
+            _overviewMin = -1;
+            _overviewMax = 1;
+            return;
         }
+
+        if (Math.Abs(max - min) < 0.000001)
+        {
+            min -= 1;
+            max += 1;
+        }
+
+        _overviewMin = min;
+        _overviewMax = max;
+        _overviewBins = bins;
     }
 
     private void DrawWindow(DrawingContext context, Rect track)
@@ -228,32 +287,6 @@ public sealed class TdmsOverviewSlider : Control
         double handleTop = window.Top + (window.Height - handleHeight) * 0.5;
         context.FillRectangle(HandleBrush, new Rect(window.Left + 3, handleTop, 3, handleHeight));
         context.FillRectangle(HandleBrush, new Rect(window.Right - 6, handleTop, 3, handleHeight));
-    }
-
-    private (double Min, double Max) FindRange()
-    {
-        double min = double.PositiveInfinity;
-        double max = double.NegativeInfinity;
-        foreach (TdmsChannelEnvelope series in _overview)
-        {
-            foreach (TdmsEnvelopePoint point in series.Points)
-            {
-                if (!float.IsFinite(point.Minimum) || !float.IsFinite(point.Maximum))
-                {
-                    continue;
-                }
-
-                if (point.Minimum < min) min = point.Minimum;
-                if (point.Maximum > max) max = point.Maximum;
-            }
-        }
-
-        if (double.IsInfinity(min) || double.IsInfinity(max))
-        {
-            return (-1, 1);
-        }
-
-        return Math.Abs(max - min) < 0.000001 ? (min - 1, max + 1) : (min, max);
     }
 
     private DragMode ResolveDragMode(Point point, Rect window)
@@ -326,5 +359,12 @@ public sealed class TdmsOverviewSlider : Control
         Move,
         ResizeStart,
         ResizeEnd
+    }
+
+    private struct OverviewBin
+    {
+        public double Minimum;
+        public double Maximum;
+        public int Count;
     }
 }
