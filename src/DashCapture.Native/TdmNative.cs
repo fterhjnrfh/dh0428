@@ -16,7 +16,7 @@ public enum DdcDataType
 
 public static class TdmNative
 {
-    private const string LibName = "nilibddc.dll";
+    private const string LibName = "nilibddc";
     public const string TdmsFileType = "TDMS";
 
     [DllImport(LibName, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Ansi)]

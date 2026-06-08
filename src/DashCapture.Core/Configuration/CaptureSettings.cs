@@ -2,12 +2,31 @@ namespace DashCapture.Core.Configuration;
 
 public sealed class CaptureSettings
 {
+    public PlatformSettings Platform { get; set; } = new();
     public AcquisitionSettings Acquisition { get; set; } = new();
     public SdkSettings Sdk { get; set; } = new();
     public DataSourceClientSettings DataSource { get; set; } = new();
     public StorageSettings Storage { get; set; } = new();
     public DisplaySettings Display { get; set; } = new();
     public QueueSettings Queues { get; set; } = new();
+}
+
+public sealed class PlatformSettings
+{
+    public bool PreferGpu { get; set; } = true;
+    public bool AllowCpuFallback { get; set; } = true;
+    public bool EnableGpuRendering { get; set; } = true;
+    public int GpuResourceCacheMb { get; set; } = 512;
+    public string NativeLibraryRoot { get; set; } = @".\native";
+    public Dictionary<string, string[]> NativeLibraryDirectories { get; set; } = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["win-x64"] = new[] { @".\native\win-x64" },
+        ["win-arm64"] = new[] { @".\native\win-arm64" },
+        ["linux-x64"] = new[] { "./native/linux-x64" },
+        ["linux-arm64"] = new[] { "./native/linux-arm64" },
+        ["osx-x64"] = new[] { "./native/osx-x64" },
+        ["osx-arm64"] = new[] { "./native/osx-arm64" }
+    };
 }
 
 public sealed class AcquisitionSettings
@@ -52,10 +71,10 @@ public sealed class StorageSettings
     public int FlushIntervalMs { get; set; } = 1000;
     public int DrainTimeoutMs { get; set; } = 300000;
     public int CompressionWorkerCount { get; set; }
-    public int CompressionQueueCapacityBlocks { get; set; } = 128;
-    public int WriteQueueCapacityBlocks { get; set; } = 128;
+    public int CompressionQueueCapacityBlocks { get; set; } = 1024;
+    public int WriteQueueCapacityBlocks { get; set; } = 1024;
     public string TdmRuntimeDir { get; set; } = ".\\TDM C DLL[\u5B98\u65B9\u6E90\u6587\u4EF6]\\dev\\bin\\64-bit";
-    public bool EnableRawBlockAudit { get; set; } = true;
+    public bool EnableRawBlockAudit { get; set; } = false;
     public FileNamingMode NamingMode { get; set; } = FileNamingMode.Time;
     public string CustomFileName { get; set; } = "DashCapture";
     public CompressionSettings Compression { get; set; } = new();
@@ -70,7 +89,7 @@ public enum FileNamingMode
 public sealed class CompressionSettings
 {
     public bool Enabled { get; set; } = true;
-    public CompressionAlgorithm Algorithm { get; set; } = CompressionAlgorithm.Zstd;
+    public CompressionAlgorithm Algorithm { get; set; } = CompressionAlgorithm.Lz4;
     public CompressionPreprocessor Preprocessor { get; set; } = CompressionPreprocessor.ByteShuffle;
     public int ChunkSizeMb { get; set; } = 4;
     public int ZstdLevel { get; set; } = 3;
@@ -112,6 +131,21 @@ public sealed class DisplaySettings
     public int MaxVisibleChannels { get; set; } = 16;
     public int MaxDisplayPointsPerSecond { get; set; } = 4000;
     public float DefaultYAxisAmplitude { get; set; }
+    public List<MonitorViewSettings> Views { get; set; } = new();
+}
+
+public sealed class MonitorViewSettings
+{
+    public string Name { get; set; } = string.Empty;
+    public bool Visible { get; set; } = true;
+    public List<MonitorChannelSettings> Channels { get; set; } = new();
+}
+
+public sealed class MonitorChannelSettings
+{
+    public string DeviceIp { get; set; } = string.Empty;
+    public int DeviceId { get; set; }
+    public int ChannelId { get; set; }
 }
 
 public sealed class QueueSettings

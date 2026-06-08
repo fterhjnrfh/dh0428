@@ -6,7 +6,7 @@ namespace DashCapture.Native;
 public static class DashSdkNative
 {
     public const int StandardCapacity = 204800;
-    private const string LibName = "Hardware_Standard_C_Interface.dll";
+    private const string LibName = "Hardware_Standard_C_Interface";
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public delegate void SampleDataChangeEventHandle(

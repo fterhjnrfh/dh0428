@@ -130,7 +130,7 @@ public sealed class DisplayPipeline : IAsyncDisposable
             }
 
             ChannelEnvelopeDecimator decimator = GetDecimator(channel);
-            EnvelopePoint[] points = decimator.Process(
+            ReadOnlySpan<EnvelopePoint> points = decimator.Process(
                 block.DataPointer,
                 sampleCount,
                 channelCount,
@@ -192,6 +192,7 @@ public sealed class DisplayPipeline : IAsyncDisposable
         private float _min;
         private float _max;
         private bool _hasValue;
+        private EnvelopePoint[] _output = Array.Empty<EnvelopePoint>();
 
         public ChannelEnvelopeDecimator(int bucketSize, float outputSampleRate)
         {
@@ -213,7 +214,7 @@ public sealed class DisplayPipeline : IAsyncDisposable
             OutputSampleRate = outputSampleRate;
         }
 
-        public unsafe EnvelopePoint[] Process(
+        public unsafe ReadOnlySpan<EnvelopePoint> Process(
             IntPtr source,
             int sampleCount,
             int channelCount,
@@ -221,7 +222,7 @@ public sealed class DisplayPipeline : IAsyncDisposable
             SampleDataLayout layout)
         {
             int estimated = Math.Max(1, sampleCount / _bucketSize + 2);
-            var output = new EnvelopePoint[estimated];
+            EnsureOutputCapacity(estimated);
             int outputCount = 0;
             float* src = (float*)source.ToPointer();
 
@@ -230,27 +231,21 @@ public sealed class DisplayPipeline : IAsyncDisposable
                 float* channelStart = src + (dataIndex * sampleCount);
                 for (int i = 0; i < sampleCount; i++)
                 {
-                    AddValue(channelStart[i], ref output, ref outputCount);
+                    AddValue(channelStart[i], ref outputCount);
                 }
             }
             else
             {
                 for (int i = 0; i < sampleCount; i++)
                 {
-                    AddValue(src[i * channelCount + dataIndex], ref output, ref outputCount);
+                    AddValue(src[i * channelCount + dataIndex], ref outputCount);
                 }
             }
 
-            if (outputCount == output.Length)
-            {
-                return output;
-            }
-
-            Array.Resize(ref output, outputCount);
-            return output;
+            return _output.AsSpan(0, outputCount);
         }
 
-        private void AddValue(float value, ref EnvelopePoint[] output, ref int outputCount)
+        private void AddValue(float value, ref int outputCount)
         {
             if (float.IsNaN(value) || float.IsInfinity(value))
             {
@@ -275,14 +270,25 @@ public sealed class DisplayPipeline : IAsyncDisposable
                 return;
             }
 
-            if (outputCount >= output.Length)
+            if (outputCount >= _output.Length)
             {
-                Array.Resize(ref output, output.Length * 2);
+                EnsureOutputCapacity(Math.Max(1, _output.Length * 2));
             }
 
-            output[outputCount] = new EnvelopePoint(outputCount, _first, _last, _min, _max);
+            _output[outputCount] = new EnvelopePoint(outputCount, _first, _last, _min, _max);
             outputCount++;
             ResetBucket();
+        }
+
+        private void EnsureOutputCapacity(int capacity)
+        {
+            if (_output.Length >= capacity)
+            {
+                return;
+            }
+
+            int newCapacity = Math.Max(capacity, Math.Max(16, _output.Length * 2));
+            Array.Resize(ref _output, newCapacity);
         }
 
         private void ResetBucket()

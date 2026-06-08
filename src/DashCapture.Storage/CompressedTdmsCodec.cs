@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Buffers.Binary;
 using DashCapture.Core.Configuration;
 using ICSharpCode.SharpZipLib.BZip2;
@@ -16,25 +17,34 @@ internal static class CompressedTdmsCodec
 
     internal static byte[] EncodePayload(byte[] input, CompressionSettings settings, out int transformedLength, out byte flags)
     {
+        return EncodePayloadCore(input.ToArray(), settings, out transformedLength, out flags);
+    }
+
+    internal static byte[] EncodePayloadInPlace(byte[] input, CompressionSettings settings, out int transformedLength, out byte flags)
+    {
+        return EncodePayloadCore(input, settings, out transformedLength, out flags);
+    }
+
+    private static byte[] EncodePayloadCore(byte[] input, CompressionSettings settings, out int transformedLength, out byte flags)
+    {
         if (!settings.Enabled || settings.Algorithm == CompressionAlgorithm.None)
         {
             transformedLength = input.Length;
             flags = CompressedCaptureFormat.StoredChunkFlag | CompressedCaptureFormat.RawStoredChunkFlag;
-            return input.ToArray();
+            return input;
         }
 
-        byte[] transformed = input.ToArray();
-        Preprocess(transformed, settings.Preprocessor, settings.LpcOrder);
-        byte[] compressed = CompressChunk(transformed, settings);
-        bool storePlain = compressed.Length >= transformed.Length;
-        transformedLength = transformed.Length;
+        Preprocess(input, settings.Preprocessor, settings.LpcOrder);
+        byte[] compressed = CompressChunk(input, settings);
+        bool storePlain = compressed.Length >= input.Length;
+        transformedLength = input.Length;
         flags = storePlain ? CompressedCaptureFormat.StoredChunkFlag : (byte)0;
         if (settings.Preprocessor != CompressionPreprocessor.None)
         {
             flags |= CompressedCaptureFormat.PreprocessedChunkFlag;
         }
 
-        return storePlain ? transformed : compressed;
+        return storePlain ? input : compressed;
     }
 
     internal static byte[] DecodePayload(
@@ -350,14 +360,22 @@ internal static class CompressedTdmsCodec
             return;
         }
 
-        byte[] original = data.ToArray();
-        for (int byteIndex = 0; byteIndex < Float32ByteCount; byteIndex++)
+        byte[] rented = ArrayPool<byte>.Shared.Rent(data.Length);
+        try
         {
-            int destinationBase = byteIndex * sampleCount;
-            for (int sample = 0; sample < sampleCount; sample++)
+            data.AsSpan().CopyTo(rented);
+            for (int byteIndex = 0; byteIndex < Float32ByteCount; byteIndex++)
             {
-                data[destinationBase + sample] = original[(sample * Float32ByteCount) + byteIndex];
+                int destinationBase = byteIndex * sampleCount;
+                for (int sample = 0; sample < sampleCount; sample++)
+                {
+                    data[destinationBase + sample] = rented[(sample * Float32ByteCount) + byteIndex];
+                }
             }
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(rented);
         }
     }
 
@@ -369,14 +387,22 @@ internal static class CompressedTdmsCodec
             return;
         }
 
-        byte[] shuffled = data.ToArray();
-        for (int byteIndex = 0; byteIndex < Float32ByteCount; byteIndex++)
+        byte[] rented = ArrayPool<byte>.Shared.Rent(data.Length);
+        try
         {
-            int sourceBase = byteIndex * sampleCount;
-            for (int sample = 0; sample < sampleCount; sample++)
+            data.AsSpan().CopyTo(rented);
+            for (int byteIndex = 0; byteIndex < Float32ByteCount; byteIndex++)
             {
-                data[(sample * Float32ByteCount) + byteIndex] = shuffled[sourceBase + sample];
+                int sourceBase = byteIndex * sampleCount;
+                for (int sample = 0; sample < sampleCount; sample++)
+                {
+                    data[(sample * Float32ByteCount) + byteIndex] = rented[sourceBase + sample];
+                }
             }
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(rented);
         }
     }
 

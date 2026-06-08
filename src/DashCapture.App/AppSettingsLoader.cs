@@ -1,6 +1,8 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using DashCapture.Core.Configuration;
+using DashCapture.Native;
 
 namespace DashCapture.App;
 
@@ -8,12 +10,7 @@ public static class AppSettingsLoader
 {
     public static CaptureSettings Load()
     {
-        string path = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
-        if (!File.Exists(path))
-        {
-            path = Path.Combine(Environment.CurrentDirectory, "appsettings.json");
-        }
-
+        string path = FindSettingsPath();
         var settings = File.Exists(path)
             ? JsonSerializer.Deserialize<CaptureSettings>(File.ReadAllText(path), Options()) ?? new CaptureSettings()
             : new CaptureSettings();
@@ -23,7 +20,30 @@ public static class AppSettingsLoader
         settings.Sdk.ParamDir = Resolve(settings.Sdk.ParamDir);
         settings.Storage.RootPath = Resolve(settings.Storage.RootPath);
         settings.Storage.TdmRuntimeDir = Resolve(settings.Storage.TdmRuntimeDir);
+        settings.Platform.NativeLibraryRoot = Resolve(settings.Platform.NativeLibraryRoot);
+        NativeBootstrap.ConfigureSearchDirectories(PlatformNativeDirectories(settings).Select(Resolve));
         return settings;
+    }
+
+    public static void SaveDisplayViews(IEnumerable<MonitorViewSettings> views)
+    {
+        string path = FindSettingsPath();
+        JsonObject root = ReadSettingsRoot(path);
+        var display = root["Display"] as JsonObject;
+        if (display is null)
+        {
+            display = new JsonObject();
+            root["Display"] = display;
+        }
+
+        display["Views"] = JsonSerializer.SerializeToNode(views, Options());
+        string? directory = Path.GetDirectoryName(path);
+        if (!string.IsNullOrWhiteSpace(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        File.WriteAllText(path, root.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
     }
 
     private static JsonSerializerOptions Options()
@@ -36,6 +56,38 @@ public static class AppSettingsLoader
         };
         options.Converters.Add(new JsonStringEnumConverter());
         return options;
+    }
+
+    private static string FindSettingsPath()
+    {
+        string basePath = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
+        if (File.Exists(basePath))
+        {
+            return basePath;
+        }
+
+        string currentPath = Path.Combine(Environment.CurrentDirectory, "appsettings.json");
+        if (File.Exists(currentPath))
+        {
+            return currentPath;
+        }
+
+        return basePath;
+    }
+
+    private static JsonObject ReadSettingsRoot(string path)
+    {
+        if (!File.Exists(path))
+        {
+            return new JsonObject();
+        }
+
+        var documentOptions = new JsonDocumentOptions
+        {
+            CommentHandling = JsonCommentHandling.Skip,
+            AllowTrailingCommas = true
+        };
+        return JsonNode.Parse(File.ReadAllText(path), documentOptions: documentOptions) as JsonObject ?? new JsonObject();
     }
 
     private static string Resolve(string path)
@@ -55,6 +107,40 @@ public static class AppSettingsLoader
         }
 
         return Path.GetFullPath(path, Environment.CurrentDirectory);
+    }
+
+    private static IEnumerable<string> PlatformNativeDirectories(CaptureSettings settings)
+    {
+        string runtimeId = NativeBootstrap.CurrentRuntimeId;
+        string osKey = runtimeId.Split('-')[0];
+
+        yield return settings.Platform.NativeLibraryRoot;
+        yield return Path.Combine(settings.Platform.NativeLibraryRoot, runtimeId);
+        yield return settings.Sdk.DashRoot;
+        yield return settings.Storage.TdmRuntimeDir;
+
+        foreach (string directory in FindConfiguredNativeDirectories(settings.Platform, runtimeId))
+        {
+            yield return directory;
+        }
+
+        foreach (string directory in FindConfiguredNativeDirectories(settings.Platform, osKey))
+        {
+            yield return directory;
+        }
+    }
+
+    private static IEnumerable<string> FindConfiguredNativeDirectories(PlatformSettings platform, string key)
+    {
+        if (!platform.NativeLibraryDirectories.TryGetValue(key, out string[]? directories))
+        {
+            yield break;
+        }
+
+        foreach (string directory in directories)
+        {
+            yield return directory;
+        }
     }
 
     private static IEnumerable<string> CandidateRoots()

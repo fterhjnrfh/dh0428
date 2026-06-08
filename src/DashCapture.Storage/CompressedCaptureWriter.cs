@@ -25,8 +25,10 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     private readonly BlockingCollection<ChannelCompressionJob> _compressionQueue;
     private readonly BlockingCollection<CompressedChannelChunk> _writeQueue;
     private readonly CancellationTokenSource _pipelineCts = new();
+    private readonly CancellationTokenSource _checkpointCts = new();
     private readonly Task[] _compressionWorkers;
     private readonly Task _writeWorker;
+    private readonly Task _checkpointWorker;
     private readonly DateTimeOffset _startedAt = DateTimeOffset.Now;
     private readonly int _totalChannelCount;
     private BinaryWriter? _writer;
@@ -40,6 +42,7 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     private long _segmentStoredBytes;
     private long _completedFileBytes;
     private long _totalRawBytes;
+    private long _writtenRawBytes;
     private long _totalPayloadBytes;
     private long _totalBlocks;
     private long _compressedBlocks;
@@ -71,6 +74,7 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         OpenNextFile();
         _compressionWorkers = StartCompressionWorkers();
         _writeWorker = Task.Run(WriteLoop);
+        _checkpointWorker = Task.Run(CheckpointLoop);
     }
 
     public string CurrentPath => _currentPath;
@@ -162,6 +166,7 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         {
             StopPipeline();
             _pipelineCts.Dispose();
+            _checkpointCts.Dispose();
         }
     }
 
@@ -569,7 +574,7 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         ReadOnlySpan<float> values = MemoryMarshal.Cast<byte, float>(job.Raw);
         CaptureBlockSummary summary = CaptureBlockSummary.From(values);
         uint rawCrc32 = Crc32.Compute(job.Raw);
-        byte[] payload = CompressedTdmsCodec.EncodePayload(job.Raw, job.Settings, out int transformedLength, out byte flags);
+        byte[] payload = CompressedTdmsCodec.EncodePayloadInPlace(job.Raw, job.Settings, out int transformedLength, out byte flags);
         uint payloadCrc32 = Crc32.Compute(payload);
 
         return new CompressedChannelChunk(
@@ -638,6 +643,48 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         }
     }
 
+    private async Task CheckpointLoop()
+    {
+        CancellationToken token = _checkpointCts.Token;
+        TimeSpan interval = TimeSpan.FromMilliseconds(DurabilityCheckpointIntervalMs());
+        try
+        {
+            while (!token.IsCancellationRequested)
+            {
+                await Task.Delay(interval, token).ConfigureAwait(false);
+                FlushDurabilityCheckpoint(flushToDisk: true);
+            }
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+        }
+        catch (Exception ex)
+        {
+            RecordPipelineFault(ex);
+        }
+    }
+
+    private void FlushDurabilityCheckpoint(bool flushToDisk)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        ThrowIfPipelineFault();
+        lock (_writeSync)
+        {
+            if (_writer is null || _stream is null)
+            {
+                return;
+            }
+
+            _writer.Flush();
+            _stream.Flush(flushToDisk);
+            UpdateDurableCheckpoint(ReadWrittenRawBytes());
+        }
+    }
+
     private void DrainPipeline()
     {
         long target = Volatile.Read(ref _queuedCompressionJobs);
@@ -657,6 +704,16 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
 
     private void StopPipeline()
     {
+        _checkpointCts.Cancel();
+        try
+        {
+            _checkpointWorker.Wait();
+        }
+        catch (AggregateException ex)
+        {
+            RecordPipelineFault(ex.Flatten().InnerExceptions.FirstOrDefault() ?? ex);
+        }
+
         try
         {
             _compressionQueue.CompleteAdding();
@@ -715,6 +772,7 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         try
         {
             _pipelineCts.Cancel();
+            _checkpointCts.Cancel();
         }
         catch (ObjectDisposedException)
         {
@@ -747,6 +805,7 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     {
         lock (_statsSync)
         {
+            _writtenRawBytes += rawLength;
             _totalPayloadBytes += payloadLength;
             _totalBlocks++;
             if ((flags & CompressedCaptureFormat.RawStoredChunkFlag) != 0)
@@ -778,6 +837,14 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         lock (_statsSync)
         {
             return _totalRawBytes;
+        }
+    }
+
+    private long ReadWrittenRawBytes()
+    {
+        lock (_statsSync)
+        {
+            return _writtenRawBytes;
         }
     }
 
@@ -862,6 +929,11 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         int reservedCores = Environment.ProcessorCount >= 8 ? 2 : 1;
         int availableCores = Math.Max(1, Environment.ProcessorCount - reservedCores);
         return Math.Clamp(Math.Min(availableCores, 16), 1, 16);
+    }
+
+    private int DurabilityCheckpointIntervalMs()
+    {
+        return Math.Clamp(_settings.FlushIntervalMs, 100, 1000);
     }
 
     private static int QueueCapacity(int configured)

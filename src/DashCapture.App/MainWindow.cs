@@ -35,15 +35,20 @@ public sealed class MainWindow : Window
     private readonly DisplayPipeline _displayPipeline;
     private TdmsStorageService? _storageService;
 
-    private readonly ComboBox _deviceCombo = new();
-    private readonly StackPanel _channelPanel = new();
     private readonly WrapPanel _viewNavPanel = new() { Orientation = Orientation.Horizontal };
     private readonly Grid _monitorGrid = new();
+    private readonly Border _selectionDrawerHost = new() { IsVisible = false };
+    private readonly StackPanel _selectionTreePanel = new() { Spacing = 6 };
     private readonly Button _addViewButton = new() { Content = "+" };
     private readonly Button _removeViewButton = new() { Content = "-" };
+    private readonly Button _showSelectionButton = new() { Content = "\u901a\u9053" };
+    private readonly Button _closeSelectionButton = new() { Content = "\u6536\u8d77" };
     private readonly Button _selectAllChannelsButton = new() { Content = "\u5168\u9009" };
     private readonly Button _clearChannelsButton = new() { Content = "\u6e05\u7a7a" };
+    private readonly CheckBox _activeViewVisibleCheck = new() { Content = "\u663e\u793a\u8be5\u89c6\u56fe" };
     private readonly TextBlock _activeViewText = new();
+    private readonly TextBlock _selectionTitle = new();
+    private readonly TextBlock _selectionHint = new();
     private readonly StackPanel _deviceInfoPanel = new();
     private readonly TextBox _storagePath = new();
     private readonly TextBox _customFileName = new();
@@ -92,7 +97,6 @@ public sealed class MainWindow : Window
     private Control? _compressionLpcField;
     private readonly TdmsViewerControl _tdmsViewer;
     private CaptureStorageStatistics? _lastStorageStats;
-    private readonly DispatcherTimer _renderTimer;
     private readonly DispatcherTimer _captureTimer;
     private readonly DispatcherTimer _runtimeStatsTimer;
     private readonly RuntimeUsageSampler _runtimeUsageSampler = new();
@@ -105,6 +109,8 @@ public sealed class MainWindow : Window
     private bool _captureCleanupInProgress;
     private bool _closeConfirmed;
     private bool _shutdownStarted;
+    private bool _monitorViewsLoadedFromSettings;
+    private bool _updatingSelectionPanel;
     private string? _lastFaultMessage;
 
     public MainWindow()
@@ -118,7 +124,11 @@ public sealed class MainWindow : Window
             () => _acquisition.Devices,
             _settings.Display.MaxDisplayPointsPerSecond);
         _tdmsViewer = new TdmsViewerControl(_settings.Storage.TdmRuntimeDir);
-        AddMonitorView();
+        LoadMonitorViewsFromSettings();
+        if (_monitorViews.Count == 0)
+        {
+            AddMonitorView();
+        }
 
         _storagePath.Text = _settings.Storage.RootPath;
         _customFileName.Text = _settings.Storage.CustomFileName;
@@ -129,12 +139,13 @@ public sealed class MainWindow : Window
         InitializeCompressionControls();
         StyleInput(_storagePath);
         StyleInput(_customFileName);
-        StyleComboBox(_deviceCombo);
         StyleComboBox(_namingMode);
         StyleComboBox(_compressionAlgorithmCombo);
         StyleComboBox(_compressionPreprocessorCombo);
         StyleControlButton(_addViewButton, AccentBlue);
         StyleControlButton(_removeViewButton, AccentRed);
+        StyleControlButton(_showSelectionButton, AccentBlue);
+        StyleControlButton(_closeSelectionButton, AccentBlue);
         StyleControlButton(_selectAllChannelsButton, AccentBlue);
         StyleControlButton(_clearChannelsButton, AccentBlue);
 
@@ -156,32 +167,38 @@ public sealed class MainWindow : Window
         _startButton.Click += async (_, _) => await StartAsync();
         _stopButton.Click += async (_, _) => await StopAsync();
         _browseButton.Click += async (_, _) => await BrowseStorageFolderAsync();
-        _deviceCombo.SelectionChanged += (_, _) => RebuildChannelList();
         _addViewButton.Click += (_, _) =>
         {
             if (_monitorViews.Count < MaxMonitorViews)
             {
                 AddMonitorView();
-                SelectMonitorView(_monitorViews.Count - 1);
+                SelectMonitorView(_monitorViews.Count - 1, showSelection: true);
                 RebuildMonitorGrid();
                 RebuildViewNav();
                 ApplyMonitorSelectionsToStore();
+                PersistMonitorViewSettings();
             }
         };
-        _removeViewButton.Click += (_, _) =>
+        _removeViewButton.Click += async (_, _) => await RemoveActiveMonitorViewAsync();
+        _showSelectionButton.Click += (_, _) => ShowSelectionDrawer();
+        _closeSelectionButton.Click += (_, _) => HideSelectionDrawer();
+        _selectAllChannelsButton.Click += (_, _) => SetAllChannelsForActiveView(true);
+        _clearChannelsButton.Click += (_, _) => SetAllChannelsForActiveView(false);
+        _activeViewVisibleCheck.IsCheckedChanged += (_, _) =>
         {
-            if (_monitorViews.Count > 1)
+            if (_updatingSelectionPanel || _monitorViews.Count == 0)
             {
-                _monitorViews.RemoveAt(_activeViewIndex);
-                _activeViewIndex = Math.Clamp(_activeViewIndex, 0, _monitorViews.Count - 1);
-                RebuildMonitorGrid();
-                RebuildViewNav();
-                RebuildChannelList();
-                ApplyMonitorSelectionsToStore();
+                return;
             }
+
+            MonitorViewState view = _monitorViews[_activeViewIndex];
+            view.Visible = _activeViewVisibleCheck.IsChecked == true;
+            RebuildMonitorGrid();
+            ApplyMonitorSelectionsToStore();
+            RebuildViewNav();
+            RebuildSelectionTree();
+            PersistMonitorViewSettings();
         };
-        _selectAllChannelsButton.Click += (_, _) => SetDeviceChannelsForActiveView(true);
-        _clearChannelsButton.Click += (_, _) => SetDeviceChannelsForActiveView(false);
         _namingMode.SelectionChanged += (_, _) => UpdateStoragePreview();
         _customFileName.PropertyChanged += (_, e) =>
         {
@@ -249,20 +266,6 @@ public sealed class MainWindow : Window
         });
         _acquisition.TelemetryUpdated += telemetry => Dispatcher.UIThread.Post(() => UpdateTelemetry(telemetry));
 
-        _renderTimer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromMilliseconds(1000.0 / Math.Max(1, _settings.Display.TargetFps))
-        };
-        _renderTimer.Tick += (_, _) =>
-        {
-            _displayFrameCounter++;
-            foreach (MonitorViewState view in _monitorViews)
-            {
-                view.Waveform.InvalidateVisual();
-            }
-        };
-        _renderTimer.Start();
-
         _runtimeStatsTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromSeconds(1)
@@ -317,8 +320,8 @@ public sealed class MainWindow : Window
         }
 
         _tdmsViewer.Dispose();
+        await DisposeMonitorViewsAsync();
         _captureTimer.Stop();
-        _renderTimer.Stop();
         _runtimeStatsTimer.Stop();
         _runtimeUsageSampler.Dispose();
         await _acquisition.DisposeAsync();
@@ -466,11 +469,11 @@ public sealed class MainWindow : Window
 
     private Control BuildMonitorTab()
     {
-        var root = new DockPanel();
-
-        Control nav = BuildMonitorNav();
-        DockPanel.SetDock(nav, Dock.Top);
-        root.Children.Add(nav);
+        var root = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitions("*,Auto"),
+            ColumnSpacing = 8
+        };
 
         var scroll = new ScrollViewer
         {
@@ -480,129 +483,278 @@ public sealed class MainWindow : Window
             Margin = new Thickness(0, 8, 0, 8)
         };
 
+        Grid.SetColumn(scroll, 0);
         root.Children.Add(scroll);
+
+        Control commands = BuildMonitorCommandPanel();
+        Grid.SetColumn(commands, 1);
+        root.Children.Add(commands);
+
         RebuildMonitorGrid();
         RebuildViewNav();
+        RebuildSelectionTree();
         return root;
     }
 
-    private Control BuildMonitorNav()
+    private Control BuildMonitorCommandPanel()
     {
-        _deviceCombo.MinWidth = 210;
-        _deviceCombo.FontSize = 13;
-        _channelPanel.Orientation = Orientation.Horizontal;
-        _channelPanel.Spacing = 6;
         _activeViewText.Foreground = TextSecondary;
         _activeViewText.FontSize = 13;
-        _activeViewText.VerticalAlignment = VerticalAlignment.Center;
+        _activeViewText.TextWrapping = TextWrapping.Wrap;
+        _activeViewText.Width = 96;
 
-        var viewScroll = new ScrollViewer
+        _addViewButton.MinWidth = 72;
+        _removeViewButton.MinWidth = 72;
+        _showSelectionButton.MinWidth = 72;
+        _selectionDrawerHost.Width = 360;
+        _selectionDrawerHost.Margin = new Thickness(8, 8, 0, 8);
+        _selectionDrawerHost.Background = PanelBackground;
+        _selectionDrawerHost.BorderBrush = BorderBrushSoft;
+        _selectionDrawerHost.BorderThickness = new Thickness(1);
+        _selectionDrawerHost.CornerRadius = new CornerRadius(8);
+        _selectionDrawerHost.Child = BuildSelectionDrawer();
+
+        var rail = new Border
         {
-            Content = _viewNavPanel,
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
-            MaxHeight = 42
-        };
-
-        var viewRow = new DockPanel
-        {
-            LastChildFill = true,
-            Children =
-            {
-                new StackPanel
-                {
-                    Orientation = Orientation.Horizontal,
-                    Spacing = 6,
-                    Margin = new Thickness(0, 0, 10, 0),
-                    Children = { _addViewButton, _removeViewButton, _activeViewText }
-                },
-                viewScroll
-            }
-        };
-
-        DockPanel.SetDock(viewRow.Children[0], Dock.Right);
-
-        var channelScroll = new ScrollViewer
-        {
-            Content = _channelPanel,
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
-            MinHeight = 42
-        };
-
-        var editRow = new Grid
-        {
-            ColumnDefinitions = new ColumnDefinitions("Auto,Auto,Auto,*"),
-            ColumnSpacing = 8,
-            Margin = new Thickness(0, 8, 0, 0)
-        };
-        editRow.Children.Add(_deviceCombo);
-
-        Grid.SetColumn(_selectAllChannelsButton, 1);
-        editRow.Children.Add(_selectAllChannelsButton);
-        Grid.SetColumn(_clearChannelsButton, 2);
-        editRow.Children.Add(_clearChannelsButton);
-        Grid.SetColumn(channelScroll, 3);
-        editRow.Children.Add(channelScroll);
-
-        return new Border
-        {
-            Margin = new Thickness(0, 10, 0, 0),
-            Padding = new Thickness(10),
+            Margin = new Thickness(0, 8, 0, 8),
+            Padding = new Thickness(8),
+            Width = 112,
             Background = PanelBackground,
             BorderBrush = BorderBrushSoft,
             BorderThickness = new Thickness(1),
             CornerRadius = new CornerRadius(8),
             Child = new StackPanel
             {
-                Spacing = 0,
-                Children = { viewRow, editRow }
+                Spacing = 8,
+                Children =
+                {
+                    _addViewButton,
+                    _removeViewButton,
+                    _showSelectionButton,
+                    _activeViewText
+                }
             }
+        };
+
+        return new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Children = { rail, _selectionDrawerHost }
         };
     }
 
-    private Control BuildSideBar()
+    private Control BuildSelectionDrawer()
     {
-        _deviceCombo.Margin = new Thickness(12, 10, 12, 8);
-        _deviceCombo.FontSize = 14;
-        DockPanel.SetDock(_deviceCombo, Dock.Top);
+        _selectionTitle.Foreground = TextPrimary;
+        _selectionTitle.FontSize = 17;
+        _selectionTitle.FontWeight = FontWeight.SemiBold;
+        _selectionTitle.TextWrapping = TextWrapping.Wrap;
+        _selectionHint.Foreground = TextSecondary;
+        _selectionHint.FontSize = 13;
+        _selectionHint.TextWrapping = TextWrapping.Wrap;
+        _activeViewVisibleCheck.Foreground = TextPrimary;
+        _activeViewVisibleCheck.FontSize = 14;
 
-        var header = new TextBlock
+        var header = new Grid
         {
-            Text = "\u901a\u9053\u53e0\u52a0",
-            Foreground = TextPrimary,
-            FontSize = 17,
-            FontWeight = FontWeight.SemiBold,
-            Margin = new Thickness(12, 2, 12, 0)
+            ColumnDefinitions = new ColumnDefinitions("*,Auto"),
+            ColumnSpacing = 8
         };
-        DockPanel.SetDock(header, Dock.Top);
+        header.Children.Add(_selectionTitle);
+        Grid.SetColumn(_closeSelectionButton, 1);
+        header.Children.Add(_closeSelectionButton);
 
-        var scroll = new ScrollViewer
+        var viewScroll = new ScrollViewer
         {
-            Content = _channelPanel,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            Margin = new Thickness(8, 4, 8, 8)
+            Content = _viewNavPanel,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            MinHeight = 38
         };
+
+        var treeScroll = new ScrollViewer
+        {
+            Content = _selectionTreePanel,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+        };
+
+        var actionRow = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitions("*,*"),
+            ColumnSpacing = 8
+        };
+        actionRow.Children.Add(_selectAllChannelsButton);
+        Grid.SetColumn(_clearChannelsButton, 1);
+        actionRow.Children.Add(_clearChannelsButton);
 
         var panel = new DockPanel
         {
-            Width = 330,
+            LastChildFill = true,
             Children =
             {
-                _deviceCombo,
                 header,
-                scroll
+                viewScroll,
+                _activeViewVisibleCheck,
+                _selectionHint,
+                actionRow,
+                treeScroll
             }
         };
 
-        return new Border
+        DockPanel.SetDock(header, Dock.Top);
+        DockPanel.SetDock(viewScroll, Dock.Top);
+        DockPanel.SetDock(_activeViewVisibleCheck, Dock.Top);
+        DockPanel.SetDock(_selectionHint, Dock.Top);
+        DockPanel.SetDock(actionRow, Dock.Bottom);
+
+        header.Margin = new Thickness(12, 12, 12, 8);
+        viewScroll.Margin = new Thickness(12, 0, 12, 8);
+        _activeViewVisibleCheck.Margin = new Thickness(12, 0, 12, 6);
+        _selectionHint.Margin = new Thickness(12, 0, 12, 10);
+        actionRow.Margin = new Thickness(12, 8, 12, 12);
+        treeScroll.Margin = new Thickness(12, 0, 12, 0);
+
+        return panel;
+    }
+
+    private void ShowSelectionDrawer()
+    {
+        _selectionDrawerHost.IsVisible = true;
+        RebuildViewNav();
+        RebuildSelectionTree();
+    }
+
+    private void HideSelectionDrawer()
+    {
+        _selectionDrawerHost.IsVisible = false;
+    }
+
+    private void RebuildSelectionTree()
+    {
+        _selectionTreePanel.Children.Clear();
+        _updatingSelectionPanel = true;
+        try
         {
-            Margin = new Thickness(0, 10, 0, 10),
-            Background = PanelBackground,
+            if (_monitorViews.Count == 0)
+            {
+                _selectionTitle.Text = "\u672a\u521b\u5efa\u89c6\u56fe";
+                _selectionHint.Text = "\u70b9\u51fb + \u521b\u5efa\u65b0\u89c6\u56fe";
+                _activeViewVisibleCheck.IsChecked = false;
+                return;
+            }
+
+            MonitorViewState view = _monitorViews[_activeViewIndex];
+            _selectionTitle.Text = $"{view.Name} \u901a\u9053\u9009\u62e9";
+            _selectionHint.Text = _acquisition.Devices.Count == 0
+                ? "\u672a\u8fde\u63a5\u8bbe\u5907\uff0c\u8fde\u63a5\u540e\u5c06\u663e\u793a\u8bbe\u5907\u6811"
+                : $"\u5df2\u9009 {view.SelectedKeys.Count}/{MaxChannelsPerMonitorView} \u901a\u9053\uff0c\u53ef\u8de8\u8bbe\u5907\u53e0\u52a0";
+            _activeViewVisibleCheck.IsChecked = view.Visible;
+
+            if (_acquisition.Devices.Count == 0)
+            {
+                _selectionTreePanel.Children.Add(new TextBlock
+                {
+                    Text = "\u6682\u65e0\u8bbe\u5907",
+                    Foreground = TextSecondary,
+                    FontSize = 14,
+                    Margin = new Thickness(2, 6)
+                });
+                return;
+            }
+
+            int deviceIndex = 0;
+            foreach (DeviceDescriptor device in _acquisition.Devices)
+            {
+                _selectionTreePanel.Children.Add(BuildDeviceSelectionNode(device, deviceIndex + 1, view));
+                deviceIndex++;
+            }
+        }
+        finally
+        {
+            _updatingSelectionPanel = false;
+        }
+    }
+
+    private Control BuildDeviceSelectionNode(DeviceDescriptor device, int displayIndex, MonitorViewState view)
+    {
+        ChannelDescriptor[] channels = device.Channels.ToArray();
+        ChannelKey[] keys = channels.Select(channel => new ChannelKey(channel)).ToArray();
+        int selectedCount = keys.Count(view.SelectedKeys.Contains);
+        bool? checkedState = selectedCount == 0
+            ? false
+            : selectedCount == keys.Length ? true : null;
+
+        var deviceCheck = new CheckBox
+        {
+            IsThreeState = true,
+            IsChecked = checkedState,
+            Content = $"{FormatDeviceName(device, displayIndex)}    {selectedCount}/{channels.Length}",
+            Foreground = device.Online ? TextPrimary : TextSecondary,
+            FontSize = 14,
+            FontWeight = FontWeight.SemiBold
+        };
+        deviceCheck.IsCheckedChanged += (_, _) =>
+        {
+            if (_updatingSelectionPanel)
+            {
+                return;
+            }
+
+            if (deviceCheck.IsChecked == true)
+            {
+                SetDeviceChannelsForActiveView(device, selected: true);
+            }
+            else if (deviceCheck.IsChecked == false)
+            {
+                SetDeviceChannelsForActiveView(device, selected: false);
+            }
+        };
+
+        var channelPanel = new StackPanel
+        {
+            Spacing = 4,
+            Margin = new Thickness(22, 6, 0, 8)
+        };
+        foreach (ChannelDescriptor channel in channels)
+        {
+            ChannelKey key = new(channel);
+            var channelCheck = new CheckBox
+            {
+                IsChecked = view.SelectedKeys.Contains(key),
+                Content = FormatChannelSelectionName(channel),
+                Foreground = channel.Online ? TextPrimary : TextSecondary,
+                FontSize = 13
+            };
+            channelCheck.IsCheckedChanged += (_, _) =>
+            {
+                if (_updatingSelectionPanel)
+                {
+                    return;
+                }
+
+                if (!TrySetChannelForActiveView(channel, channelCheck.IsChecked == true))
+                {
+                    _updatingSelectionPanel = true;
+                    channelCheck.IsChecked = false;
+                    _updatingSelectionPanel = false;
+                    return;
+                }
+
+                CommitMonitorSelectionChange(_monitorViews[_activeViewIndex]);
+            };
+            channelPanel.Children.Add(channelCheck);
+        }
+
+        return new Expander
+        {
+            Header = deviceCheck,
+            IsExpanded = selectedCount > 0 || displayIndex == 1,
+            Content = channelPanel,
             BorderBrush = BorderBrushSoft,
             BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
-            Child = panel
+            Background = PanelBackground2,
+            Margin = new Thickness(0, 0, 0, 6),
+            Padding = new Thickness(8, 4)
         };
     }
 
@@ -1000,36 +1152,13 @@ public sealed class MainWindow : Window
 
     private void RefreshDevicesFromAcquisition(bool seedDefault)
     {
-        DeviceKey? selectedKey = _deviceCombo.SelectedItem is DeviceItem selected
-            ? new DeviceKey(selected.Device.DeviceId, selected.Device.IpAddress)
-            : null;
-
-        List<DeviceItem> items = _acquisition.Devices
-            .Select((device, index) => new DeviceItem(device, index + 1))
-            .ToList();
-        _deviceCombo.ItemsSource = items;
-
-        if (items.Count == 0)
-        {
-            _deviceCombo.SelectedIndex = -1;
-        }
-        else if (selectedKey is { } key)
-        {
-            DeviceItem? next = items.FirstOrDefault(item => item.Key.Equals(key));
-            _deviceCombo.SelectedItem = next ?? items[0];
-        }
-        else if (_deviceCombo.SelectedIndex < 0)
-        {
-            _deviceCombo.SelectedIndex = 0;
-        }
-
         if (seedDefault)
         {
             SeedDefaultMonitorSelection();
         }
 
         ApplyMonitorSelectionsToStore();
-        RebuildChannelList();
+        RebuildSelectionTree();
         RefreshDeviceInfoPanel();
     }
 
@@ -1214,69 +1343,22 @@ public sealed class MainWindow : Window
         return $"\u91c7\u96c6\u65f6\u957f {hours:00}:{elapsed.Minutes:00}:{elapsed.Seconds:00}";
     }
 
-    private void RebuildChannelList()
+    private void LoadMonitorViewsFromSettings()
     {
-        _channelPanel.Children.Clear();
-        if (_deviceCombo.SelectedItem is not DeviceItem selected || _monitorViews.Count == 0)
+        foreach (MonitorViewSettings viewSettings in _settings.Display.Views.Take(MaxMonitorViews))
         {
-            return;
+            AddMonitorView(viewSettings);
         }
 
-        MonitorViewState view = _monitorViews[_activeViewIndex];
-        foreach (ChannelDescriptor channel in selected.Device.Channels.Take(256))
+        _monitorViewsLoadedFromSettings = _monitorViews.Count > 0;
+        if (_monitorViews.Count > 0)
         {
-            var checkBox = new CheckBox
-            {
-                Content = channel.Name,
-                Tag = channel,
-                IsChecked = view.SelectedKeys.Contains(new ChannelKey(channel)),
-                Margin = new Thickness(0, 0, 4, 0),
-                Foreground = channel.Online ? TextPrimary : TextSecondary,
-                FontSize = 13
-            };
-            checkBox.IsCheckedChanged += (_, _) =>
-            {
-                if (checkBox.Tag is not ChannelDescriptor item)
-                {
-                    return;
-                }
-
-                ChannelKey key = new(item);
-                if (checkBox.IsChecked == true)
-                {
-                    if (view.SelectedKeys.Count >= MaxChannelsPerMonitorView && !view.SelectedKeys.Contains(key))
-                    {
-                        checkBox.IsChecked = false;
-                        return;
-                    }
-
-                    view.SelectedKeys.Add(key);
-                }
-                else
-                {
-                    view.SelectedKeys.Remove(key);
-                }
-
-                RefreshViewChannels(view);
-                ApplyMonitorSelectionsToStore();
-            };
-
-            _channelPanel.Children.Add(new Border
-            {
-                Margin = new Thickness(0, 0, 6, 0),
-                Padding = new Thickness(8, 5),
-                Background = PanelBackground2,
-                BorderBrush = BorderBrushSoft,
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(6),
-                Child = checkBox
-            });
+            int firstVisible = _monitorViews.FindIndex(view => view.Visible);
+            _activeViewIndex = firstVisible >= 0 ? firstVisible : 0;
         }
-
-        UpdateActiveViewText();
     }
 
-    private void AddMonitorView()
+    private void AddMonitorView(MonitorViewSettings? settings = null)
     {
         var waveform = new WaveformControl
         {
@@ -1311,13 +1393,35 @@ public sealed class MainWindow : Window
         };
         DockPanel.SetDock(title, Dock.Top);
 
-        var view = new MonitorViewState(waveform, host, title);
-        host.PointerPressed += (_, _) => SelectMonitorView(_monitorViews.IndexOf(view));
+        MonitorViewState? view = null;
+        var renderLoop = new MonitorViewRenderLoop(
+            waveform,
+            MonitorFrameInterval(),
+            () => view?.Visible == true,
+            TrackDisplayFrame);
+
+        string name = string.IsNullOrWhiteSpace(settings?.Name)
+            ? DefaultMonitorViewName(_monitorViews.Count)
+            : settings.Name.Trim();
+        view = new MonitorViewState(waveform, host, title, renderLoop)
+        {
+            Name = name,
+            Visible = settings?.Visible ?? true
+        };
+        foreach (MonitorChannelSettings channel in settings?.Channels ?? Enumerable.Empty<MonitorChannelSettings>())
+        {
+            if (!string.IsNullOrWhiteSpace(channel.DeviceIp))
+            {
+                view.SelectedKeys.Add(new ChannelKey(channel.DeviceIp, channel.DeviceId, channel.ChannelId));
+            }
+        }
+
+        host.PointerPressed += (_, _) => SelectMonitorView(_monitorViews.IndexOf(view), showSelection: true);
         _monitorViews.Add(view);
         RefreshViewChannels(view);
     }
 
-    private void SelectMonitorView(int index)
+    private void SelectMonitorView(int index, bool showSelection = false)
     {
         if (index < 0 || index >= _monitorViews.Count)
         {
@@ -1326,8 +1430,12 @@ public sealed class MainWindow : Window
 
         _activeViewIndex = index;
         RebuildViewNav();
-        RebuildChannelList();
+        RebuildSelectionTree();
         UpdateViewSelectionChrome();
+        if (showSelection)
+        {
+            ShowSelectionDrawer();
+        }
     }
 
     private void RebuildViewNav()
@@ -1346,7 +1454,7 @@ public sealed class MainWindow : Window
                 Foreground = index == _activeViewIndex ? Brushes.White : TextPrimary,
                 BorderBrush = BorderBrushSoft
             };
-            button.Click += (_, _) => SelectMonitorView(index);
+            button.Click += (_, _) => SelectMonitorView(index, showSelection: true);
             _viewNavPanel.Children.Add(button);
         }
 
@@ -1362,7 +1470,28 @@ public sealed class MainWindow : Window
         _monitorGrid.RowDefinitions.Clear();
         _monitorGrid.ColumnDefinitions.Clear();
 
-        int count = Math.Max(1, _monitorViews.Count);
+        var visibleViews = _monitorViews
+            .Select((view, index) => new { View = view, Index = index })
+            .Where(item => item.View.Visible)
+            .ToArray();
+
+        if (visibleViews.Length == 0)
+        {
+            _monitorGrid.RowDefinitions.Add(new RowDefinition(GridLength.Star) { MinHeight = 360 });
+            _monitorGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+            _monitorGrid.Children.Add(new TextBlock
+            {
+                Text = "\u6682\u65e0\u53ef\u89c1\u89c6\u56fe",
+                Foreground = TextSecondary,
+                FontSize = 18,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            });
+            UpdateViewSelectionChrome();
+            return;
+        }
+
+        int count = visibleViews.Length;
         int columns = (int)Math.Ceiling(Math.Sqrt(count));
         int rows = (int)Math.Ceiling(count / (double)columns);
 
@@ -1376,9 +1505,9 @@ public sealed class MainWindow : Window
             _monitorGrid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star) { MinWidth = 260 });
         }
 
-        for (int i = 0; i < _monitorViews.Count; i++)
+        for (int i = 0; i < visibleViews.Length; i++)
         {
-            Border host = _monitorViews[i].Host;
+            Border host = visibleViews[i].View.Host;
             Grid.SetRow(host, i / columns);
             Grid.SetColumn(host, i % columns);
             _monitorGrid.Children.Add(host);
@@ -1398,7 +1527,7 @@ public sealed class MainWindow : Window
 
     private void SeedDefaultMonitorSelection()
     {
-        if (_acquisition.Devices.Count == 0 || _monitorViews.Count == 0 || _monitorViews.Any(view => view.SelectedKeys.Count > 0))
+        if (_monitorViewsLoadedFromSettings || _acquisition.Devices.Count == 0 || _monitorViews.Count == 0 || _monitorViews.Any(view => view.SelectedKeys.Count > 0))
         {
             return;
         }
@@ -1411,37 +1540,110 @@ public sealed class MainWindow : Window
 
         RefreshViewChannels(firstView);
         ApplyMonitorSelectionsToStore();
+        PersistMonitorViewSettings();
     }
 
-    private void SetDeviceChannelsForActiveView(bool selected)
+    private void SetAllChannelsForActiveView(bool selected)
     {
-        if (_deviceCombo.SelectedItem is not DeviceItem item || _monitorViews.Count == 0)
+        if (_monitorViews.Count == 0)
         {
             return;
         }
 
         MonitorViewState view = _monitorViews[_activeViewIndex];
-        foreach (ChannelDescriptor channel in item.Device.Channels)
+        if (!selected)
         {
-            ChannelKey key = new(channel);
-            if (selected)
-            {
-                if (view.SelectedKeys.Count >= MaxChannelsPerMonitorView && !view.SelectedKeys.Contains(key))
-                {
-                    break;
-                }
+            view.SelectedKeys.Clear();
+            CommitMonitorSelectionChange(view);
+            return;
+        }
 
-                view.SelectedKeys.Add(key);
-            }
-            else
+        foreach (ChannelDescriptor channel in _acquisition.Devices.SelectMany(device => device.Channels))
+        {
+            if (!TrySetChannelForView(view, channel, selected: true))
             {
-                view.SelectedKeys.Remove(key);
+                break;
             }
         }
 
+        CommitMonitorSelectionChange(view);
+    }
+
+    private void SetDeviceChannelsForActiveView(DeviceDescriptor device, bool selected)
+    {
+        if (_monitorViews.Count == 0)
+        {
+            return;
+        }
+
+        MonitorViewState view = _monitorViews[_activeViewIndex];
+        foreach (ChannelDescriptor channel in device.Channels)
+        {
+            if (!TrySetChannelForView(view, channel, selected))
+            {
+                break;
+            }
+        }
+
+        CommitMonitorSelectionChange(view);
+    }
+
+    private bool TrySetChannelForActiveView(ChannelDescriptor channel, bool selected)
+    {
+        return _monitorViews.Count > 0 && TrySetChannelForView(_monitorViews[_activeViewIndex], channel, selected);
+    }
+
+    private bool TrySetChannelForView(MonitorViewState view, ChannelDescriptor channel, bool selected)
+    {
+        ChannelKey key = new(channel);
+        if (selected)
+        {
+            if (view.SelectedKeys.Count >= MaxChannelsPerMonitorView && !view.SelectedKeys.Contains(key))
+            {
+                _selectionHint.Text = $"\u5355\u4e2a\u89c6\u56fe\u6700\u591a\u652f\u6301 {MaxChannelsPerMonitorView} \u4e2a\u901a\u9053";
+                return false;
+            }
+
+            view.SelectedKeys.Add(key);
+            return true;
+        }
+
+        view.SelectedKeys.Remove(key);
+        return true;
+    }
+
+    private void CommitMonitorSelectionChange(MonitorViewState view)
+    {
         RefreshViewChannels(view);
-        RebuildChannelList();
         ApplyMonitorSelectionsToStore();
+        RebuildSelectionTree();
+        PersistMonitorViewSettings();
+    }
+
+    private async Task RemoveActiveMonitorViewAsync()
+    {
+        if (_monitorViews.Count <= 1)
+        {
+            return;
+        }
+
+        MonitorViewState removed = _monitorViews[_activeViewIndex];
+        _monitorViews.RemoveAt(_activeViewIndex);
+        _activeViewIndex = Math.Clamp(_activeViewIndex, 0, _monitorViews.Count - 1);
+        RebuildMonitorGrid();
+        RebuildViewNav();
+        RebuildSelectionTree();
+        ApplyMonitorSelectionsToStore();
+        PersistMonitorViewSettings();
+        await removed.DisposeAsync();
+    }
+
+    private async Task DisposeMonitorViewsAsync()
+    {
+        foreach (MonitorViewState view in _monitorViews.ToArray())
+        {
+            await view.DisposeAsync();
+        }
     }
 
     private void ApplyMonitorSelectionsToStore()
@@ -1452,6 +1654,7 @@ public sealed class MainWindow : Window
         }
 
         ChannelDescriptor[] union = _monitorViews
+            .Where(view => view.Visible)
             .SelectMany(view => view.Channels)
             .GroupBy(channel => new ChannelKey(channel))
             .Select(group => group.First())
@@ -1469,26 +1672,57 @@ public sealed class MainWindow : Window
         return Math.Max(1000, pointsPerSecond * seconds);
     }
 
+    private TimeSpan MonitorFrameInterval()
+    {
+        double milliseconds = Math.Max(1.0, 1000.0 / Math.Max(1, _settings.Display.TargetFps));
+        return TimeSpan.FromMilliseconds(milliseconds);
+    }
+
+    private void TrackDisplayFrame()
+    {
+        Interlocked.Increment(ref _displayFrameCounter);
+    }
+
     private void RefreshViewChannels(MonitorViewState view)
     {
-        Dictionary<ChannelKey, ChannelDescriptor> lookup = _acquisition.Devices
+        Dictionary<ChannelKey, ChannelDescriptor> exactLookup = _acquisition.Devices
             .SelectMany(device => device.Channels)
             .GroupBy(channel => new ChannelKey(channel))
             .ToDictionary(group => group.Key, group => group.First());
+        Dictionary<(int DeviceId, int ChannelId), ChannelDescriptor> fallbackLookup = _acquisition.Devices
+            .SelectMany(device => device.Channels)
+            .GroupBy(channel => (channel.DeviceId, channel.ChannelId))
+            .ToDictionary(group => group.Key, group => group.First());
 
-        view.Channels = view.SelectedKeys
-            .Where(lookup.ContainsKey)
-            .Select(key => lookup[key])
-            .Take(MaxChannelsPerMonitorView)
-            .ToArray();
-        view.SelectedKeys.Clear();
-        foreach (ChannelDescriptor channel in view.Channels)
+        var channels = new List<ChannelDescriptor>();
+        var normalizedKeys = new HashSet<ChannelKey>();
+        foreach (ChannelKey selectedKey in view.SelectedKeys.Take(MaxChannelsPerMonitorView).ToArray())
         {
-            view.SelectedKeys.Add(new ChannelKey(channel));
+            if (exactLookup.TryGetValue(selectedKey, out ChannelDescriptor? channel) ||
+                fallbackLookup.TryGetValue((selectedKey.DeviceId, selectedKey.ChannelId), out channel))
+            {
+                ChannelKey normalizedKey = new(channel);
+                if (normalizedKeys.Add(normalizedKey))
+                {
+                    channels.Add(channel);
+                }
+            }
+            else
+            {
+                normalizedKeys.Add(selectedKey);
+            }
         }
 
+        view.SelectedKeys.Clear();
+        foreach (ChannelKey key in normalizedKeys)
+        {
+            view.SelectedKeys.Add(key);
+        }
+
+        view.Channels = channels;
         int viewIndex = _monitorViews.IndexOf(view);
-        view.Title.Text = $"View {viewIndex + 1}    {view.Channels.Count} ch";
+        view.Name = string.IsNullOrWhiteSpace(view.Name) ? DefaultMonitorViewName(viewIndex) : view.Name;
+        view.Title.Text = $"{view.Name}    \u663e\u793a {view.Channels.Count} / \u5df2\u9009 {view.SelectedKeys.Count} \u901a\u9053";
         view.Waveform.Channels = view.Channels;
     }
 
@@ -1501,7 +1735,38 @@ public sealed class MainWindow : Window
         }
 
         MonitorViewState view = _monitorViews[_activeViewIndex];
-        _activeViewText.Text = $"View {_activeViewIndex + 1}/{_monitorViews.Count}    {view.Channels.Count}/{MaxChannelsPerMonitorView} ch";
+        _activeViewText.Text = $"{view.Name}\n{_activeViewIndex + 1}/{_monitorViews.Count}\n{view.SelectedKeys.Count}/{MaxChannelsPerMonitorView} \u901a\u9053";
+    }
+
+    private void PersistMonitorViewSettings()
+    {
+        try
+        {
+            List<MonitorViewSettings> views = _monitorViews
+                .Select((view, index) => new MonitorViewSettings
+                {
+                    Name = string.IsNullOrWhiteSpace(view.Name) ? DefaultMonitorViewName(index) : view.Name,
+                    Visible = view.Visible,
+                    Channels = view.SelectedKeys
+                        .OrderBy(key => key.DeviceId)
+                        .ThenBy(key => key.ChannelId)
+                        .ThenBy(key => key.DeviceIp, StringComparer.OrdinalIgnoreCase)
+                        .Select(key => new MonitorChannelSettings
+                        {
+                            DeviceIp = key.DeviceIp,
+                            DeviceId = key.DeviceId,
+                            ChannelId = key.ChannelId
+                        })
+                        .ToList()
+                })
+                .ToList();
+            _settings.Display.Views = views;
+            AppSettingsLoader.SaveDisplayViews(views);
+        }
+        catch (Exception ex)
+        {
+            _status.Text = $"\u89c6\u56fe\u914d\u7f6e\u4fdd\u5b58\u5931\u8d25\uff1a{ex.Message}";
+        }
     }
 
     private void RefreshDeviceInfoPanel()
@@ -1614,8 +1879,8 @@ public sealed class MainWindow : Window
     {
         DateTimeOffset now = DateTimeOffset.UtcNow;
         double elapsedSeconds = Math.Max(0.001, (now - _lastRuntimeStatsAt).TotalSeconds);
-        double displayFps = _displayFrameCounter / elapsedSeconds;
-        _displayFrameCounter = 0;
+        int displayFrames = Interlocked.Exchange(ref _displayFrameCounter, 0);
+        double displayFps = displayFrames / elapsedSeconds;
         _lastRuntimeStatsAt = now;
 
         RuntimeUsageSnapshot usage = _runtimeUsageSampler.Sample();
@@ -1983,44 +2248,112 @@ public sealed class MainWindow : Window
 
     private static string FormatDeviceName(DeviceDescriptor device, int displayIndex)
     {
-        return $"Device {displayIndex} ({device.IpAddress})";
+        return $"\u8bbe\u5907 {displayIndex}\uff08{device.IpAddress}\uff09";
     }
 
-    private sealed class DeviceItem
+    private static string FormatChannelSelectionName(ChannelDescriptor channel)
     {
-        public DeviceItem(DeviceDescriptor device, int displayIndex)
-        {
-            Device = device;
-            Key = new DeviceKey(device.DeviceId, device.IpAddress);
-            DisplayName = FormatDeviceName(device, displayIndex);
-        }
-
-        public DeviceDescriptor Device { get; }
-        public DeviceKey Key { get; }
-        public string DisplayName { get; }
-        public override string ToString() => DisplayName;
+        string name = string.IsNullOrWhiteSpace(channel.Name)
+            ? $"\u901a\u9053 {channel.ChannelId + 1}"
+            : channel.Name;
+        return $"{name}    {channel.SampleRate:0.##} Hz";
     }
 
-    private readonly record struct DeviceKey(int DeviceId, string IpAddress);
+    private static string DefaultMonitorViewName(int zeroBasedIndex)
+    {
+        return $"\u89c6\u56fe {zeroBasedIndex + 1}";
+    }
 
     private sealed record OptionItem<T>(T Value, string Label)
     {
         public override string ToString() => Label;
     }
 
-    private sealed class MonitorViewState
+    private sealed class MonitorViewRenderLoop : IAsyncDisposable
     {
-        public MonitorViewState(WaveformControl waveform, Border host, TextBlock title)
+        private readonly WaveformControl _waveform;
+        private readonly TimeSpan _interval;
+        private readonly Func<bool> _shouldRender;
+        private readonly Action _frameTick;
+        private readonly CancellationTokenSource _cts = new();
+        private readonly Task _worker;
+
+        public MonitorViewRenderLoop(WaveformControl waveform, TimeSpan interval, Func<bool> shouldRender, Action frameTick)
+        {
+            _waveform = waveform;
+            _interval = interval;
+            _shouldRender = shouldRender;
+            _frameTick = frameTick;
+            _worker = Task.Factory.StartNew(
+                () => RunAsync(_cts.Token),
+                _cts.Token,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default).Unwrap();
+        }
+
+        private async Task RunAsync(CancellationToken cancellationToken)
+        {
+            using var timer = new PeriodicTimer(_interval);
+            try
+            {
+                while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false))
+                {
+                    Dispatcher.UIThread.Post(() =>
+                    {
+                        if (cancellationToken.IsCancellationRequested || !_shouldRender())
+                        {
+                            return;
+                        }
+
+                        _frameTick();
+                        _waveform.InvalidateVisual();
+                    });
+                }
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            _cts.Cancel();
+            try
+            {
+                await _worker.ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            finally
+            {
+                _cts.Dispose();
+            }
+        }
+    }
+
+    private sealed class MonitorViewState : IAsyncDisposable
+    {
+        public MonitorViewState(WaveformControl waveform, Border host, TextBlock title, MonitorViewRenderLoop renderLoop)
         {
             Waveform = waveform;
             Host = host;
             Title = title;
+            RenderLoop = renderLoop;
         }
 
+        public string Name { get; set; } = string.Empty;
+        public bool Visible { get; set; } = true;
         public WaveformControl Waveform { get; }
         public Border Host { get; }
         public TextBlock Title { get; }
+        public MonitorViewRenderLoop RenderLoop { get; }
         public HashSet<ChannelKey> SelectedKeys { get; } = new();
         public IReadOnlyList<ChannelDescriptor> Channels { get; set; } = Array.Empty<ChannelDescriptor>();
+
+        public ValueTask DisposeAsync()
+        {
+            return RenderLoop.DisposeAsync();
+        }
     }
 }

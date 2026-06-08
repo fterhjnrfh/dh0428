@@ -3,8 +3,14 @@
     <LangVersion>10.0</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <PlatformTarget>x64</PlatformTarget>
+    <Platforms>AnyCPU;x64;arm64</Platforms>
+    <PlatformTarget Condition="'$(PlatformTarget)' == '' and '$(RuntimeIdentifier)' != '' and $(RuntimeIdentifier.Contains('-arm64'))">arm64</PlatformTarget>
+    <PlatformTarget Condition="'$(PlatformTarget)' == '' and '$(RuntimeIdentifier)' != '' and $(RuntimeIdentifier.Contains('-x64'))">x64</PlatformTarget>
+    <PlatformTarget Condition="'$(PlatformTarget)' == ''">AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
+    <TieredCompilation>true</TieredCompilation>
+    <TieredPGO>true</TieredPGO>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>

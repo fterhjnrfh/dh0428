@@ -1,0 +1,19 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.log
+*.lscache
+
+# Build and publish output
+Debug/
+Release/
+publish/
+
+# Local data and temporary files
+Data/
+*.tmp
+*.temp
