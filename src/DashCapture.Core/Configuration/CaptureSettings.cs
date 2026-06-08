@@ -90,13 +90,16 @@ public enum FileNamingMode
 public sealed class StorageChannelSelectionSettings
 {
     public StorageChannelSelectionMode Mode { get; set; } = StorageChannelSelectionMode.AllChannels;
+    public double? SampleRateMinHz { get; set; }
+    public double? SampleRateMaxHz { get; set; }
     public List<MonitorChannelSettings> Channels { get; set; } = new();
 }
 
 public enum StorageChannelSelectionMode
 {
     AllChannels,
-    SelectedChannels
+    SelectedChannels,
+    SampleRateRange
 }
 
 public sealed class CompressionSettings
