@@ -18,6 +18,9 @@ public sealed class MainWindow : Window
 {
     private const int MaxMonitorViews = 64;
     private const int MaxChannelsPerMonitorView = 64;
+    private const double ButtonMinHeight = 34;
+    private const double FieldMinHeight = 36;
+    private const double PanelRadius = 8;
 
     private static readonly IBrush PageBackground = new SolidColorBrush(Color.FromRgb(242, 246, 251));
     private static readonly IBrush PanelBackground = new SolidColorBrush(Color.FromRgb(255, 255, 255));
@@ -86,8 +89,8 @@ public sealed class MainWindow : Window
     private readonly CheckBox _compressionEnabledCheck = new() { Content = "\u542f\u7528\u65e0\u635f\u538b\u7f29" };
     private readonly ComboBox _compressionAlgorithmCombo = new();
     private readonly ComboBox _compressionPreprocessorCombo = new();
-    private readonly StackPanel _compressionAlgorithmParams = new() { Orientation = Orientation.Horizontal, Spacing = 10 };
-    private readonly StackPanel _compressionPreprocessorParams = new() { Orientation = Orientation.Horizontal, Spacing = 10 };
+    private readonly WrapPanel _compressionAlgorithmParams = new() { Orientation = Orientation.Horizontal };
+    private readonly WrapPanel _compressionPreprocessorParams = new() { Orientation = Orientation.Horizontal };
     private readonly Slider _compressionZstdLevel = new() { Minimum = -5, Maximum = 22, Width = 150 };
     private readonly Slider _compressionZstdWindowLog = new() { Minimum = 0, Maximum = 31, Width = 150 };
     private readonly Slider _compressionLz4HcLevel = new() { Minimum = 3, Maximum = 12, Width = 150 };
@@ -474,8 +477,9 @@ public sealed class MainWindow : Window
 
         var bar = new Grid
         {
-            Margin = new Thickness(12, 10),
-            ColumnDefinitions = new ColumnDefinitions("Auto,Auto,Auto,*")
+            Margin = new Thickness(16, 12),
+            ColumnDefinitions = new ColumnDefinitions("Auto,Auto,Auto,*"),
+            ColumnSpacing = 12
         };
 
         Control deviceGroup = AddControlGroup("\u8bbe\u5907", _connectButton);
@@ -517,7 +521,7 @@ public sealed class MainWindow : Window
     {
         return new TabControl
         {
-            Margin = new Thickness(10, 4, 10, 0),
+            Margin = new Thickness(14, 8, 14, 0),
             FontSize = 15,
             Items =
             {
@@ -534,7 +538,7 @@ public sealed class MainWindow : Window
         var root = new Grid
         {
             ColumnDefinitions = new ColumnDefinitions("*,Auto"),
-            ColumnSpacing = 8
+            ColumnSpacing = 12
         };
 
         var scroll = new ScrollViewer
@@ -542,7 +546,7 @@ public sealed class MainWindow : Window
             Content = _monitorGrid,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            Margin = new Thickness(0, 8, 0, 8)
+            Margin = new Thickness(0, 10, 0, 10)
         };
 
         Grid.SetColumn(scroll, 0);
@@ -563,31 +567,31 @@ public sealed class MainWindow : Window
         _activeViewText.Foreground = TextSecondary;
         _activeViewText.FontSize = 13;
         _activeViewText.TextWrapping = TextWrapping.Wrap;
-        _activeViewText.Width = 96;
+        _activeViewText.Width = 108;
 
-        _addViewButton.MinWidth = 72;
-        _removeViewButton.MinWidth = 72;
-        _showSelectionButton.MinWidth = 72;
-        _selectionDrawerHost.Width = 360;
-        _selectionDrawerHost.Margin = new Thickness(8, 8, 0, 8);
+        _addViewButton.MinWidth = 88;
+        _removeViewButton.MinWidth = 88;
+        _showSelectionButton.MinWidth = 88;
+        _selectionDrawerHost.Width = 380;
+        _selectionDrawerHost.Margin = new Thickness(10, 10, 0, 10);
         _selectionDrawerHost.Background = PanelBackground;
         _selectionDrawerHost.BorderBrush = BorderBrushSoft;
         _selectionDrawerHost.BorderThickness = new Thickness(1);
-        _selectionDrawerHost.CornerRadius = new CornerRadius(8);
+        _selectionDrawerHost.CornerRadius = new CornerRadius(PanelRadius);
         _selectionDrawerHost.Child = BuildSelectionDrawer();
 
         var rail = new Border
         {
-            Margin = new Thickness(0, 8, 0, 8),
-            Padding = new Thickness(8),
-            Width = 112,
+            Margin = new Thickness(0, 10, 0, 10),
+            Padding = new Thickness(10),
+            Width = 128,
             Background = PanelBackground,
             BorderBrush = BorderBrushSoft,
             BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
+            CornerRadius = new CornerRadius(PanelRadius),
             Child = new StackPanel
             {
-                Spacing = 8,
+                Spacing = 9,
                 Children =
                 {
                     _addViewButton,
@@ -620,7 +624,7 @@ public sealed class MainWindow : Window
         var header = new Grid
         {
             ColumnDefinitions = new ColumnDefinitions("*,Auto"),
-            ColumnSpacing = 8
+            ColumnSpacing = 10
         };
         header.Children.Add(_selectionTitle);
         Grid.SetColumn(_closeSelectionButton, 1);
@@ -631,7 +635,7 @@ public sealed class MainWindow : Window
             Content = _viewNavPanel,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
             VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
-            MinHeight = 38
+            MinHeight = 40
         };
 
         var treeScroll = new ScrollViewer
@@ -643,7 +647,7 @@ public sealed class MainWindow : Window
         var actionRow = new Grid
         {
             ColumnDefinitions = new ColumnDefinitions("*,*"),
-            ColumnSpacing = 8
+            ColumnSpacing = 10
         };
         actionRow.Children.Add(_selectAllChannelsButton);
         Grid.SetColumn(_clearChannelsButton, 1);
@@ -669,12 +673,12 @@ public sealed class MainWindow : Window
         DockPanel.SetDock(_selectionHint, Dock.Top);
         DockPanel.SetDock(actionRow, Dock.Bottom);
 
-        header.Margin = new Thickness(12, 12, 12, 8);
-        viewScroll.Margin = new Thickness(12, 0, 12, 8);
-        _activeViewVisibleCheck.Margin = new Thickness(12, 0, 12, 6);
-        _selectionHint.Margin = new Thickness(12, 0, 12, 10);
-        actionRow.Margin = new Thickness(12, 8, 12, 12);
-        treeScroll.Margin = new Thickness(12, 0, 12, 0);
+        header.Margin = new Thickness(14, 14, 14, 10);
+        viewScroll.Margin = new Thickness(14, 0, 14, 10);
+        _activeViewVisibleCheck.Margin = new Thickness(14, 0, 14, 8);
+        _selectionHint.Margin = new Thickness(14, 0, 14, 12);
+        actionRow.Margin = new Thickness(14, 10, 14, 14);
+        treeScroll.Margin = new Thickness(14, 0, 14, 0);
 
         return panel;
     }
@@ -816,14 +820,14 @@ public sealed class MainWindow : Window
             BorderThickness = new Thickness(1),
             Background = PanelBackground2,
             Margin = new Thickness(0, 0, 0, 6),
-            Padding = new Thickness(8, 4)
+            Padding = new Thickness(10, 5)
         };
     }
 
     private Control BuildDeviceTab()
     {
-        _deviceInfoPanel.Margin = new Thickness(14);
-        _deviceInfoPanel.Spacing = 12;
+        _deviceInfoPanel.Margin = new Thickness(16);
+        _deviceInfoPanel.Spacing = 14;
         RefreshDeviceInfoPanel();
 
         return new ScrollViewer
@@ -845,18 +849,18 @@ public sealed class MainWindow : Window
 
         var root = new Grid
         {
-            Margin = new Thickness(18),
-            ColumnDefinitions = new ColumnDefinitions("*,*"),
+            Margin = new Thickness(16),
+            ColumnDefinitions = new ColumnDefinitions("1.05*,0.95*"),
             RowDefinitions = new RowDefinitions("Auto,Auto,Auto"),
-            ColumnSpacing = 14,
-            RowSpacing = 14,
+            ColumnSpacing = 16,
+            RowSpacing = 16,
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
 
         var pathGrid = new Grid
         {
             ColumnDefinitions = new ColumnDefinitions("*,Auto"),
-            ColumnSpacing = 10,
+            ColumnSpacing = 12,
             Children =
             {
                 _storagePath,
@@ -868,7 +872,7 @@ public sealed class MainWindow : Window
         var storageGrid = new Grid
         {
             RowDefinitions = new RowDefinitions("Auto,Auto,Auto"),
-            RowSpacing = 10,
+            RowSpacing = 12,
             Children =
             {
                 StorageField("\u91c7\u96c6\u65f6\u5199\u5165", _storageTabEnabledCheck),
@@ -876,7 +880,7 @@ public sealed class MainWindow : Window
                 new Grid
                 {
                     ColumnDefinitions = new ColumnDefinitions("*,*"),
-                    ColumnSpacing = 12,
+                    ColumnSpacing = 14,
                     Children =
                     {
                         StorageField("\u547d\u540d\u65b9\u5f0f", _namingMode),
@@ -894,7 +898,7 @@ public sealed class MainWindow : Window
         _storagePreview.FontSize = 13;
         var storageContent = new StackPanel
         {
-            Spacing = 10,
+            Spacing = 12,
             Children =
             {
                 storageGrid,
@@ -979,12 +983,12 @@ public sealed class MainWindow : Window
         };
         foreach (Control child in actionRow.Children)
         {
-            child.Margin = new Thickness(0, 0, 8, 8);
+            child.Margin = new Thickness(0, 0, 10, 10);
         }
 
         var panel = new StackPanel
         {
-            Spacing = 10,
+            Spacing = 12,
             Children =
             {
                 actionRow,
@@ -1103,7 +1107,7 @@ public sealed class MainWindow : Window
             BorderThickness = new Thickness(1),
             Background = PanelBackground2,
             Margin = new Thickness(0, 0, 0, 6),
-            Padding = new Thickness(8, 4)
+            Padding = new Thickness(10, 5)
         };
     }
 
@@ -1487,7 +1491,7 @@ public sealed class MainWindow : Window
             Background = Brushes.Transparent,
             Child = new StackPanel
             {
-                Spacing = 10,
+                Spacing = 12,
                 Children = { switches, options, _compressionAlgorithmParams, _compressionPreprocessorParams }
             }
         };
@@ -1550,9 +1554,9 @@ public sealed class MainWindow : Window
 
         var grid = new Grid
         {
-            ColumnDefinitions = new ColumnDefinitions("104,*"),
+            ColumnDefinitions = new ColumnDefinitions("112,*"),
             ColumnSpacing = 10,
-            MinHeight = 38,
+            MinHeight = FieldMinHeight,
             Children =
             {
                 new TextBlock
@@ -1573,14 +1577,14 @@ public sealed class MainWindow : Window
     {
         return new Border
         {
-            Padding = new Thickness(12),
+            Padding = new Thickness(14),
             Background = PanelBackground,
             BorderBrush = BorderBrushSoft,
             BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
+            CornerRadius = new CornerRadius(PanelRadius),
             Child = new StackPanel
             {
-                Spacing = 10,
+                Spacing = 12,
                 Children =
                 {
                     new TextBlock
@@ -1607,9 +1611,9 @@ public sealed class MainWindow : Window
         };
         var grid = new Grid
         {
-            ColumnDefinitions = new ColumnDefinitions("92,*"),
+            ColumnDefinitions = new ColumnDefinitions("104,*"),
             ColumnSpacing = 10,
-            MinHeight = 38,
+            MinHeight = FieldMinHeight,
             Children =
             {
                 labelBlock,
@@ -1635,13 +1639,13 @@ public sealed class MainWindow : Window
     private static Control CompressionField(string label, Control editor)
     {
         var block = FieldBlock(label, editor);
-        block.Margin = new Thickness(0, 0, 12, 10);
+        block.Margin = new Thickness(0, 0, 16, 12);
         return block;
     }
 
     private static Control SliderField(string label, Slider slider, TextBlock valueBlock, string hint)
     {
-        valueBlock.Width = 38;
+        valueBlock.Width = 42;
         valueBlock.Foreground = TextPrimary;
         valueBlock.FontSize = 13;
         valueBlock.VerticalAlignment = VerticalAlignment.Center;
@@ -1656,9 +1660,9 @@ public sealed class MainWindow : Window
 
         return new StackPanel
         {
-            Width = 220,
-            Margin = new Thickness(0, 0, 12, 8),
-            Spacing = 3,
+            Width = 240,
+            Margin = new Thickness(0, 0, 16, 12),
+            Spacing = 4,
             Children =
             {
                 new TextBlock { Text = label, Foreground = TextPrimary, FontSize = 13, FontWeight = FontWeight.SemiBold },
@@ -1680,7 +1684,7 @@ public sealed class MainWindow : Window
 
     private Control BuildStatusBar()
     {
-        _metrics.Margin = new Thickness(12, 6);
+        _metrics.Margin = new Thickness(16, 7);
         _metrics.Foreground = TextSecondary;
         _metrics.FontSize = 13;
         return new Border
@@ -1991,11 +1995,11 @@ public sealed class MainWindow : Window
 
         var host = new Border
         {
-            Margin = new Thickness(4),
+            Margin = new Thickness(5),
             Background = PanelBackground,
             BorderBrush = BorderBrushSoft,
             BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
+            CornerRadius = new CornerRadius(PanelRadius),
             Child = new DockPanel
             {
                 Children =
@@ -2783,7 +2787,6 @@ public sealed class MainWindow : Window
         {
             Orientation = Orientation.Horizontal,
             Spacing = 8,
-            Margin = new Thickness(0, 0, 16, 0),
             VerticalAlignment = VerticalAlignment.Center,
             Children =
             {
@@ -2803,7 +2806,6 @@ public sealed class MainWindow : Window
     {
         return new Border
         {
-            Margin = new Thickness(0, 0, 16, 0),
             Padding = new Thickness(12, 7),
             Background = PanelBackground2,
             BorderBrush = BorderBrushSoft,
@@ -2860,8 +2862,9 @@ public sealed class MainWindow : Window
     {
         button.Background = background;
         button.Foreground = Brushes.White;
-        button.Padding = new Thickness(16, 8);
+        button.Padding = new Thickness(14, 7);
         button.MinWidth = 88;
+        button.MinHeight = ButtonMinHeight;
         button.FontSize = 14;
         button.FontWeight = FontWeight.SemiBold;
     }
@@ -2873,6 +2876,7 @@ public sealed class MainWindow : Window
         textBox.BorderBrush = BorderBrushSoft;
         textBox.FontSize = 14;
         textBox.Padding = new Thickness(10, 7);
+        textBox.MinHeight = FieldMinHeight;
     }
 
     private static void StyleComboBox(ComboBox comboBox)
@@ -2882,6 +2886,7 @@ public sealed class MainWindow : Window
         comboBox.BorderBrush = BorderBrushSoft;
         comboBox.FontSize = 14;
         comboBox.Padding = new Thickness(8, 5);
+        comboBox.MinHeight = FieldMinHeight;
     }
 
     private static IBrush ChannelBrush(int channelId)

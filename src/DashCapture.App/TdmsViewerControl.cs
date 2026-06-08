@@ -13,6 +13,9 @@ namespace DashCapture.App;
 public sealed class TdmsViewerControl : UserControl, IDisposable
 {
     private const int MaxEnvelopeCacheEntries = 1536;
+    private const double ButtonMinHeight = 32;
+    private const double FieldMinHeight = 34;
+    private const double PanelRadius = 8;
 
     private static readonly IBrush PageBackground = new SolidColorBrush(Color.FromRgb(242, 246, 251));
     private static readonly IBrush PanelBackground = Brushes.White;
@@ -111,9 +114,9 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
     {
         var root = new Grid
         {
-            Margin = new Thickness(10),
+            Margin = new Thickness(12),
             RowDefinitions = new RowDefinitions("Auto,*,Auto"),
-            RowSpacing = 8
+            RowSpacing = 10
         };
 
         Control topPanel = BuildSidePanel();
@@ -138,7 +141,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
             Background = PanelBackground,
             BorderBrush = BorderBrushSoft,
             BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
+            CornerRadius = new CornerRadius(PanelRadius),
             Child = plotHost
         };
         Grid.SetRow(plotPanel, 1);
@@ -147,7 +150,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         var statusGrid = new Grid
         {
             ColumnDefinitions = new ColumnDefinitions("1.1*,1.4*,1.5*"),
-            ColumnSpacing = 12,
+            ColumnSpacing = 14,
             Children =
             {
                 _summaryText,
@@ -159,11 +162,11 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         Grid.SetColumn(_statusText, 2);
         var statusPanel = new Border
         {
-            Padding = new Thickness(10, 6),
+            Padding = new Thickness(12, 7),
             Background = PanelBackground2,
             BorderBrush = BorderBrushSoft,
             BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
+            CornerRadius = new CornerRadius(PanelRadius),
             Child = statusGrid
         };
         Grid.SetRow(statusPanel, 2);
@@ -224,7 +227,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         var sliderRow = new Grid
         {
             ColumnDefinitions = new ColumnDefinitions("*,Auto"),
-            ColumnSpacing = 12,
+            ColumnSpacing = 14,
             Children =
             {
                 _overviewSlider,
@@ -236,7 +239,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         var bottomLine = new Grid
         {
             ColumnDefinitions = new ColumnDefinitions("*,Auto"),
-            ColumnSpacing = 12,
+            ColumnSpacing = 14,
             Children =
             {
                 _fileText,
@@ -247,14 +250,14 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
 
         return new Border
         {
-            Padding = new Thickness(10),
+            Padding = new Thickness(12),
             Background = PanelBackground,
             BorderBrush = BorderBrushSoft,
             BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(8),
+            CornerRadius = new CornerRadius(PanelRadius),
             Child = new StackPanel
             {
-                Spacing = 8,
+                Spacing = 10,
                 Children = { toolbar, sliderRow, bottomLine }
             }
         };
@@ -265,8 +268,8 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         return new StackPanel
         {
             Orientation = Orientation.Horizontal,
-            Spacing = 5,
-            Margin = new Thickness(0, 0, 8, 6),
+            Spacing = 6,
+            Margin = new Thickness(0, 0, 10, 8),
             Children =
             {
                 new TextBlock
@@ -1227,7 +1230,9 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         button.Background = background;
         button.Foreground = Brushes.White;
         button.Padding = new Thickness(12, 7);
-        button.Margin = new Thickness(0, 0, 8, 8);
+        button.Margin = new Thickness(0, 0, 10, 8);
+        button.MinHeight = ButtonMinHeight;
+        button.MinWidth = 68;
         button.FontSize = 13;
         button.FontWeight = FontWeight.SemiBold;
     }
@@ -1239,6 +1244,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         textBox.BorderBrush = BorderBrushSoft;
         textBox.FontSize = 13;
         textBox.Padding = new Thickness(8, 5);
+        textBox.MinHeight = FieldMinHeight;
     }
 
     private static void StyleComboBox(ComboBox comboBox)
@@ -1248,6 +1254,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         comboBox.BorderBrush = BorderBrushSoft;
         comboBox.FontSize = 13;
         comboBox.Padding = new Thickness(7, 4);
+        comboBox.MinHeight = FieldMinHeight;
     }
 
     private static string FormatDuration(double seconds)
