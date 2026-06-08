@@ -9,30 +9,30 @@ namespace DashCapture.App;
 
 public sealed class TdmsWaveformControl : Control
 {
-    private static readonly IBrush BackgroundBrush = new SolidColorBrush(Color.FromRgb(242, 246, 251));
+    private static readonly IBrush BackgroundBrush = new SolidColorBrush(Color.FromRgb(232, 236, 241));
     private static readonly IBrush PlotBrush = Brushes.White;
-    private static readonly IBrush AxisBrush = new SolidColorBrush(Color.FromRgb(64, 76, 96));
-    private static readonly IBrush LabelBrush = new SolidColorBrush(Color.FromRgb(24, 35, 52));
-    private static readonly IBrush MutedBrush = new SolidColorBrush(Color.FromRgb(100, 116, 139));
-    private static readonly IBrush ProbeBrush = new SolidColorBrush(Color.FromRgb(18, 24, 33));
-    private static readonly IBrush SelectionBrush = new SolidColorBrush(Color.FromArgb(46, 38, 119, 220));
-    private static readonly Pen GridPen = new(new SolidColorBrush(Color.FromRgb(216, 226, 238)), 1);
-    private static readonly Pen MinorGridPen = new(new SolidColorBrush(Color.FromRgb(232, 238, 246)), 1);
+    private static readonly IBrush AxisBrush = new SolidColorBrush(Color.FromRgb(72, 82, 96));
+    private static readonly IBrush LabelBrush = new SolidColorBrush(Color.FromRgb(20, 29, 39));
+    private static readonly IBrush MutedBrush = new SolidColorBrush(Color.FromRgb(101, 111, 126));
+    private static readonly IBrush ProbeBrush = new SolidColorBrush(Color.FromRgb(31, 38, 48));
+    private static readonly IBrush SelectionBrush = new SolidColorBrush(Color.FromArgb(44, 31, 91, 140));
+    private static readonly Pen GridPen = new(new SolidColorBrush(Color.FromRgb(214, 220, 228)), 1);
+    private static readonly Pen MinorGridPen = new(new SolidColorBrush(Color.FromRgb(230, 234, 239)), 1);
     private static readonly Pen AxisPen = new(AxisBrush, 1.2);
-    private static readonly Pen ProbePen = new(new SolidColorBrush(Color.FromRgb(18, 24, 33)), 1);
-    private static readonly Pen SelectionPen = new(new SolidColorBrush(Color.FromRgb(38, 119, 220)), 1);
+    private static readonly Pen ProbePen = new(new SolidColorBrush(Color.FromRgb(31, 38, 48)), 1);
+    private static readonly Pen SelectionPen = new(new SolidColorBrush(Color.FromRgb(31, 91, 140)), 1);
     private static readonly Color[] Palette =
     {
-        Color.FromRgb(24, 118, 210),
-        Color.FromRgb(33, 150, 83),
-        Color.FromRgb(230, 149, 0),
-        Color.FromRgb(210, 69, 69),
-        Color.FromRgb(123, 88, 210),
-        Color.FromRgb(0, 143, 156),
-        Color.FromRgb(214, 108, 32),
-        Color.FromRgb(116, 132, 20),
-        Color.FromRgb(14, 116, 144),
-        Color.FromRgb(190, 24, 93)
+        Color.FromRgb(32, 91, 138),
+        Color.FromRgb(38, 117, 85),
+        Color.FromRgb(153, 106, 38),
+        Color.FromRgb(153, 72, 70),
+        Color.FromRgb(93, 86, 133),
+        Color.FromRgb(45, 112, 124),
+        Color.FromRgb(132, 85, 45),
+        Color.FromRgb(100, 111, 48),
+        Color.FromRgb(48, 99, 114),
+        Color.FromRgb(139, 65, 92)
     };
 
     private Rect _lastPlot;

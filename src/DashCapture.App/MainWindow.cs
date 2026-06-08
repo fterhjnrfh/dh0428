@@ -18,19 +18,21 @@ public sealed class MainWindow : Window
 {
     private const int MaxMonitorViews = 64;
     private const int MaxChannelsPerMonitorView = 64;
-    private const double ButtonMinHeight = 34;
-    private const double FieldMinHeight = 36;
-    private const double PanelRadius = 8;
+    private const double ButtonMinHeight = 32;
+    private const double FieldMinHeight = 34;
+    private const double PanelRadius = 4;
 
-    private static readonly IBrush PageBackground = new SolidColorBrush(Color.FromRgb(242, 246, 251));
+    private static readonly IBrush PageBackground = new SolidColorBrush(Color.FromRgb(232, 236, 241));
     private static readonly IBrush PanelBackground = new SolidColorBrush(Color.FromRgb(255, 255, 255));
-    private static readonly IBrush PanelBackground2 = new SolidColorBrush(Color.FromRgb(236, 243, 252));
-    private static readonly IBrush BorderBrushSoft = new SolidColorBrush(Color.FromRgb(199, 211, 228));
-    private static readonly IBrush TextPrimary = new SolidColorBrush(Color.FromRgb(24, 35, 52));
-    private static readonly IBrush TextSecondary = new SolidColorBrush(Color.FromRgb(91, 108, 132));
-    private static readonly IBrush AccentBlue = new SolidColorBrush(Color.FromRgb(38, 119, 220));
-    private static readonly IBrush AccentGreen = new SolidColorBrush(Color.FromRgb(35, 153, 100));
-    private static readonly IBrush AccentRed = new SolidColorBrush(Color.FromRgb(207, 71, 71));
+    private static readonly IBrush PanelBackground2 = new SolidColorBrush(Color.FromRgb(244, 246, 248));
+    private static readonly IBrush BorderBrushSoft = new SolidColorBrush(Color.FromRgb(190, 198, 208));
+    private static readonly IBrush TextPrimary = new SolidColorBrush(Color.FromRgb(20, 29, 39));
+    private static readonly IBrush TextSecondary = new SolidColorBrush(Color.FromRgb(82, 92, 106));
+    private static readonly IBrush AccentBlue = new SolidColorBrush(Color.FromRgb(31, 91, 140));
+    private static readonly IBrush AccentGreen = new SolidColorBrush(Color.FromRgb(35, 117, 80));
+    private static readonly IBrush AccentRed = new SolidColorBrush(Color.FromRgb(159, 66, 66));
+    private static readonly IBrush TopBarBackground = new SolidColorBrush(Color.FromRgb(248, 249, 251));
+    private static readonly IBrush StatusBarBackground = new SolidColorBrush(Color.FromRgb(31, 38, 48));
 
     private readonly CaptureSettings _settings;
     private readonly AcquisitionService _acquisition;
@@ -477,7 +479,7 @@ public sealed class MainWindow : Window
 
         var bar = new Grid
         {
-            Margin = new Thickness(16, 12),
+            Margin = new Thickness(14, 10),
             ColumnDefinitions = new ColumnDefinitions("Auto,Auto,Auto,*"),
             ColumnSpacing = 12
         };
@@ -501,7 +503,7 @@ public sealed class MainWindow : Window
         bar.Children.Add(statusPill);
 
         _captureTimerText.Foreground = TextSecondary;
-        _captureTimerText.FontSize = 15;
+        _captureTimerText.FontSize = 14;
         _captureTimerText.FontWeight = FontWeight.SemiBold;
         _captureTimerText.VerticalAlignment = VerticalAlignment.Center;
         _captureTimerText.HorizontalAlignment = HorizontalAlignment.Right;
@@ -510,7 +512,7 @@ public sealed class MainWindow : Window
 
         return new Border
         {
-            Background = PanelBackground,
+            Background = TopBarBackground,
             BorderBrush = BorderBrushSoft,
             BorderThickness = new Thickness(0, 0, 0, 1),
             Child = bar
@@ -521,8 +523,8 @@ public sealed class MainWindow : Window
     {
         return new TabControl
         {
-            Margin = new Thickness(14, 8, 14, 0),
-            FontSize = 15,
+            Margin = new Thickness(12, 7, 12, 0),
+            FontSize = 14,
             Items =
             {
                 new TabItem { Header = "\u4e3b\u76d1\u63a7", Content = BuildMonitorTab() },
@@ -567,12 +569,12 @@ public sealed class MainWindow : Window
         _activeViewText.Foreground = TextSecondary;
         _activeViewText.FontSize = 13;
         _activeViewText.TextWrapping = TextWrapping.Wrap;
-        _activeViewText.Width = 108;
+        _activeViewText.Width = 104;
 
-        _addViewButton.MinWidth = 88;
-        _removeViewButton.MinWidth = 88;
-        _showSelectionButton.MinWidth = 88;
-        _selectionDrawerHost.Width = 380;
+        _addViewButton.MinWidth = 82;
+        _removeViewButton.MinWidth = 82;
+        _showSelectionButton.MinWidth = 82;
+        _selectionDrawerHost.Width = 372;
         _selectionDrawerHost.Margin = new Thickness(10, 10, 0, 10);
         _selectionDrawerHost.Background = PanelBackground;
         _selectionDrawerHost.BorderBrush = BorderBrushSoft;
@@ -584,7 +586,7 @@ public sealed class MainWindow : Window
         {
             Margin = new Thickness(0, 10, 0, 10),
             Padding = new Thickness(10),
-            Width = 128,
+            Width = 120,
             Background = PanelBackground,
             BorderBrush = BorderBrushSoft,
             BorderThickness = new Thickness(1),
@@ -612,7 +614,7 @@ public sealed class MainWindow : Window
     private Control BuildSelectionDrawer()
     {
         _selectionTitle.Foreground = TextPrimary;
-        _selectionTitle.FontSize = 17;
+        _selectionTitle.FontSize = 16;
         _selectionTitle.FontWeight = FontWeight.SemiBold;
         _selectionTitle.TextWrapping = TextWrapping.Wrap;
         _selectionHint.Foreground = TextSecondary;
@@ -1689,7 +1691,7 @@ public sealed class MainWindow : Window
         _metrics.FontSize = 13;
         return new Border
         {
-            Background = new SolidColorBrush(Color.FromRgb(18, 24, 33)),
+            Background = StatusBarBackground,
             BorderBrush = BorderBrushSoft,
             BorderThickness = new Thickness(0, 1, 0, 0),
             Child = _metrics
@@ -2806,11 +2808,11 @@ public sealed class MainWindow : Window
     {
         return new Border
         {
-            Padding = new Thickness(12, 7),
+            Padding = new Thickness(10, 6),
             Background = PanelBackground2,
             BorderBrush = BorderBrushSoft,
             BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(16),
+            CornerRadius = new CornerRadius(PanelRadius),
             Child = new StackPanel
             {
                 Orientation = Orientation.Horizontal,
@@ -2821,7 +2823,7 @@ public sealed class MainWindow : Window
                     {
                         Text = "\u72b6\u6001",
                         Foreground = TextSecondary,
-                        FontSize = 13
+                        FontSize = 12
                     },
                     _status
                 }
@@ -2835,7 +2837,7 @@ public sealed class MainWindow : Window
         {
             Text = text,
             Foreground = TextPrimary,
-            FontSize = 20,
+            FontSize = 18,
             FontWeight = FontWeight.SemiBold
         };
     }
@@ -2851,7 +2853,7 @@ public sealed class MainWindow : Window
                 {
                     Text = label,
                     Foreground = TextSecondary,
-                    FontSize = 14
+                    FontSize = 13
                 },
                 editor
             }
@@ -2862,10 +2864,12 @@ public sealed class MainWindow : Window
     {
         button.Background = background;
         button.Foreground = Brushes.White;
-        button.Padding = new Thickness(14, 7);
-        button.MinWidth = 88;
+        button.BorderBrush = background;
+        button.BorderThickness = new Thickness(1);
+        button.Padding = new Thickness(12, 6);
+        button.MinWidth = 82;
         button.MinHeight = ButtonMinHeight;
-        button.FontSize = 14;
+        button.FontSize = 13;
         button.FontWeight = FontWeight.SemiBold;
     }
 
@@ -2874,8 +2878,8 @@ public sealed class MainWindow : Window
         textBox.Background = Brushes.White;
         textBox.Foreground = TextPrimary;
         textBox.BorderBrush = BorderBrushSoft;
-        textBox.FontSize = 14;
-        textBox.Padding = new Thickness(10, 7);
+        textBox.FontSize = 13;
+        textBox.Padding = new Thickness(9, 6);
         textBox.MinHeight = FieldMinHeight;
     }
 
@@ -2884,8 +2888,8 @@ public sealed class MainWindow : Window
         comboBox.Background = Brushes.White;
         comboBox.Foreground = TextPrimary;
         comboBox.BorderBrush = BorderBrushSoft;
-        comboBox.FontSize = 14;
-        comboBox.Padding = new Thickness(8, 5);
+        comboBox.FontSize = 13;
+        comboBox.Padding = new Thickness(8, 4);
         comboBox.MinHeight = FieldMinHeight;
     }
 
@@ -2893,12 +2897,12 @@ public sealed class MainWindow : Window
     {
         Color[] colors =
         {
-            Color.FromRgb(66, 133, 244),
-            Color.FromRgb(52, 168, 83),
-            Color.FromRgb(251, 188, 5),
-            Color.FromRgb(234, 67, 53),
-            Color.FromRgb(156, 102, 255),
-            Color.FromRgb(0, 173, 181)
+            Color.FromRgb(32, 91, 138),
+            Color.FromRgb(38, 117, 85),
+            Color.FromRgb(153, 106, 38),
+            Color.FromRgb(153, 72, 70),
+            Color.FromRgb(93, 86, 133),
+            Color.FromRgb(45, 112, 124)
         };
         return new SolidColorBrush(colors[Math.Abs(channelId) % colors.Length]);
     }

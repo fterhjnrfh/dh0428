@@ -15,16 +15,16 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
     private const int MaxEnvelopeCacheEntries = 1536;
     private const double ButtonMinHeight = 32;
     private const double FieldMinHeight = 34;
-    private const double PanelRadius = 8;
+    private const double PanelRadius = 4;
 
-    private static readonly IBrush PageBackground = new SolidColorBrush(Color.FromRgb(242, 246, 251));
+    private static readonly IBrush PageBackground = new SolidColorBrush(Color.FromRgb(232, 236, 241));
     private static readonly IBrush PanelBackground = Brushes.White;
-    private static readonly IBrush PanelBackground2 = new SolidColorBrush(Color.FromRgb(236, 243, 252));
-    private static readonly IBrush BorderBrushSoft = new SolidColorBrush(Color.FromRgb(199, 211, 228));
-    private static readonly IBrush TextPrimary = new SolidColorBrush(Color.FromRgb(24, 35, 52));
-    private static readonly IBrush TextSecondary = new SolidColorBrush(Color.FromRgb(91, 108, 132));
-    private static readonly IBrush AccentBlue = new SolidColorBrush(Color.FromRgb(38, 119, 220));
-    private static readonly IBrush AccentGreen = new SolidColorBrush(Color.FromRgb(35, 153, 100));
+    private static readonly IBrush PanelBackground2 = new SolidColorBrush(Color.FromRgb(244, 246, 248));
+    private static readonly IBrush BorderBrushSoft = new SolidColorBrush(Color.FromRgb(190, 198, 208));
+    private static readonly IBrush TextPrimary = new SolidColorBrush(Color.FromRgb(20, 29, 39));
+    private static readonly IBrush TextSecondary = new SolidColorBrush(Color.FromRgb(82, 92, 106));
+    private static readonly IBrush AccentBlue = new SolidColorBrush(Color.FromRgb(31, 91, 140));
+    private static readonly IBrush AccentGreen = new SolidColorBrush(Color.FromRgb(35, 117, 80));
 
     private readonly string _tdmRuntimeDir;
     private readonly Button _openFileButton = new() { Content = "Open File" };
@@ -124,7 +124,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         root.Children.Add(topPanel);
 
         _rangeText.Foreground = TextSecondary;
-        _rangeText.FontSize = 12;
+        _rangeText.FontSize = 11;
         _rangeText.VerticalAlignment = VerticalAlignment.Center;
 
         var plotHost = new DockPanel
@@ -193,7 +193,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         _selectedChannelsText.TextWrapping = TextWrapping.NoWrap;
         _selectedChannelsText.TextTrimming = TextTrimming.CharacterEllipsis;
         _exportProgressText.Foreground = AccentGreen;
-        _exportProgressText.FontSize = 13;
+        _exportProgressText.FontSize = 12;
         _exportProgressText.FontWeight = FontWeight.SemiBold;
         _exportProgressText.TextWrapping = TextWrapping.NoWrap;
         _exportProgressText.TextTrimming = TextTrimming.CharacterEllipsis;
@@ -222,7 +222,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
                 _autoY
             }
         };
-        _autoY.Margin = new Thickness(0, 5, 8, 5);
+        _autoY.Margin = new Thickness(0, 4, 10, 6);
 
         var sliderRow = new Grid
         {
@@ -1229,11 +1229,13 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
     {
         button.Background = background;
         button.Foreground = Brushes.White;
-        button.Padding = new Thickness(12, 7);
+        button.BorderBrush = background;
+        button.BorderThickness = new Thickness(1);
+        button.Padding = new Thickness(11, 6);
         button.Margin = new Thickness(0, 0, 10, 8);
         button.MinHeight = ButtonMinHeight;
-        button.MinWidth = 68;
-        button.FontSize = 13;
+        button.MinWidth = 64;
+        button.FontSize = 12;
         button.FontWeight = FontWeight.SemiBold;
     }
 
@@ -1242,7 +1244,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         textBox.Background = Brushes.White;
         textBox.Foreground = TextPrimary;
         textBox.BorderBrush = BorderBrushSoft;
-        textBox.FontSize = 13;
+        textBox.FontSize = 12;
         textBox.Padding = new Thickness(8, 5);
         textBox.MinHeight = FieldMinHeight;
     }
@@ -1252,7 +1254,7 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         comboBox.Background = Brushes.White;
         comboBox.Foreground = TextPrimary;
         comboBox.BorderBrush = BorderBrushSoft;
-        comboBox.FontSize = 13;
+        comboBox.FontSize = 12;
         comboBox.Padding = new Thickness(7, 4);
         comboBox.MinHeight = FieldMinHeight;
     }

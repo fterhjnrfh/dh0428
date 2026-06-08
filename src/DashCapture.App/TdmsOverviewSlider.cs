@@ -8,15 +8,15 @@ namespace DashCapture.App;
 
 public sealed class TdmsOverviewSlider : Control
 {
-    private static readonly IBrush TrackBrush = new SolidColorBrush(Color.FromRgb(236, 243, 252));
-    private static readonly IBrush EmptyBrush = new SolidColorBrush(Color.FromRgb(190, 202, 220));
-    private static readonly IBrush DimBrush = new SolidColorBrush(Color.FromArgb(40, 24, 35, 52));
-    private static readonly IBrush WindowBrush = new SolidColorBrush(Color.FromArgb(82, 38, 119, 220));
-    private static readonly IBrush HandleBrush = new SolidColorBrush(Color.FromArgb(190, 38, 119, 220));
-    private static readonly Pen BorderPen = new(new SolidColorBrush(Color.FromRgb(199, 211, 228)), 1);
-    private static readonly Pen OverviewPen = new(new SolidColorBrush(Color.FromArgb(190, 38, 119, 220)), 1);
-    private static readonly Pen WindowPen = new(new SolidColorBrush(Color.FromRgb(38, 119, 220)), 1.2);
-    private static readonly Pen CenterPen = new(new SolidColorBrush(Color.FromArgb(90, 91, 108, 132)), 1);
+    private static readonly IBrush TrackBrush = new SolidColorBrush(Color.FromRgb(244, 246, 248));
+    private static readonly IBrush EmptyBrush = new SolidColorBrush(Color.FromRgb(174, 184, 197));
+    private static readonly IBrush DimBrush = new SolidColorBrush(Color.FromArgb(42, 20, 29, 39));
+    private static readonly IBrush WindowBrush = new SolidColorBrush(Color.FromArgb(78, 31, 91, 140));
+    private static readonly IBrush HandleBrush = new SolidColorBrush(Color.FromArgb(190, 31, 91, 140));
+    private static readonly Pen BorderPen = new(new SolidColorBrush(Color.FromRgb(190, 198, 208)), 1);
+    private static readonly Pen OverviewPen = new(new SolidColorBrush(Color.FromArgb(185, 31, 91, 140)), 1);
+    private static readonly Pen WindowPen = new(new SolidColorBrush(Color.FromRgb(31, 91, 140)), 1.2);
+    private static readonly Pen CenterPen = new(new SolidColorBrush(Color.FromArgb(90, 82, 92, 106)), 1);
 
     private IReadOnlyList<TdmsChannelEnvelope> _overview = Array.Empty<TdmsChannelEnvelope>();
     private OverviewBin[] _overviewBins = Array.Empty<OverviewBin>();
