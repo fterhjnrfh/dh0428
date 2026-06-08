@@ -20,6 +20,8 @@ public static class AppSettingsLoader
         settings.Sdk.ParamDir = Resolve(settings.Sdk.ParamDir);
         settings.Storage.RootPath = Resolve(settings.Storage.RootPath);
         settings.Storage.TdmRuntimeDir = Resolve(settings.Storage.TdmRuntimeDir);
+        settings.Storage.ChannelSelection ??= new StorageChannelSelectionSettings();
+        settings.Storage.ChannelSelection.Channels ??= new List<MonitorChannelSettings>();
         settings.Platform.NativeLibraryRoot = Resolve(settings.Platform.NativeLibraryRoot);
         NativeBootstrap.ConfigureSearchDirectories(PlatformNativeDirectories(settings).Select(Resolve));
         return settings;
@@ -37,6 +39,26 @@ public static class AppSettingsLoader
         }
 
         display["Views"] = JsonSerializer.SerializeToNode(views, Options());
+        WriteSettingsRoot(path, root);
+    }
+
+    public static void SaveStorageChannelSelection(StorageChannelSelectionSettings channelSelection)
+    {
+        string path = FindSettingsPath();
+        JsonObject root = ReadSettingsRoot(path);
+        var storage = root["Storage"] as JsonObject;
+        if (storage is null)
+        {
+            storage = new JsonObject();
+            root["Storage"] = storage;
+        }
+
+        storage["ChannelSelection"] = JsonSerializer.SerializeToNode(channelSelection, Options());
+        WriteSettingsRoot(path, root);
+    }
+
+    private static void WriteSettingsRoot(string path, JsonObject root)
+    {
         string? directory = Path.GetDirectoryName(path);
         if (!string.IsNullOrWhiteSpace(directory))
         {

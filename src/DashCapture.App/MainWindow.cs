@@ -49,6 +49,15 @@ public sealed class MainWindow : Window
     private readonly TextBlock _activeViewText = new();
     private readonly TextBlock _selectionTitle = new();
     private readonly TextBlock _selectionHint = new();
+    private readonly RadioButton _storageAllChannelsRadio = new() { Content = "\u5168\u90e8\u901a\u9053", GroupName = "StorageChannelMode" };
+    private readonly RadioButton _storageSelectedChannelsRadio = new() { Content = "\u4ec5\u4fdd\u5b58\u9009\u4e2d\u901a\u9053", GroupName = "StorageChannelMode" };
+    private readonly Button _storageSelectAllChannelsButton = new() { Content = "\u5168\u9009" };
+    private readonly Button _storageClearChannelsButton = new() { Content = "\u6e05\u7a7a" };
+    private readonly Button _storageOnlineChannelsButton = new() { Content = "\u4ec5\u5728\u7ebf\u901a\u9053" };
+    private readonly Button _storageUseMonitorChannelsButton = new() { Content = "\u4f7f\u7528\u5f53\u524d\u76d1\u63a7\u89c6\u56fe" };
+    private readonly StackPanel _storageChannelTreePanel = new() { Spacing = 6 };
+    private readonly TextBlock _storageChannelSummary = new();
+    private readonly TextBlock _storageChannelHint = new();
     private readonly StackPanel _deviceInfoPanel = new();
     private readonly TextBox _storagePath = new();
     private readonly TextBox _customFileName = new();
@@ -101,6 +110,7 @@ public sealed class MainWindow : Window
     private readonly DispatcherTimer _runtimeStatsTimer;
     private readonly RuntimeUsageSampler _runtimeUsageSampler = new();
     private readonly List<MonitorViewState> _monitorViews = new();
+    private readonly HashSet<ChannelKey> _storageSelectedKeys = new();
     private DateTimeOffset _captureStartedAt;
     private DateTimeOffset _lastRuntimeStatsAt = DateTimeOffset.UtcNow;
     private int _activeViewIndex;
@@ -111,6 +121,7 @@ public sealed class MainWindow : Window
     private bool _shutdownStarted;
     private bool _monitorViewsLoadedFromSettings;
     private bool _updatingSelectionPanel;
+    private bool _updatingStorageChannelPanel;
     private string? _lastFaultMessage;
 
     public MainWindow()
@@ -125,6 +136,7 @@ public sealed class MainWindow : Window
             _settings.Display.MaxDisplayPointsPerSecond);
         _tdmsViewer = new TdmsViewerControl(_settings.Storage.TdmRuntimeDir);
         LoadMonitorViewsFromSettings();
+        LoadStorageChannelSelectionFromSettings();
         if (_monitorViews.Count == 0)
         {
             AddMonitorView();
@@ -134,6 +146,8 @@ public sealed class MainWindow : Window
         _customFileName.Text = _settings.Storage.CustomFileName;
         _storageEnabledCheck.IsChecked = _settings.Storage.Enabled;
         _storageTabEnabledCheck.IsChecked = _settings.Storage.Enabled;
+        _storageAllChannelsRadio.IsChecked = _settings.Storage.ChannelSelection.Mode != StorageChannelSelectionMode.SelectedChannels;
+        _storageSelectedChannelsRadio.IsChecked = _settings.Storage.ChannelSelection.Mode == StorageChannelSelectionMode.SelectedChannels;
         _namingMode.ItemsSource = new[] { "\u6309\u65f6\u95f4\u547d\u540d", "\u81ea\u5b9a\u4e49\u547d\u540d" };
         _namingMode.SelectedIndex = _settings.Storage.NamingMode == FileNamingMode.Time ? 0 : 1;
         InitializeCompressionControls();
@@ -148,6 +162,10 @@ public sealed class MainWindow : Window
         StyleControlButton(_closeSelectionButton, AccentBlue);
         StyleControlButton(_selectAllChannelsButton, AccentBlue);
         StyleControlButton(_clearChannelsButton, AccentBlue);
+        StyleControlButton(_storageSelectAllChannelsButton, AccentBlue);
+        StyleControlButton(_storageClearChannelsButton, AccentBlue);
+        StyleControlButton(_storageOnlineChannelsButton, AccentGreen);
+        StyleControlButton(_storageUseMonitorChannelsButton, AccentBlue);
 
         Title = "DASH Capture";
         Background = PageBackground;
@@ -232,6 +250,30 @@ public sealed class MainWindow : Window
 
             UpdateStoragePreview();
         };
+        _storageAllChannelsRadio.IsCheckedChanged += (_, _) =>
+        {
+            if (_updatingStorageChannelPanel || _storageAllChannelsRadio.IsChecked != true)
+            {
+                return;
+            }
+
+            _settings.Storage.ChannelSelection.Mode = StorageChannelSelectionMode.AllChannels;
+            CommitStorageChannelSelectionChange();
+        };
+        _storageSelectedChannelsRadio.IsCheckedChanged += (_, _) =>
+        {
+            if (_updatingStorageChannelPanel || _storageSelectedChannelsRadio.IsChecked != true)
+            {
+                return;
+            }
+
+            _settings.Storage.ChannelSelection.Mode = StorageChannelSelectionMode.SelectedChannels;
+            CommitStorageChannelSelectionChange();
+        };
+        _storageSelectAllChannelsButton.Click += (_, _) => SetAllStorageChannels();
+        _storageClearChannelsButton.Click += (_, _) => ClearStorageChannels();
+        _storageOnlineChannelsButton.Click += (_, _) => SetOnlineStorageChannels();
+        _storageUseMonitorChannelsButton.Click += (_, _) => UseActiveMonitorViewForStorage();
         _compressionEnabledCheck.IsCheckedChanged += (_, _) =>
         {
             UpdateCompressionParameterVisibility();
@@ -785,7 +827,7 @@ public sealed class MainWindow : Window
         {
             Margin = new Thickness(18),
             ColumnDefinitions = new ColumnDefinitions("*,*"),
-            RowDefinitions = new RowDefinitions("Auto,Auto"),
+            RowDefinitions = new RowDefinitions("Auto,Auto,Auto"),
             ColumnSpacing = 14,
             RowSpacing = 14,
             HorizontalAlignment = HorizontalAlignment.Stretch
@@ -850,10 +892,16 @@ public sealed class MainWindow : Window
         Grid.SetRow(compressionModule, 0);
         root.Children.Add(compressionModule);
 
+        Control channelModule = StorageModule("\u5b58\u50a8\u901a\u9053", BuildStorageChannelSelectionPanel());
+        Grid.SetColumn(channelModule, 0);
+        Grid.SetRow(channelModule, 1);
+        Grid.SetColumnSpan(channelModule, 2);
+        root.Children.Add(channelModule);
+
         UpdateStorageStatsFields(null);
         Control runtimeModule = StorageModule("\u8fd0\u884c\u53c2\u6570", BuildRuntimeParametersPanel());
         Grid.SetColumn(runtimeModule, 0);
-        Grid.SetRow(runtimeModule, 1);
+        Grid.SetRow(runtimeModule, 2);
         Grid.SetColumnSpan(runtimeModule, 2);
         root.Children.Add(runtimeModule);
 
@@ -863,6 +911,459 @@ public sealed class MainWindow : Window
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto
         };
+    }
+
+    private Control BuildStorageChannelSelectionPanel()
+    {
+        _storageChannelSummary.Foreground = TextPrimary;
+        _storageChannelSummary.FontSize = 14;
+        _storageChannelSummary.TextWrapping = TextWrapping.Wrap;
+        _storageChannelHint.Foreground = TextSecondary;
+        _storageChannelHint.FontSize = 13;
+        _storageChannelHint.TextWrapping = TextWrapping.Wrap;
+        _storageAllChannelsRadio.Foreground = TextPrimary;
+        _storageSelectedChannelsRadio.Foreground = TextPrimary;
+
+        var modeRow = new WrapPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Children =
+            {
+                _storageAllChannelsRadio,
+                _storageSelectedChannelsRadio
+            }
+        };
+        _storageAllChannelsRadio.Margin = new Thickness(0, 0, 18, 0);
+
+        var actionRow = new WrapPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Children =
+            {
+                _storageSelectAllChannelsButton,
+                _storageClearChannelsButton,
+                _storageOnlineChannelsButton,
+                _storageUseMonitorChannelsButton
+            }
+        };
+        foreach (Control child in actionRow.Children)
+        {
+            child.Margin = new Thickness(0, 0, 8, 8);
+        }
+
+        var treeScroll = new ScrollViewer
+        {
+            Content = _storageChannelTreePanel,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            MaxHeight = 340
+        };
+
+        var panel = new StackPanel
+        {
+            Spacing = 10,
+            Children =
+            {
+                modeRow,
+                _storageChannelSummary,
+                _storageChannelHint,
+                actionRow,
+                treeScroll
+            }
+        };
+
+        RebuildStorageChannelTree();
+        return panel;
+    }
+
+    private void LoadStorageChannelSelectionFromSettings()
+    {
+        _storageSelectedKeys.Clear();
+        foreach (MonitorChannelSettings channel in _settings.Storage.ChannelSelection.Channels)
+        {
+            _storageSelectedKeys.Add(new ChannelKey(channel.DeviceIp, channel.DeviceId, channel.ChannelId));
+        }
+    }
+
+    private void RebuildStorageChannelTree()
+    {
+        _storageChannelTreePanel.Children.Clear();
+        _updatingStorageChannelPanel = true;
+        try
+        {
+            NormalizeStorageSelectedKeys();
+            _storageAllChannelsRadio.IsChecked = _settings.Storage.ChannelSelection.Mode != StorageChannelSelectionMode.SelectedChannels;
+            _storageSelectedChannelsRadio.IsChecked = _settings.Storage.ChannelSelection.Mode == StorageChannelSelectionMode.SelectedChannels;
+
+            if (_acquisition.Devices.Count == 0)
+            {
+                _storageChannelTreePanel.Children.Add(new TextBlock
+                {
+                    Text = "\u6682\u65e0\u8bbe\u5907",
+                    Foreground = TextSecondary,
+                    FontSize = 14,
+                    Margin = new Thickness(2, 6)
+                });
+                return;
+            }
+
+            int deviceIndex = 0;
+            foreach (DeviceDescriptor device in _acquisition.Devices)
+            {
+                _storageChannelTreePanel.Children.Add(BuildStorageDeviceSelectionNode(device, deviceIndex + 1));
+                deviceIndex++;
+            }
+        }
+        finally
+        {
+            _updatingStorageChannelPanel = false;
+            UpdateStorageChannelSummary();
+            UpdateStorageChannelControlState();
+        }
+    }
+
+    private Control BuildStorageDeviceSelectionNode(DeviceDescriptor device, int displayIndex)
+    {
+        bool selectedMode = _settings.Storage.ChannelSelection.Mode == StorageChannelSelectionMode.SelectedChannels;
+        ChannelDescriptor[] channels = device.Channels.ToArray();
+        int selectedCount = selectedMode
+            ? channels.Count(IsStorageChannelSelected)
+            : channels.Length;
+        bool? checkedState = selectedCount == 0
+            ? false
+            : selectedCount == channels.Length ? true : null;
+
+        var deviceCheck = new CheckBox
+        {
+            IsThreeState = true,
+            IsChecked = checkedState,
+            Content = $"{FormatDeviceName(device, displayIndex)}    {selectedCount}/{channels.Length}",
+            Foreground = device.Online ? TextPrimary : TextSecondary,
+            FontSize = 14,
+            FontWeight = FontWeight.SemiBold,
+            IsEnabled = selectedMode
+        };
+        deviceCheck.IsCheckedChanged += (_, _) =>
+        {
+            if (_updatingStorageChannelPanel)
+            {
+                return;
+            }
+
+            if (deviceCheck.IsChecked == true)
+            {
+                SetStorageDeviceChannels(device, selected: true);
+            }
+            else if (deviceCheck.IsChecked == false)
+            {
+                SetStorageDeviceChannels(device, selected: false);
+            }
+        };
+
+        var channelPanel = new StackPanel
+        {
+            Spacing = 4,
+            Margin = new Thickness(22, 6, 0, 8)
+        };
+        foreach (ChannelDescriptor channel in channels)
+        {
+            var channelCheck = new CheckBox
+            {
+                IsChecked = !selectedMode || IsStorageChannelSelected(channel),
+                Content = FormatChannelSelectionName(channel),
+                Foreground = channel.Online ? TextPrimary : TextSecondary,
+                FontSize = 13,
+                IsEnabled = selectedMode
+            };
+            channelCheck.IsCheckedChanged += (_, _) =>
+            {
+                if (_updatingStorageChannelPanel)
+                {
+                    return;
+                }
+
+                TrySetStorageChannel(channel, channelCheck.IsChecked == true);
+                CommitStorageChannelSelectionChange();
+            };
+            channelPanel.Children.Add(channelCheck);
+        }
+
+        return new Expander
+        {
+            Header = deviceCheck,
+            IsExpanded = selectedCount > 0 || displayIndex == 1,
+            Content = channelPanel,
+            BorderBrush = BorderBrushSoft,
+            BorderThickness = new Thickness(1),
+            Background = PanelBackground2,
+            Margin = new Thickness(0, 0, 0, 6),
+            Padding = new Thickness(8, 4)
+        };
+    }
+
+    private void SetAllStorageChannels()
+    {
+        if (_acquisition.Devices.Count == 0)
+        {
+            return;
+        }
+
+        SetStorageChannelMode(StorageChannelSelectionMode.SelectedChannels);
+        _storageSelectedKeys.Clear();
+        foreach (ChannelDescriptor channel in _acquisition.Devices.SelectMany(device => device.Channels))
+        {
+            _storageSelectedKeys.Add(new ChannelKey(channel));
+        }
+
+        CommitStorageChannelSelectionChange();
+    }
+
+    private void ClearStorageChannels()
+    {
+        SetStorageChannelMode(StorageChannelSelectionMode.SelectedChannels);
+        _storageSelectedKeys.Clear();
+        CommitStorageChannelSelectionChange();
+    }
+
+    private void SetOnlineStorageChannels()
+    {
+        if (_acquisition.Devices.Count == 0)
+        {
+            return;
+        }
+
+        SetStorageChannelMode(StorageChannelSelectionMode.SelectedChannels);
+        _storageSelectedKeys.Clear();
+        foreach (ChannelDescriptor channel in _acquisition.Devices
+                     .Where(device => device.Online)
+                     .SelectMany(device => device.Channels)
+                     .Where(channel => channel.Online))
+        {
+            _storageSelectedKeys.Add(new ChannelKey(channel));
+        }
+
+        CommitStorageChannelSelectionChange();
+    }
+
+    private void UseActiveMonitorViewForStorage()
+    {
+        if (_monitorViews.Count == 0)
+        {
+            return;
+        }
+
+        SetStorageChannelMode(StorageChannelSelectionMode.SelectedChannels);
+        _storageSelectedKeys.Clear();
+        foreach (ChannelKey key in _monitorViews[_activeViewIndex].SelectedKeys)
+        {
+            _storageSelectedKeys.Add(key);
+        }
+
+        CommitStorageChannelSelectionChange();
+    }
+
+    private void SetStorageDeviceChannels(DeviceDescriptor device, bool selected)
+    {
+        SetStorageChannelMode(StorageChannelSelectionMode.SelectedChannels);
+        foreach (ChannelDescriptor channel in device.Channels)
+        {
+            TrySetStorageChannel(channel, selected);
+        }
+
+        CommitStorageChannelSelectionChange();
+    }
+
+    private bool TrySetStorageChannel(ChannelDescriptor channel, bool selected)
+    {
+        ChannelKey key = new(channel);
+        RemoveStorageChannelKey(channel);
+        if (selected)
+        {
+            _storageSelectedKeys.Add(key);
+        }
+
+        return true;
+    }
+
+    private void RemoveStorageChannelKey(ChannelDescriptor channel)
+    {
+        ChannelKey key = new(channel);
+        _storageSelectedKeys.RemoveWhere(item =>
+            item == key ||
+            (item.DeviceId == channel.DeviceId && item.ChannelId == channel.ChannelId));
+    }
+
+    private bool IsStorageChannelSelected(ChannelDescriptor channel)
+    {
+        ChannelKey key = new(channel);
+        return _storageSelectedKeys.Contains(key) ||
+               _storageSelectedKeys.Any(item => item.DeviceId == channel.DeviceId && item.ChannelId == channel.ChannelId);
+    }
+
+    private void SetStorageChannelMode(StorageChannelSelectionMode mode)
+    {
+        _settings.Storage.ChannelSelection.Mode = mode;
+        _updatingStorageChannelPanel = true;
+        try
+        {
+            _storageAllChannelsRadio.IsChecked = mode == StorageChannelSelectionMode.AllChannels;
+            _storageSelectedChannelsRadio.IsChecked = mode == StorageChannelSelectionMode.SelectedChannels;
+        }
+        finally
+        {
+            _updatingStorageChannelPanel = false;
+        }
+    }
+
+    private void CommitStorageChannelSelectionChange()
+    {
+        NormalizeStorageSelectedKeys();
+        PersistStorageChannelSelectionSettings();
+        RebuildStorageChannelTree();
+        UpdateStoragePreview();
+    }
+
+    private void PersistStorageChannelSelectionSettings()
+    {
+        try
+        {
+            var selection = new StorageChannelSelectionSettings
+            {
+                Mode = _settings.Storage.ChannelSelection.Mode,
+                Channels = _storageSelectedKeys
+                    .OrderBy(key => key.DeviceId)
+                    .ThenBy(key => key.ChannelId)
+                    .ThenBy(key => key.DeviceIp, StringComparer.OrdinalIgnoreCase)
+                    .Select(key => new MonitorChannelSettings
+                    {
+                        DeviceIp = key.DeviceIp,
+                        DeviceId = key.DeviceId,
+                        ChannelId = key.ChannelId
+                    })
+                    .ToList()
+            };
+
+            _settings.Storage.ChannelSelection = selection;
+            AppSettingsLoader.SaveStorageChannelSelection(selection);
+        }
+        catch
+        {
+        }
+    }
+
+    private void NormalizeStorageSelectedKeys()
+    {
+        if (_acquisition.Devices.Count == 0 || _storageSelectedKeys.Count == 0)
+        {
+            return;
+        }
+
+        Dictionary<ChannelKey, ChannelDescriptor> exactLookup = _acquisition.Devices
+            .SelectMany(device => device.Channels)
+            .GroupBy(channel => new ChannelKey(channel))
+            .ToDictionary(group => group.Key, group => group.First());
+        Dictionary<(int DeviceId, int ChannelId), ChannelDescriptor> fallbackLookup = _acquisition.Devices
+            .SelectMany(device => device.Channels)
+            .GroupBy(channel => (channel.DeviceId, channel.ChannelId))
+            .ToDictionary(group => group.Key, group => group.First());
+
+        var normalizedKeys = new HashSet<ChannelKey>();
+        foreach (ChannelKey selectedKey in _storageSelectedKeys.ToArray())
+        {
+            if (exactLookup.TryGetValue(selectedKey, out ChannelDescriptor? channel) ||
+                fallbackLookup.TryGetValue((selectedKey.DeviceId, selectedKey.ChannelId), out channel))
+            {
+                normalizedKeys.Add(new ChannelKey(channel));
+            }
+            else
+            {
+                normalizedKeys.Add(selectedKey);
+            }
+        }
+
+        _storageSelectedKeys.Clear();
+        foreach (ChannelKey key in normalizedKeys)
+        {
+            _storageSelectedKeys.Add(key);
+        }
+    }
+
+    private IReadOnlyList<DeviceDescriptor> ResolveStorageDevices(IReadOnlyList<DeviceDescriptor> devices)
+    {
+        if (_settings.Storage.ChannelSelection.Mode != StorageChannelSelectionMode.SelectedChannels)
+        {
+            return devices;
+        }
+
+        if (devices.Count == 0 || _storageSelectedKeys.Count == 0)
+        {
+            return Array.Empty<DeviceDescriptor>();
+        }
+
+        var selectedDevices = new List<DeviceDescriptor>();
+        foreach (DeviceDescriptor device in devices)
+        {
+            ChannelDescriptor[] selectedChannels = device.Channels
+                .Where(IsStorageChannelSelected)
+                .ToArray();
+            if (selectedChannels.Length > 0)
+            {
+                selectedDevices.Add(device with { Channels = selectedChannels });
+            }
+        }
+
+        return selectedDevices;
+    }
+
+    private void UpdateStorageChannelSummary()
+    {
+        int totalChannels = _acquisition.Devices.Sum(device => device.Channels.Count);
+        int selectedChannels = ResolveStorageDevices(_acquisition.Devices).Sum(device => device.Channels.Count);
+        bool selectedMode = _settings.Storage.ChannelSelection.Mode == StorageChannelSelectionMode.SelectedChannels;
+
+        if (totalChannels == 0)
+        {
+            _storageChannelSummary.Text = selectedMode
+                ? $"\u672a\u8fde\u63a5\u8bbe\u5907\uff1b\u5df2\u4fdd\u5b58 {_storageSelectedKeys.Count} \u4e2a\u901a\u9053\u914d\u7f6e"
+                : "\u672a\u8fde\u63a5\u8bbe\u5907\uff1b\u8fde\u63a5\u540e\u9ed8\u8ba4\u4fdd\u5b58\u5168\u90e8\u901a\u9053";
+        }
+        else
+        {
+            _storageChannelSummary.Text = selectedMode
+                ? $"\u672c\u6b21\u5c06\u4fdd\u5b58 {selectedChannels}/{totalChannels} \u4e2a\u901a\u9053"
+                : $"\u672c\u6b21\u5c06\u4fdd\u5b58\u5168\u90e8 {totalChannels} \u4e2a\u901a\u9053";
+        }
+
+        if (_captureUiRunning)
+        {
+            _storageChannelHint.Text = "\u91c7\u96c6\u8fd0\u884c\u4e2d\uff0c\u5b58\u50a8\u901a\u9053\u5df2\u9501\u5b9a\uff0c\u4fee\u6539\u5c06\u5728\u4e0b\u6b21\u91c7\u96c6\u524d\u751f\u6548";
+        }
+        else if (!selectedMode)
+        {
+            _storageChannelHint.Text = "\u5168\u90e8\u901a\u9053\u6a21\u5f0f\u4e0b\u4f1a\u5199\u5165\u5f53\u524d\u8bbe\u5907\u7684\u6240\u6709\u901a\u9053";
+        }
+        else if (selectedChannels == 0)
+        {
+            _storageChannelHint.Text = "\u4ec5\u4fdd\u5b58\u9009\u4e2d\u901a\u9053\u6a21\u5f0f\u4e0b\uff0c\u5f00\u59cb\u91c7\u96c6\u524d\u81f3\u5c11\u9700\u8981\u9009\u62e9\u4e00\u4e2a\u901a\u9053";
+        }
+        else
+        {
+            _storageChannelHint.Text = "\u53ef\u8de8\u8bbe\u5907\u9009\u62e9\u9700\u8981\u5199\u76d8\u7684\u901a\u9053\uff0c\u914d\u7f6e\u4f1a\u81ea\u52a8\u4fdd\u5b58";
+        }
+    }
+
+    private void UpdateStorageChannelControlState()
+    {
+        bool canEdit = !_captureUiRunning && !_captureCleanupInProgress;
+        bool selectedMode = _settings.Storage.ChannelSelection.Mode == StorageChannelSelectionMode.SelectedChannels;
+        bool hasDevices = _acquisition.Devices.Count > 0;
+
+        _storageAllChannelsRadio.IsEnabled = canEdit;
+        _storageSelectedChannelsRadio.IsEnabled = canEdit;
+        _storageChannelTreePanel.IsEnabled = canEdit && selectedMode;
+        _storageSelectAllChannelsButton.IsEnabled = canEdit && hasDevices;
+        _storageClearChannelsButton.IsEnabled = canEdit;
+        _storageOnlineChannelsButton.IsEnabled = canEdit && hasDevices;
+        _storageUseMonitorChannelsButton.IsEnabled = canEdit && _monitorViews.Count > 0;
     }
 
     private Control BuildCompressionSettingsPanel()
@@ -1159,6 +1660,7 @@ public sealed class MainWindow : Window
 
         ApplyMonitorSelectionsToStore();
         RebuildSelectionTree();
+        RebuildStorageChannelTree();
         RefreshDeviceInfoPanel();
     }
 
@@ -1197,6 +1699,29 @@ public sealed class MainWindow : Window
         }.ShowDialog(this);
     }
 
+    private async Task ShowStorageChannelSelectionRequiredAsync()
+    {
+        await new Window
+        {
+            Title = "\u5b58\u50a8\u901a\u9053\u672a\u9009\u62e9",
+            Width = 520,
+            Height = 220,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Content = new Border
+            {
+                Padding = new Thickness(18),
+                Background = Brushes.White,
+                Child = new TextBlock
+                {
+                    Text = "\u5f53\u524d\u5b58\u50a8\u6a21\u5f0f\u4e3a\u201c\u4ec5\u4fdd\u5b58\u9009\u4e2d\u901a\u9053\u201d\uff0c\u4f46\u6ca1\u6709\u53ef\u7528\u7684\u5b58\u50a8\u901a\u9053\u3002\n\n\u8bf7\u5728\u201c\u5b58\u50a8\u201d\u9875\u9762\u9009\u62e9\u9700\u8981\u5199\u76d8\u7684\u8bbe\u5907\u901a\u9053\uff0c\u6216\u5207\u6362\u4e3a\u201c\u5168\u90e8\u901a\u9053\u201d\u3002",
+                    TextWrapping = TextWrapping.Wrap,
+                    Foreground = TextPrimary,
+                    FontSize = 14
+                }
+            }
+        }.ShowDialog(this);
+    }
+
     private async Task StartAsync()
     {
         if (!_acquisition.IsConnected)
@@ -1211,7 +1736,16 @@ public sealed class MainWindow : Window
 
         ApplyMonitorSelectionsToStore();
         ApplyStorageSettingsFromUi();
+        NormalizeStorageSelectedKeys();
         bool storageEnabled = _settings.Storage.Enabled;
+        IReadOnlyList<DeviceDescriptor> storageDevices = ResolveStorageDevices(_acquisition.Devices);
+        if (storageEnabled && storageDevices.Sum(device => device.Channels.Count) == 0)
+        {
+            await ShowStorageChannelSelectionRequiredAsync();
+            RebuildStorageChannelTree();
+            return;
+        }
+
         _acquisition.SetStorageEnabled(storageEnabled);
         _waveformStore.Clear();
         _lastStorageStats = null;
@@ -1228,7 +1762,7 @@ public sealed class MainWindow : Window
         {
             _storageService = new TdmsStorageService(_acquisition, _settings.Storage);
             _storageService.Faulted += fault => Dispatcher.UIThread.Post(() => _status.Text = fault.Message);
-            await _storageService.StartAsync(_acquisition.Devices, CancellationToken.None);
+            await _storageService.StartAsync(storageDevices, _acquisition.Devices, CancellationToken.None);
         }
 
         await _displayPipeline.StartAsync(CancellationToken.None);
@@ -1238,6 +1772,8 @@ public sealed class MainWindow : Window
         SetButtons(connect: false, start: false, stop: true);
         _storageEnabledCheck.IsEnabled = false;
         _storageTabEnabledCheck.IsEnabled = false;
+        UpdateStorageChannelControlState();
+        UpdateStorageChannelSummary();
         _status.Text = storageEnabled
             ? (_settings.Storage.Compression.Enabled && _settings.Storage.Compression.Algorithm != CompressionAlgorithm.None ? "\u91c7\u96c6\u4e2d\uff0c\u6b63\u5728\u5199\u5165\u538b\u7f29 .dhcap" : "\u91c7\u96c6\u4e2d\uff0c\u6b63\u5728\u5199\u5165 Codec=None \u539f\u59cb .dhcap")
             : "\u91c7\u96c6\u4e2d\uff0c\u4ec5\u663e\u793a\u4e0d\u4fdd\u5b58";
@@ -1290,6 +1826,8 @@ public sealed class MainWindow : Window
             _storageEnabledCheck.IsEnabled = true;
             _storageTabEnabledCheck.IsEnabled = true;
             _captureUiRunning = false;
+            UpdateStorageChannelControlState();
+            UpdateStorageChannelSummary();
             if (_acquisition.Devices.Count > 0)
             {
                 string? reason = string.IsNullOrWhiteSpace(stopReason) ? _lastFaultMessage : stopReason;
@@ -2005,6 +2543,9 @@ public sealed class MainWindow : Window
         _settings.Storage.Enabled = _storageEnabledCheck.IsChecked == true;
         _settings.Storage.NamingMode = _namingMode.SelectedIndex == 1 ? FileNamingMode.Custom : FileNamingMode.Time;
         _settings.Storage.CustomFileName = string.IsNullOrWhiteSpace(_customFileName.Text) ? "DashCapture" : _customFileName.Text.Trim();
+        _settings.Storage.ChannelSelection.Mode = _storageSelectedChannelsRadio.IsChecked == true
+            ? StorageChannelSelectionMode.SelectedChannels
+            : StorageChannelSelectionMode.AllChannels;
         CompressionSettings compression = _settings.Storage.Compression;
         compression.Enabled = _compressionEnabledCheck.IsChecked == true;
         compression.Algorithm = SelectedValue(_compressionAlgorithmCombo, compression.Algorithm);
@@ -2028,9 +2569,23 @@ public sealed class MainWindow : Window
         string preview = custom
             ? $"{baseName}_0001{extension}\uff1b\u82e5\u91cd\u540d\u5219\u81ea\u52a8\u4f7f\u7528 {baseName}_001\\..."
             : $"DashCapture_yyyyMMdd_HHmmss_0001{extension}";
-        _storagePreview.Text = $"\u4fdd\u5b58\u76ee\u5f55: {folder}\n\u6587\u4ef6\u540d: {preview}\n\u538b\u7f29: {CompressionSummaryFromUi()}";
+        _storagePreview.Text = $"\u4fdd\u5b58\u76ee\u5f55: {folder}\n\u6587\u4ef6\u540d: {preview}\n\u901a\u9053: {StorageChannelPreviewSummary()}\n\u538b\u7f29: {CompressionSummaryFromUi()}";
         _storagePreview.Foreground = TextPrimary;
         _storagePreview.FontSize = 14;
+    }
+
+    private string StorageChannelPreviewSummary()
+    {
+        int totalChannels = _acquisition.Devices.Sum(device => device.Channels.Count);
+        if (_settings.Storage.ChannelSelection.Mode != StorageChannelSelectionMode.SelectedChannels)
+        {
+            return totalChannels > 0 ? $"\u5168\u90e8 {totalChannels} \u901a\u9053" : "\u5168\u90e8\u901a\u9053";
+        }
+
+        int selectedChannels = ResolveStorageDevices(_acquisition.Devices).Sum(device => device.Channels.Count);
+        return totalChannels > 0
+            ? $"\u9009\u4e2d {selectedChannels}/{totalChannels} \u901a\u9053"
+            : $"\u5df2\u4fdd\u5b58 {_storageSelectedKeys.Count} \u4e2a\u901a\u9053\u914d\u7f6e";
     }
 
     private string CompressionSummaryFromUi()

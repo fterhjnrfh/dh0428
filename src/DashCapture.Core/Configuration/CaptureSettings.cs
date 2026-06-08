@@ -77,6 +77,7 @@ public sealed class StorageSettings
     public bool EnableRawBlockAudit { get; set; } = false;
     public FileNamingMode NamingMode { get; set; } = FileNamingMode.Time;
     public string CustomFileName { get; set; } = "DashCapture";
+    public StorageChannelSelectionSettings ChannelSelection { get; set; } = new();
     public CompressionSettings Compression { get; set; } = new();
 }
 
@@ -84,6 +85,18 @@ public enum FileNamingMode
 {
     Time,
     Custom
+}
+
+public sealed class StorageChannelSelectionSettings
+{
+    public StorageChannelSelectionMode Mode { get; set; } = StorageChannelSelectionMode.AllChannels;
+    public List<MonitorChannelSettings> Channels { get; set; } = new();
+}
+
+public enum StorageChannelSelectionMode
+{
+    AllChannels,
+    SelectedChannels
 }
 
 public sealed class CompressionSettings

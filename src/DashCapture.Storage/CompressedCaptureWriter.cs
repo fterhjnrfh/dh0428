@@ -13,6 +13,7 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     private readonly StorageSettings _settings;
     private readonly CompressionSettings _compressionSettings;
     private readonly IReadOnlyList<DeviceDescriptor> _devices;
+    private readonly IReadOnlyList<DeviceDescriptor> _sourceDevices;
     private readonly Dictionary<ChannelKey, CompressedCaptureChannelManifest> _channels = new();
     private readonly Dictionary<ChannelKey, ChannelWriteBuffer> _pendingBuffers = new();
     private readonly Dictionary<ChannelKey, ulong> _sampleCounts = new();
@@ -31,6 +32,7 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     private readonly Task _checkpointWorker;
     private readonly DateTimeOffset _startedAt = DateTimeOffset.Now;
     private readonly int _totalChannelCount;
+    private readonly int _sourceTotalChannelCount;
     private BinaryWriter? _writer;
     private FileStream? _stream;
     private RawBlockAuditWriter? _auditWriter;
@@ -60,12 +62,14 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     private bool _rollPending;
     private bool _disposed;
 
-    public CompressedCaptureWriter(StorageSettings settings, IReadOnlyList<DeviceDescriptor> devices)
+    public CompressedCaptureWriter(StorageSettings settings, IReadOnlyList<DeviceDescriptor> devices, IReadOnlyList<DeviceDescriptor>? sourceDevices = null)
     {
         _settings = settings;
         _compressionSettings = CloneCompressionSettings(settings.Compression);
         _devices = devices;
+        _sourceDevices = sourceDevices ?? devices;
         _totalChannelCount = devices.Sum(device => device.Channels.Count);
+        _sourceTotalChannelCount = _sourceDevices.Sum(device => device.Channels.Count);
         _compressionQueue = new BlockingCollection<ChannelCompressionJob>(QueueCapacity(settings.CompressionQueueCapacityBlocks));
         _writeQueue = new BlockingCollection<CompressedChannelChunk>(QueueCapacity(settings.WriteQueueCapacityBlocks));
         Directory.CreateDirectory(settings.RootPath);
@@ -1010,7 +1014,7 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         return block.Header.MessageType == DashSampleMessageType.AnalogMultiChannelData ||
                block.Header.GroupId < 0 ||
                block.Header.MachineId < 0 ||
-               (_devices.Count > 1 && _totalChannelCount > 0 && block.ChannelCount == _totalChannelCount);
+               (_sourceDevices.Count > 1 && _sourceTotalChannelCount > 0 && block.ChannelCount == _sourceTotalChannelCount);
     }
 
     private static bool IsExplicitSingleChannelBlock(AcquisitionBlock block)

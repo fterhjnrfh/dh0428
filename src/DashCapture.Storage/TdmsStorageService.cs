@@ -27,7 +27,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
     public bool IsRunning => _worker is not null && !_worker.IsCompleted;
     public CaptureStorageStatistics? GetStatistics() => _writer?.Statistics ?? _lastStatistics;
 
-    public Task StartAsync(IReadOnlyList<DeviceDescriptor> devices, CancellationToken cancellationToken)
+    public Task StartAsync(IReadOnlyList<DeviceDescriptor> devices, IReadOnlyList<DeviceDescriptor> sourceDevices, CancellationToken cancellationToken)
     {
         if (IsRunning)
         {
@@ -35,7 +35,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
         }
 
         _lastStatistics = null;
-        _writer = new CompressedCaptureWriter(_settings, devices);
+        _writer = new CompressedCaptureWriter(_settings, devices, sourceDevices);
         _writer.Faulted += OnWriterFaulted;
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         _worker = Task.Run(() => ConsumeAsync(_cts.Token), CancellationToken.None);
