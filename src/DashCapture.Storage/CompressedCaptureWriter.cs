@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -14,6 +15,7 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
     private readonly CompressionSettings _compressionSettings;
     private readonly IReadOnlyList<DeviceDescriptor> _devices;
     private readonly IReadOnlyList<DeviceDescriptor> _sourceDevices;
+    private readonly Dictionary<int, DeviceDescriptor> _devicesById;
     private readonly Dictionary<ChannelKey, CompressedCaptureChannelManifest> _channels = new();
     private readonly Dictionary<ChannelKey, ChannelWriteBuffer> _pendingBuffers = new();
     private readonly Dictionary<ChannelKey, ulong> _sampleCounts = new();
@@ -68,6 +70,7 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         _compressionSettings = CloneCompressionSettings(settings.Compression);
         _devices = devices;
         _sourceDevices = sourceDevices ?? devices;
+        _devicesById = BuildDeviceLookup(devices);
         _totalChannelCount = devices.Sum(device => device.Channels.Count);
         _sourceTotalChannelCount = _sourceDevices.Sum(device => device.Channels.Count);
         _compressionQueue = new BlockingCollection<ChannelCompressionJob>(QueueCapacity(settings.CompressionQueueCapacityBlocks));
@@ -198,21 +201,27 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
             return;
         }
 
-        float[] scratch = new float[sampleCount];
-
-        foreach (DeviceDescriptor device in _devices)
+        float[] scratch = ArrayPool<float>.Shared.Rent(sampleCount);
+        try
         {
-            foreach (ChannelDescriptor channel in device.Channels)
+            foreach (DeviceDescriptor device in _devices)
             {
-                int dataIndex = channel.DataIndex;
-                if (dataIndex < 0 || dataIndex >= channelCount)
+                foreach (ChannelDescriptor channel in device.Channels)
                 {
-                    continue;
-                }
+                    int dataIndex = channel.DataIndex;
+                    if (dataIndex < 0 || dataIndex >= channelCount)
+                    {
+                        continue;
+                    }
 
-                NativeDeinterleaver.CopyFloatChannel(block.DataPointer, sampleCount, channelCount, dataIndex, scratch, block.Header.Layout);
-                AppendChannel(channel, scratch.AsSpan(0, sampleCount), block);
+                    NativeDeinterleaver.CopyFloatChannel(block.DataPointer, sampleCount, channelCount, dataIndex, scratch, block.Header.Layout);
+                    AppendChannel(channel, scratch.AsSpan(0, sampleCount), block);
+                }
             }
+        }
+        finally
+        {
+            ArrayPool<float>.Shared.Return(scratch);
         }
 
         RollFileIfNeeded();
@@ -238,18 +247,24 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
             return;
         }
 
-        float[] scratch = new float[sampleCount];
-
-        foreach (ChannelDescriptor channel in device.Channels)
+        float[] scratch = ArrayPool<float>.Shared.Rent(sampleCount);
+        try
         {
-            int dataIndex = ResolveDataIndex(block, channel);
-            if (dataIndex < 0 || dataIndex >= channelCount)
+            foreach (ChannelDescriptor channel in device.Channels)
             {
-                continue;
-            }
+                int dataIndex = ResolveDataIndex(block, channel);
+                if (dataIndex < 0 || dataIndex >= channelCount)
+                {
+                    continue;
+                }
 
-            NativeDeinterleaver.CopyFloatChannel(block.DataPointer, sampleCount, channelCount, dataIndex, scratch, block.Header.Layout);
-            AppendChannel(channel, scratch.AsSpan(0, sampleCount), block);
+                NativeDeinterleaver.CopyFloatChannel(block.DataPointer, sampleCount, channelCount, dataIndex, scratch, block.Header.Layout);
+                AppendChannel(channel, scratch.AsSpan(0, sampleCount), block);
+            }
+        }
+        finally
+        {
+            ArrayPool<float>.Shared.Return(scratch);
         }
     }
 
@@ -299,7 +314,16 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
         _fileIndex++;
         _currentPath = CreateNextFilePath();
         _auditWriter = _settings.EnableRawBlockAudit ? new RawBlockAuditWriter(_currentPath) : null;
-        _stream = new FileStream(_currentPath, FileMode.CreateNew, FileAccess.Write, FileShare.Read, 1024 * 1024);
+        _stream = new FileStream(
+            _currentPath,
+            new FileStreamOptions
+            {
+                Mode = FileMode.CreateNew,
+                Access = FileAccess.Write,
+                Share = FileShare.Read,
+                BufferSize = 4 * 1024 * 1024,
+                Options = FileOptions.SequentialScan
+            });
         _writer = new BinaryWriter(_stream, Encoding.UTF8, leaveOpen: true);
 
         CompressedCaptureManifest manifest = CreateManifest();
@@ -1024,8 +1048,24 @@ public sealed class CompressedCaptureWriter : ICaptureStorageWriter
 
     private DeviceDescriptor? ResolveDevice(SdkSampleData header)
     {
-        return _devices.FirstOrDefault(d => d.DeviceId == header.GroupId) ??
-               _devices.FirstOrDefault(d => d.DeviceId == header.MachineId);
+        if (_devicesById.TryGetValue(header.GroupId, out DeviceDescriptor? device))
+        {
+            return device;
+        }
+
+        return _devicesById.TryGetValue(header.MachineId, out device) ? device : null;
+    }
+
+    private static Dictionary<int, DeviceDescriptor> BuildDeviceLookup(IReadOnlyList<DeviceDescriptor> devices)
+    {
+        var lookup = new Dictionary<int, DeviceDescriptor>(devices.Count * 2);
+        for (int i = 0; i < devices.Count; i++)
+        {
+            DeviceDescriptor device = devices[i];
+            lookup[device.DeviceId] = device;
+        }
+
+        return lookup;
     }
 
     private string CreateNextFilePath()

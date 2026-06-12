@@ -15,8 +15,9 @@ public sealed class AcquisitionService : IAsyncDisposable
     private readonly Channel<AcquisitionBlock> _displayQueue;
     private readonly ContinuityTracker _continuity = new();
     private readonly object _sync = new();
-    private readonly object _devicesSync = new();
-    private IReadOnlyList<DeviceDescriptor> _devices = Array.Empty<DeviceDescriptor>();
+    private DeviceDescriptor[] _devices = Array.Empty<DeviceDescriptor>();
+    private Dictionary<int, DeviceDescriptor> _devicesById = new();
+    private int _totalChannelCount;
     private IAcquisitionSource? _source;
     private long _blocksReceived;
     private long _bytesReceived;
@@ -52,10 +53,7 @@ public sealed class AcquisitionService : IAsyncDisposable
     {
         get
         {
-            lock (_devicesSync)
-            {
-                return _devices;
-            }
+            return Volatile.Read(ref _devices);
         }
     }
     public ChannelReader<AcquisitionBlock> StorageReader => _storageQueue.Reader;
@@ -295,15 +293,14 @@ public sealed class AcquisitionService : IAsyncDisposable
 
         if (_settings.Sdk.GetDataType == GetDataType.MultiMachine)
         {
-            int totalChannels = Devices.Sum(d => d.Channels.Count);
+            int totalChannels = Volatile.Read(ref _totalChannelCount);
             if (totalChannels > 0)
             {
                 return totalChannels;
             }
         }
 
-        DeviceDescriptor? device = Devices.FirstOrDefault(d => d.DeviceId == sample.GroupId) ??
-                                   Devices.FirstOrDefault(d => d.DeviceId == sample.MachineId);
+        DeviceDescriptor? device = ResolveDevice(sample.GroupId, sample.MachineId);
         return Math.Max(1, device?.Channels.Count ?? 1);
     }
 
@@ -318,11 +315,29 @@ public sealed class AcquisitionService : IAsyncDisposable
 
     private void SetDevices(IReadOnlyList<DeviceDescriptor> devices)
     {
-        IReadOnlyList<DeviceDescriptor> snapshot = devices.ToList();
-        lock (_devicesSync)
+        DeviceDescriptor[] snapshot = devices.ToArray();
+        var devicesById = new Dictionary<int, DeviceDescriptor>(snapshot.Length * 2);
+        int totalChannels = 0;
+        foreach (DeviceDescriptor device in snapshot)
         {
-            _devices = snapshot;
+            devicesById[device.DeviceId] = device;
+            totalChannels += device.Channels.Count;
         }
+
+        Volatile.Write(ref _devicesById, devicesById);
+        Volatile.Write(ref _totalChannelCount, totalChannels);
+        Volatile.Write(ref _devices, snapshot);
+    }
+
+    private DeviceDescriptor? ResolveDevice(int groupId, int machineId)
+    {
+        Dictionary<int, DeviceDescriptor> devicesById = Volatile.Read(ref _devicesById);
+        if (devicesById.TryGetValue(groupId, out DeviceDescriptor? device))
+        {
+            return device;
+        }
+
+        return devicesById.TryGetValue(machineId, out device) ? device : null;
     }
 
     private static int InferFloatChannelCount(SdkSampleData sample)

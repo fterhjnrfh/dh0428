@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using DashCapture.Core.Models;
 using DashCapture.Display;
 using System.Globalization;
 
@@ -9,27 +10,35 @@ namespace DashCapture.App;
 public sealed class WaveformControl : Control
 {
     private static readonly IBrush BackgroundBrush = new SolidColorBrush(Color.FromRgb(232, 236, 241));
-    private static readonly IBrush PlotBrush = new SolidColorBrush(Color.FromRgb(255, 255, 255));
+    private static readonly IBrush PlotBrush = new SolidColorBrush(Color.FromRgb(250, 252, 255));
     private static readonly IBrush AxisBrush = new SolidColorBrush(Color.FromRgb(72, 82, 96));
     private static readonly IBrush LabelBrush = new SolidColorBrush(Color.FromRgb(20, 29, 39));
     private static readonly IBrush MutedBrush = new SolidColorBrush(Color.FromRgb(101, 111, 126));
-    private static readonly IBrush LegendBackgroundBrush = new SolidColorBrush(Color.FromArgb(226, 255, 255, 255));
-    private static readonly Pen GridPen = new(new SolidColorBrush(Color.FromRgb(214, 220, 228)), 1);
-    private static readonly Pen MinorGridPen = new(new SolidColorBrush(Color.FromRgb(230, 234, 239)), 1);
+    private static readonly Pen GridPen = new(new SolidColorBrush(Color.FromRgb(214, 221, 231)), 1);
+    private static readonly Pen MinorGridPen = new(new SolidColorBrush(Color.FromRgb(236, 240, 245)), 1);
     private static readonly Pen AxisPen = new(AxisBrush, 1.2);
-    private static readonly Pen ZeroLinePen = new(new SolidColorBrush(Color.FromRgb(128, 141, 158)), 1.3);
-    private static readonly Pen PlotBorderPen = new(new SolidColorBrush(Color.FromRgb(190, 198, 208)), 1);
+    private static readonly Pen ZeroLinePen = new(new SolidColorBrush(Color.FromRgb(116, 130, 149)), 1.4);
+    private static readonly Pen PlotBorderPen = new(new SolidColorBrush(Color.FromRgb(184, 195, 209)), 1);
+    private static readonly Pen PlotInnerBorderPen = new(new SolidColorBrush(Color.FromArgb(96, 255, 255, 255)), 1);
+    private const double AxisFontSize = 11;
+    private const double AxisTitleFontSize = 12;
+    private const double LegendFontSize = 11;
+    private const double MinimumPlotWidth = 64;
+    private const double MinimumPlotHeight = 48;
     private static readonly Color[] Palette =
     {
-        Color.FromRgb(32, 91, 138),
-        Color.FromRgb(38, 117, 85),
-        Color.FromRgb(153, 106, 38),
-        Color.FromRgb(153, 72, 70),
-        Color.FromRgb(93, 86, 133),
-        Color.FromRgb(45, 112, 124),
-        Color.FromRgb(132, 85, 45),
-        Color.FromRgb(100, 111, 48)
+        Color.FromRgb(18, 94, 172),
+        Color.FromRgb(0, 126, 98),
+        Color.FromRgb(190, 95, 24),
+        Color.FromRgb(181, 57, 66),
+        Color.FromRgb(105, 78, 190),
+        Color.FromRgb(0, 132, 152),
+        Color.FromRgb(154, 93, 31),
+        Color.FromRgb(84, 112, 35)
     };
+
+    private readonly Dictionary<ChannelKey, SeriesPens> _seriesPens = new();
+    private EnvelopePoint[] _downsampleBuffer = Array.Empty<EnvelopePoint>();
 
     public WaveformStore? Store { get; set; }
     public IReadOnlyList<Core.Models.ChannelDescriptor>? Channels { get; set; }
@@ -39,7 +48,12 @@ public sealed class WaveformControl : Control
     public override void Render(DrawingContext context)
     {
         base.Render(context);
-        Rect bounds = Bounds;
+        Rect bounds = new(0, 0, Bounds.Width, Bounds.Height);
+        if (bounds.Width <= 0 || bounds.Height <= 0)
+        {
+            return;
+        }
+
         context.FillRectangle(BackgroundBrush, bounds);
 
         IReadOnlyList<WaveformSnapshot>? snapshot = Store?.SnapshotSeries(Channels);
@@ -52,7 +66,9 @@ public sealed class WaveformControl : Control
             DrawPlotSurface(context, emptyPlot);
             DrawAxes(
                 context,
+                bounds,
                 emptyPlot,
+                0,
                 Math.Max(0.001, WindowSeconds),
                 emptyMin,
                 emptyMax);
@@ -60,7 +76,8 @@ public sealed class WaveformControl : Control
             return;
         }
 
-        double visibleSeconds = FindVisibleSeconds(snapshot);
+        double visibleSeconds = Math.Max(0.001, WindowSeconds);
+        double xAxisStart = ResolveSweepAxisStart(snapshot, visibleSeconds);
         (double rawMin, double rawMax) = FindVisibleRange(snapshot, visibleSeconds);
         if (!IsFinite(rawMin) || !IsFinite(rawMax))
         {
@@ -71,7 +88,7 @@ public sealed class WaveformControl : Control
         (double yMin, double yMax) = NiceBoundsWithPadding(rawMin, rawMax, GetDefaultYAxisAmplitude());
         Rect plot = CreatePlotRect(bounds, yMin, yMax);
         DrawPlotSurface(context, plot);
-        DrawAxes(context, plot, visibleSeconds, yMin, yMax);
+        DrawAxes(context, bounds, plot, xAxisStart, xAxisStart + visibleSeconds, yMin, yMax);
 
         double width = Math.Max(1, plot.Width);
         int channelIndex = 0;
@@ -87,42 +104,66 @@ public sealed class WaveformControl : Control
                 }
 
                 double sampleRate = GetSampleRate(series.DisplaySampleRate);
-                int sampleCount = Math.Min(samples.Length, Math.Max(1, (int)Math.Ceiling(visibleSeconds * sampleRate)));
-                ReadOnlySpan<EnvelopePoint> visibleSamples = samples.AsSpan(samples.Length - sampleCount, sampleCount);
-                EnvelopePoint[] envelope = EnvelopeDownsampler.Downsample(visibleSamples, (int)Math.Max(1, width));
-                double seriesSeconds = Math.Min(visibleSeconds, sampleCount / sampleRate);
-                var pen = new Pen(new SolidColorBrush(SeriesColor(series, channelIndex)), 1.4);
-                DrawEnvelope(context, envelope, pen, plot, visibleSeconds, seriesSeconds, yMin, yMax);
+                int pointsPerSweep = PointsPerSweep(visibleSeconds, sampleRate);
+                ReadOnlySpan<EnvelopePoint> sweepSamples = CurrentSweepSpan(
+                    samples,
+                    series.TotalPointCount,
+                    pointsPerSweep);
+                if (sweepSamples.Length == 0)
+                {
+                    continue;
+                }
+
+                int targetBuckets = Math.Min(sweepSamples.Length, (int)Math.Max(1, width));
+                EnsureDownsampleCapacity(targetBuckets);
+                int envelopeCount = EnvelopeDownsampler.Downsample(
+                    sweepSamples,
+                    targetBuckets,
+                    _downsampleBuffer.AsSpan(0, targetBuckets));
+                double seriesSeconds = Math.Min(
+                    visibleSeconds,
+                    Math.Max(0, sweepSamples.Length - 1) / sampleRate);
+                DrawEnvelope(
+                    context,
+                    _downsampleBuffer.AsSpan(0, envelopeCount),
+                    GetSeriesPen(series, channelIndex),
+                    plot,
+                    visibleSeconds,
+                    seriesSeconds,
+                    yMin,
+                    yMax);
                 channelIndex++;
             }
         }
 
-        DrawLegend(context, plot, snapshot);
+        DrawLegend(context, bounds, plot, snapshot);
     }
 
     private static Rect CreatePlotRect(Rect bounds, double yMin, double yMax)
     {
-        const double top = 18;
-        const double right = 18;
-        const double bottom = 48;
-        double left = Math.Clamp(MeasureYAxisWidth(yMin, yMax, bounds.Height) + 20, 72, 148);
+        double top = bounds.Height >= 150 ? 22 : 18;
+        double right = 8;
+        double bottom = bounds.Height >= 150 ? 42 : 34;
+        double plotHeight = Math.Max(MinimumPlotHeight, bounds.Height - top - bottom);
+        double left = Math.Clamp(MeasureYAxisWidth(yMin, yMax, plotHeight) + 13, 38, 122);
         return new Rect(
             bounds.Left + left,
             bounds.Top + top,
-            Math.Max(1, bounds.Width - left - right),
-            Math.Max(1, bounds.Height - top - bottom));
+            Math.Max(MinimumPlotWidth, bounds.Width - left - right),
+            Math.Max(MinimumPlotHeight, bounds.Height - top - bottom));
     }
 
     private static void DrawPlotSurface(DrawingContext context, Rect plot)
     {
         context.FillRectangle(PlotBrush, plot);
-        context.DrawRectangle(null, PlotBorderPen, plot);
+        context.DrawRectangle(null, PlotBorderPen, plot, 3, 3);
+        context.DrawRectangle(null, PlotInnerBorderPen, new Rect(plot.X + 1, plot.Y + 1, Math.Max(1, plot.Width - 2), Math.Max(1, plot.Height - 2)), 2, 2);
     }
 
-    private void DrawAxes(DrawingContext context, Rect plot, double visibleSeconds, double yMin, double yMax)
+    private void DrawAxes(DrawingContext context, Rect bounds, Rect plot, double xMin, double xMax, double yMin, double yMax)
     {
         DrawAxisGrid(context, plot, yMin, yMax, vertical: false);
-        DrawAxisGrid(context, plot, -Math.Max(0.001, visibleSeconds), 0, vertical: true);
+        DrawAxisGrid(context, plot, xMin, xMax, vertical: true);
 
         if (yMin < 0 && yMax > 0)
         {
@@ -133,17 +174,16 @@ public sealed class WaveformControl : Control
 
         context.DrawLine(AxisPen, plot.BottomLeft, plot.BottomRight);
         context.DrawLine(AxisPen, plot.BottomLeft, plot.TopLeft);
-        DrawText(context, "\u5E45\u503C", new Point(Math.Max(8, plot.Left - 68), plot.Top - 2), 13, LabelBrush);
-        DrawText(context, "\u65F6\u95F4 (s)", new Point(plot.Right - 58, plot.Bottom + 28), 13, LabelBrush);
+        DrawAxisTitles(context, bounds, plot);
     }
 
     private static void DrawAxisGrid(DrawingContext context, Rect plot, double min, double max, bool vertical)
     {
         double range = Math.Max(0.000001, max - min);
-        double targetPixels = vertical ? 92 : 54;
-        int targetTicks = (int)Math.Clamp((vertical ? plot.Width : plot.Height) / targetPixels, 4, 12);
+        double targetPixels = vertical ? 96 : 52;
+        int targetTicks = (int)Math.Clamp((vertical ? plot.Width : plot.Height) / targetPixels, 3, 10);
         double majorStep = NiceNumber(range / targetTicks, round: true);
-        double minorStep = majorStep / 5;
+        double minorStep = majorStep / 2;
 
         double minorStart = Math.Ceiling(min / minorStep) * minorStep;
         for (double value = minorStart; value <= max + minorStep * 0.5; value += minorStep)
@@ -167,6 +207,8 @@ public sealed class WaveformControl : Control
         }
 
         double majorStart = Math.Ceiling(min / majorStep) * majorStep;
+        double lastLabelEnd = double.NegativeInfinity;
+        var yLabels = new List<AxisLabel>();
         for (double value = majorStart; value <= max + majorStep * 0.5; value += majorStep)
         {
             double ratio = (value - min) / range;
@@ -179,23 +221,36 @@ public sealed class WaveformControl : Control
             {
                 double x = plot.Left + ratio * plot.Width;
                 context.DrawLine(GridPen, new Point(x, plot.Top), new Point(x, plot.Bottom));
-                DrawText(context, FormatTime(value), new Point(x - 18, plot.Bottom + 9), 12, AxisBrush);
+                string label = FormatTime(value);
+                Size size = MeasureText(label, AxisFontSize);
+                double labelX = Clamp(x - size.Width / 2, plot.Left, plot.Right - size.Width);
+                if (labelX >= lastLabelEnd + 8)
+                {
+                    DrawText(context, label, new Point(labelX, plot.Bottom + 10), AxisFontSize, AxisBrush);
+                    lastLabelEnd = labelX + size.Width;
+                }
             }
             else
             {
                 double y = plot.Bottom - ratio * plot.Height;
                 context.DrawLine(GridPen, new Point(plot.Left, y), new Point(plot.Right, y));
                 string label = FormatAxisValue(value, majorStep);
-                double labelWidth = MeasureText(label, 12).Width;
-                DrawText(context, label, new Point(plot.Left - labelWidth - 10, y - 9), 12, AxisBrush);
+                Size size = MeasureText(label, AxisFontSize);
+                double labelY = Clamp(y - size.Height / 2, plot.Top, plot.Bottom - size.Height);
+                yLabels.Add(new AxisLabel(label, plot.Left - size.Width - 6, labelY, size.Height));
             }
+        }
+
+        if (!vertical)
+        {
+            DrawYAxisLabels(context, yLabels);
         }
     }
 
     private static void DrawEnvelope(
         DrawingContext context,
-        EnvelopePoint[] envelope,
-        Pen pen,
+        ReadOnlySpan<EnvelopePoint> envelope,
+        SeriesPens pens,
         Rect plot,
         double visibleSeconds,
         double seriesSeconds,
@@ -209,7 +264,6 @@ public sealed class WaveformControl : Control
 
         double range = Math.Max(0.000001, max - min);
         double xRange = Math.Max(0.000001, visibleSeconds);
-        double xStart = -Math.Max(0.000001, seriesSeconds);
         Point? previous = null;
         for (int i = 0; i < envelope.Length; i++)
         {
@@ -220,38 +274,32 @@ public sealed class WaveformControl : Control
                 continue;
             }
 
-            double seconds = envelope.Length == 1 ? 0 : xStart + i * seriesSeconds / (envelope.Length - 1);
-            double x = plot.Left + (seconds + xRange) / xRange * plot.Width;
+            double seconds = envelope.Length == 1 ? 0 : i * seriesSeconds / (envelope.Length - 1);
+            double x = plot.Left + seconds / xRange * plot.Width;
             double yMin = plot.Top + plot.Height - ((point.Minimum - min) / range) * plot.Height;
             double yMax = plot.Top + plot.Height - ((point.Maximum - min) / range) * plot.Height;
             double yLast = plot.Top + plot.Height - ((point.Last - min) / range) * plot.Height;
-            context.DrawLine(pen, new Point(x, yMin), new Point(x, yMax));
+            if (!IsFinite(x) || !IsFinite(yMin) || !IsFinite(yMax) || !IsFinite(yLast) ||
+                x < plot.Left - 0.5 || x > plot.Right + 0.5)
+            {
+                previous = null;
+                continue;
+            }
+
+            x = Clamp(x, plot.Left, plot.Right);
+            yMin = Clamp(yMin, plot.Top, plot.Bottom);
+            yMax = Clamp(yMax, plot.Top, plot.Bottom);
+            yLast = Clamp(yLast, plot.Top, plot.Bottom);
+            DrawSignalLine(context, pens, new Point(x, yMin), new Point(x, yMax));
 
             var current = new Point(x, yLast);
-            if (previous is not null)
+            if (previous is not null && current.X >= previous.Value.X)
             {
-                context.DrawLine(pen, previous.Value, current);
+                DrawSignalLine(context, pens, previous.Value, current);
             }
 
             previous = current;
         }
-    }
-
-    private double FindVisibleSeconds(IReadOnlyList<WaveformSnapshot> snapshot)
-    {
-        double visibleSeconds = 0;
-        foreach (WaveformSnapshot series in snapshot)
-        {
-            EnvelopePoint[] samples = series.Points;
-            if (samples.Length == 0)
-            {
-                continue;
-            }
-
-            visibleSeconds = Math.Max(visibleSeconds, samples.Length / GetSampleRate(series.DisplaySampleRate));
-        }
-
-        return Math.Clamp(visibleSeconds <= 0 ? WindowSeconds : visibleSeconds, 0.001, Math.Max(0.001, WindowSeconds));
     }
 
     private static (double Min, double Max) FindVisibleRange(IReadOnlyList<WaveformSnapshot> snapshot, double visibleSeconds)
@@ -261,11 +309,11 @@ public sealed class WaveformControl : Control
         foreach (WaveformSnapshot series in snapshot)
         {
             EnvelopePoint[] data = series.Points;
-            int count = Math.Min(data.Length, Math.Max(1, (int)Math.Ceiling(visibleSeconds * GetSampleRate(series.DisplaySampleRate))));
-            int start = Math.Max(0, data.Length - count);
-            for (int i = start; i < data.Length; i++)
+            int pointsPerSweep = PointsPerSweep(visibleSeconds, GetSampleRate(series.DisplaySampleRate));
+            ReadOnlySpan<EnvelopePoint> visibleData = CurrentSweepSpan(data, series.TotalPointCount, pointsPerSweep);
+            for (int i = 0; i < visibleData.Length; i++)
             {
-                EnvelopePoint point = data[i];
+                EnvelopePoint point = visibleData[i];
                 if (!IsFinite(point.Minimum) || !IsFinite(point.Maximum))
                 {
                     continue;
@@ -277,6 +325,25 @@ public sealed class WaveformControl : Control
         }
 
         return (globalMin, globalMax);
+    }
+
+    private static double ResolveSweepAxisStart(IReadOnlyList<WaveformSnapshot> snapshot, double visibleSeconds)
+    {
+        double latestElapsedSeconds = 0;
+        foreach (WaveformSnapshot series in snapshot)
+        {
+            long total = series.TotalPointCount > 0 ? series.TotalPointCount : series.Points.Length;
+            if (total <= 0)
+            {
+                continue;
+            }
+
+            double sampleRate = GetSampleRate(series.DisplaySampleRate);
+            latestElapsedSeconds = Math.Max(latestElapsedSeconds, Math.Max(0, total - 1) / sampleRate);
+        }
+
+        double sweepIndex = Math.Floor(latestElapsedSeconds / Math.Max(0.001, visibleSeconds));
+        return sweepIndex * Math.Max(0.001, visibleSeconds);
     }
 
     private static (double Min, double Max) NiceBoundsWithPadding(double min, double max, double defaultAmplitude)
@@ -341,6 +408,42 @@ public sealed class WaveformControl : Control
     private static bool IsFinite(double value)
     {
         return !double.IsNaN(value) && !double.IsInfinity(value);
+    }
+
+    private static int PointsPerSweep(double visibleSeconds, double sampleRate)
+    {
+        return Math.Max(1, (int)Math.Ceiling(Math.Max(0.001, visibleSeconds) * Math.Max(1, sampleRate)));
+    }
+
+    private static ReadOnlySpan<EnvelopePoint> CurrentSweepSpan(
+        EnvelopePoint[] samples,
+        long totalPointCount,
+        int pointsPerSweep)
+    {
+        if (samples.Length == 0)
+        {
+            return ReadOnlySpan<EnvelopePoint>.Empty;
+        }
+
+        long total = totalPointCount > 0 ? totalPointCount : samples.Length;
+        int sweepCount;
+        if (total < pointsPerSweep)
+        {
+            sweepCount = (int)Math.Min(total, samples.Length);
+        }
+        else
+        {
+            int phase = (int)(total % pointsPerSweep);
+            sweepCount = phase == 0 ? pointsPerSweep : phase;
+            sweepCount = Math.Min(sweepCount, samples.Length);
+        }
+
+        if (sweepCount <= 0)
+        {
+            return ReadOnlySpan<EnvelopePoint>.Empty;
+        }
+
+        return samples.AsSpan(samples.Length - sweepCount, sweepCount);
     }
 
     private static double NiceNumber(double value, bool round)
@@ -410,14 +513,14 @@ public sealed class WaveformControl : Control
     private static double MeasureYAxisWidth(double min, double max, double height)
     {
         double range = Math.Max(0.000001, max - min);
-        int targetTicks = (int)Math.Clamp(Math.Max(1, height - 66) / 54, 4, 12);
+        int targetTicks = (int)Math.Clamp(Math.Max(1, height - 66) / 52, 3, 10);
         double majorStep = NiceNumber(range / targetTicks, round: true);
         double majorStart = Math.Ceiling(min / majorStep) * majorStep;
-        double width = MeasureText(FormatAxisValue(min, majorStep), 12).Width;
-        width = Math.Max(width, MeasureText(FormatAxisValue(max, majorStep), 12).Width);
+        double width = MeasureText(FormatAxisValue(min, majorStep), AxisFontSize).Width;
+        width = Math.Max(width, MeasureText(FormatAxisValue(max, majorStep), AxisFontSize).Width);
         for (double value = majorStart; value <= max + majorStep * 0.5; value += majorStep)
         {
-            width = Math.Max(width, MeasureText(FormatAxisValue(value, majorStep), 12).Width);
+            width = Math.Max(width, MeasureText(FormatAxisValue(value, majorStep), AxisFontSize).Width);
         }
 
         return width;
@@ -441,33 +544,76 @@ public sealed class WaveformControl : Control
         return Palette[index];
     }
 
-    private static void DrawLegend(DrawingContext context, Rect plot, IReadOnlyList<WaveformSnapshot> snapshot)
+    private void EnsureDownsampleCapacity(int capacity)
+    {
+        if (_downsampleBuffer.Length >= capacity)
+        {
+            return;
+        }
+
+        int next = Math.Max(64, _downsampleBuffer.Length);
+        while (next < capacity)
+        {
+            next *= 2;
+        }
+
+        _downsampleBuffer = new EnvelopePoint[next];
+    }
+
+    private SeriesPens GetSeriesPen(WaveformSnapshot series, int fallbackIndex)
+    {
+        var key = new ChannelKey(series.Channel);
+        if (_seriesPens.TryGetValue(key, out SeriesPens pens))
+        {
+            return pens;
+        }
+
+        Color color = SeriesColor(series, fallbackIndex);
+        pens = new SeriesPens(
+            new Pen(new SolidColorBrush(Color.FromArgb(210, 255, 255, 255)), 3.6),
+            new Pen(new SolidColorBrush(color), 1.65));
+        _seriesPens[key] = pens;
+        return pens;
+    }
+
+    private static void DrawLegend(DrawingContext context, Rect bounds, Rect plot, IReadOnlyList<WaveformSnapshot> snapshot)
     {
         WaveformSnapshot[] items = snapshot
             .Where(series => series.Points.Length > 0)
-            .Take(6)
             .ToArray();
         if (items.Length == 0)
         {
             return;
         }
 
-        double rowHeight = 18;
-        double width = Math.Min(220, Math.Max(120, plot.Width * 0.38));
-        double height = items.Length * rowHeight + 8;
-        var panel = new Rect(plot.Right - width - 8, plot.Top + 8, width, height);
-        context.DrawRectangle(LegendBackgroundBrush, PlotBorderPen, panel, 6);
-
+        double top = bounds.Top + 4;
+        double x = plot.Left + 6;
+        double right = plot.Right;
+        double rowCenterY = top + 8;
+        int hidden = 0;
         for (int i = 0; i < items.Length; i++)
         {
             WaveformSnapshot series = items[i];
-            double y = panel.Top + 8 + i * rowHeight;
-            var pen = new Pen(new SolidColorBrush(SeriesColor(series, i)), 2);
-            context.DrawLine(pen, new Point(panel.Left + 10, y + 7), new Point(panel.Left + 24, y + 7));
-            string name = string.IsNullOrWhiteSpace(series.Channel.Name)
-                ? $"\u901a\u9053 {series.Channel.ChannelId + 1}"
-                : series.Channel.Name;
-            DrawText(context, TrimText(name, 20), new Point(panel.Left + 30, y - 1), 12, LabelBrush);
+            string label = TrimText(SeriesLegendText(series), 18);
+            Size labelSize = MeasureText(label, LegendFontSize);
+            double itemWidth = 28 + labelSize.Width;
+            if (x + itemWidth > right - 42)
+            {
+                hidden = items.Length - i;
+                break;
+            }
+
+            var legendPen = new Pen(new SolidColorBrush(SeriesColor(series, i)), 2.4);
+            context.DrawLine(legendPen, new Point(x, rowCenterY), new Point(x + 16, rowCenterY));
+            DrawText(context, label, new Point(x + 22, top), LegendFontSize, LabelBrush);
+            x += itemWidth + 16;
+        }
+
+        if (hidden > 0)
+        {
+            string text = $"+{hidden}";
+            Size size = MeasureText(text, LegendFontSize);
+            DrawText(context, text, new Point(right - size.Width, top), LegendFontSize, MutedBrush);
         }
     }
 
@@ -477,4 +623,51 @@ public sealed class WaveformControl : Control
             ? text
             : text[..Math.Max(1, maxLength - 1)] + "\u2026";
     }
+
+    private static void DrawAxisTitles(DrawingContext context, Rect bounds, Rect plot)
+    {
+        if (plot.Top - bounds.Top >= 14)
+        {
+            DrawText(context, "\u5E45\u503C", new Point(bounds.Left + 3, bounds.Top + 4), AxisTitleFontSize, LabelBrush);
+        }
+    }
+
+    private static void DrawYAxisLabels(DrawingContext context, List<AxisLabel> labels)
+    {
+        labels.Sort(static (left, right) => left.Y.CompareTo(right.Y));
+        double lastBottom = double.NegativeInfinity;
+        foreach (AxisLabel label in labels)
+        {
+            if (label.Y < lastBottom + 2)
+            {
+                continue;
+            }
+
+            DrawText(context, label.Text, new Point(label.X, label.Y), AxisFontSize, AxisBrush);
+            lastBottom = label.Y + label.Height;
+        }
+    }
+
+    private static void DrawSignalLine(DrawingContext context, SeriesPens pens, Point start, Point end)
+    {
+        context.DrawLine(pens.Halo, start, end);
+        context.DrawLine(pens.Stroke, start, end);
+    }
+
+    private static string SeriesLegendText(WaveformSnapshot series)
+    {
+        string name = string.IsNullOrWhiteSpace(series.Channel.Name)
+            ? $"\u901A\u9053 {series.Channel.ChannelId + 1}"
+            : series.Channel.Name;
+        return name;
+    }
+
+    private static double Clamp(double value, double min, double max)
+    {
+        return max <= min ? min : Math.Clamp(value, min, max);
+    }
+
+    private readonly record struct SeriesPens(Pen Halo, Pen Stroke);
+
+    private readonly record struct AxisLabel(string Text, double X, double Y, double Height);
 }

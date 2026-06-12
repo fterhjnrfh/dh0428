@@ -26,6 +26,8 @@ public sealed class MainWindow : Window
     private static readonly IBrush PanelBackground = new SolidColorBrush(Color.FromRgb(255, 255, 255));
     private static readonly IBrush PanelBackground2 = new SolidColorBrush(Color.FromRgb(244, 246, 248));
     private static readonly IBrush BorderBrushSoft = new SolidColorBrush(Color.FromRgb(190, 198, 208));
+    private static readonly IBrush MonitorViewBorderBrush = new SolidColorBrush(Color.FromRgb(92, 108, 128));
+    private static readonly IBrush MonitorViewSeparatorBrush = new SolidColorBrush(Color.FromRgb(174, 185, 199));
     private static readonly IBrush TextPrimary = new SolidColorBrush(Color.FromRgb(20, 29, 39));
     private static readonly IBrush TextSecondary = new SolidColorBrush(Color.FromRgb(82, 92, 106));
     private static readonly IBrush AccentBlue = new SolidColorBrush(Color.FromRgb(31, 91, 140));
@@ -54,17 +56,13 @@ public sealed class MainWindow : Window
     private readonly TextBlock _activeViewText = new();
     private readonly TextBlock _selectionTitle = new();
     private readonly TextBlock _selectionHint = new();
-    private readonly RadioButton _storageAllChannelsRadio = new() { Content = "\u5168\u90e8\u901a\u9053", GroupName = "StorageChannelMode" };
-    private readonly RadioButton _storageSelectedChannelsRadio = new() { Content = "\u4ec5\u4fdd\u5b58\u9009\u4e2d\u901a\u9053", GroupName = "StorageChannelMode" };
-    private readonly Button _storageSelectAllChannelsButton = new() { Content = "\u5168\u9009" };
-    private readonly Button _storageClearChannelsButton = new() { Content = "\u6e05\u7a7a" };
-    private readonly Button _storageOnlineChannelsButton = new() { Content = "\u4ec5\u5728\u7ebf\u901a\u9053" };
-    private readonly Button _storageUseMonitorChannelsButton = new() { Content = "\u4f7f\u7528\u5f53\u524d\u76d1\u63a7\u89c6\u56fe" };
+    private readonly Button _storageAllChannelsButton = new() { Content = "\u5168\u90e8\u901a\u9053" };
+    private readonly Button _storageSampleRateRangeButton = new() { Content = "\u6309\u91c7\u6837\u7387\u533a\u95f4" };
+    private readonly Button _storageSelectedChannelsButton = new() { Content = "\u4ec5\u4fdd\u5b58\u9009\u4e2d\u901a\u9053" };
     private readonly TextBox _storageSampleRateMin = new() { Width = 120, Watermark = "\u6700\u4f4e Hz" };
     private readonly TextBox _storageSampleRateMax = new() { Width = 120, Watermark = "\u6700\u9ad8 Hz" };
-    private readonly StackPanel _storageChannelTreePanel = new() { Spacing = 6 };
-    private readonly TextBlock _storageChannelSummary = new();
-    private readonly TextBlock _storageChannelHint = new();
+    private readonly StackPanel _storageChannelDetailsPanel = new() { Spacing = 12 };
+    private readonly Control _storageSampleRateRangePanel;
     private readonly StackPanel _deviceInfoPanel = new();
     private readonly TextBox _storagePath = new();
     private readonly TextBox _customFileName = new();
@@ -134,6 +132,7 @@ public sealed class MainWindow : Window
     public MainWindow()
     {
         _settings = AppSettingsLoader.Load();
+        _storageSampleRateRangePanel = BuildStorageSampleRateRangePanel();
         _acquisition = new AcquisitionService(_settings);
         _waveformStore = new WaveformStore(DisplayCapacity());
         _displayPipeline = new DisplayPipeline(
@@ -153,8 +152,6 @@ public sealed class MainWindow : Window
         _customFileName.Text = _settings.Storage.CustomFileName;
         _storageEnabledCheck.IsChecked = _settings.Storage.Enabled;
         _storageTabEnabledCheck.IsChecked = _settings.Storage.Enabled;
-        _storageAllChannelsRadio.IsChecked = _settings.Storage.ChannelSelection.Mode != StorageChannelSelectionMode.SelectedChannels;
-        _storageSelectedChannelsRadio.IsChecked = _settings.Storage.ChannelSelection.Mode == StorageChannelSelectionMode.SelectedChannels;
         _storageSampleRateMin.Text = FormatNullableSampleRate(_settings.Storage.ChannelSelection.SampleRateMinHz);
         _storageSampleRateMax.Text = FormatNullableSampleRate(_settings.Storage.ChannelSelection.SampleRateMaxHz);
         _namingMode.ItemsSource = new[] { "\u6309\u65f6\u95f4\u547d\u540d", "\u81ea\u5b9a\u4e49\u547d\u540d" };
@@ -167,16 +164,16 @@ public sealed class MainWindow : Window
         StyleComboBox(_namingMode);
         StyleComboBox(_compressionAlgorithmCombo);
         StyleComboBox(_compressionPreprocessorCombo);
+        StyleStorageModeButton(_storageAllChannelsButton);
+        StyleStorageModeButton(_storageSampleRateRangeButton);
+        StyleStorageModeButton(_storageSelectedChannelsButton);
+        UpdateStorageModeButtons();
         StyleControlButton(_addViewButton, AccentBlue);
         StyleControlButton(_removeViewButton, AccentRed);
         StyleControlButton(_showSelectionButton, AccentBlue);
         StyleControlButton(_closeSelectionButton, AccentBlue);
         StyleControlButton(_selectAllChannelsButton, AccentBlue);
         StyleControlButton(_clearChannelsButton, AccentBlue);
-        StyleControlButton(_storageSelectAllChannelsButton, AccentBlue);
-        StyleControlButton(_storageClearChannelsButton, AccentBlue);
-        StyleControlButton(_storageOnlineChannelsButton, AccentGreen);
-        StyleControlButton(_storageUseMonitorChannelsButton, AccentBlue);
 
         Title = "DASH Capture";
         Background = PageBackground;
@@ -261,30 +258,22 @@ public sealed class MainWindow : Window
 
             UpdateStoragePreview();
         };
-        _storageAllChannelsRadio.IsCheckedChanged += (_, _) =>
+        _storageAllChannelsButton.Click += (_, _) =>
         {
-            if (_updatingStorageChannelPanel || _storageAllChannelsRadio.IsChecked != true)
-            {
-                return;
-            }
-
-            _settings.Storage.ChannelSelection.Mode = StorageChannelSelectionMode.AllChannels;
+            SetStorageChannelMode(StorageChannelSelectionMode.AllChannels);
             CommitStorageChannelSelectionChange();
         };
-        _storageSelectedChannelsRadio.IsCheckedChanged += (_, _) =>
+        _storageSampleRateRangeButton.Click += (_, _) =>
         {
-            if (_updatingStorageChannelPanel || _storageSelectedChannelsRadio.IsChecked != true)
-            {
-                return;
-            }
-
-            _settings.Storage.ChannelSelection.Mode = StorageChannelSelectionMode.SelectedChannels;
+            SetStorageChannelMode(StorageChannelSelectionMode.SampleRateRange);
+            _storageSelectedKeys.Clear();
             CommitStorageChannelSelectionChange();
         };
-        _storageSelectAllChannelsButton.Click += (_, _) => SetAllStorageChannels();
-        _storageClearChannelsButton.Click += (_, _) => ClearStorageChannels();
-        _storageOnlineChannelsButton.Click += (_, _) => SetOnlineStorageChannels();
-        _storageUseMonitorChannelsButton.Click += (_, _) => UseActiveMonitorViewForStorage();
+        _storageSelectedChannelsButton.Click += (_, _) =>
+        {
+            SetStorageChannelMode(StorageChannelSelectionMode.SelectedChannels);
+            CommitStorageChannelSelectionChange();
+        };
         _storageSampleRateMin.PropertyChanged += (_, e) =>
         {
             if (e.Property == TextBox.TextProperty)
@@ -941,13 +930,89 @@ public sealed class MainWindow : Window
 
     private Control BuildStorageChannelSelectionPanel()
     {
-        _storageChannelSummary.Foreground = TextPrimary;
-        _storageChannelSummary.FontSize = 14;
-        _storageChannelSummary.TextWrapping = TextWrapping.Wrap;
-        _storageChannelHint.Foreground = TextSecondary;
-        _storageChannelHint.FontSize = 13;
-        _storageChannelHint.TextWrapping = TextWrapping.Wrap;
+        var modeRow = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitions("*,*,*"),
+            ColumnSpacing = 12,
+            Children =
+            {
+                _storageAllChannelsButton,
+                _storageSampleRateRangeButton,
+                _storageSelectedChannelsButton
+            }
+        };
+        Grid.SetColumn(modeRow.Children[1], 1);
+        Grid.SetColumn(modeRow.Children[2], 2);
 
+        var panel = new StackPanel
+        {
+            Spacing = 12,
+            Children =
+            {
+                modeRow,
+                _storageChannelDetailsPanel
+            }
+        };
+
+        RefreshStorageChannelPanel();
+        return panel;
+    }
+
+    private void LoadStorageChannelSelectionFromSettings()
+    {
+        _storageSelectedKeys.Clear();
+        foreach (MonitorChannelSettings channel in _settings.Storage.ChannelSelection.Channels)
+        {
+            _storageSelectedKeys.Add(new ChannelKey(channel.DeviceIp, channel.DeviceId, channel.ChannelId));
+        }
+    }
+
+    private void RefreshStorageChannelPanel()
+    {
+        _updatingStorageChannelPanel = true;
+        try
+        {
+            NormalizeStorageSelectedKeys();
+            UpdateStorageModeButtons();
+        }
+        finally
+        {
+            _updatingStorageChannelPanel = false;
+            RebuildStorageChannelTree();
+            UpdateStorageChannelControlState();
+        }
+    }
+
+    private void RebuildStorageChannelTree()
+    {
+        _storageChannelDetailsPanel.Children.Clear();
+        StorageChannelSelectionMode mode = _settings.Storage.ChannelSelection.Mode;
+        if (mode == StorageChannelSelectionMode.AllChannels)
+        {
+            return;
+        }
+
+        if (mode == StorageChannelSelectionMode.SampleRateRange)
+        {
+            _storageChannelDetailsPanel.Children.Add(_storageSampleRateRangePanel);
+        }
+
+        if (_acquisition.Devices.Count == 0)
+        {
+            return;
+        }
+
+        _storageChannelDetailsPanel.Children.Add(new ScrollViewer
+        {
+            Content = BuildStorageDeviceGrid(),
+            MaxHeight = 360,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled
+        });
+    }
+
+    private Control BuildStorageSampleRateRangePanel()
+    {
         var rangeControl = new StackPanel
         {
             Orientation = Orientation.Horizontal,
@@ -973,74 +1038,41 @@ public sealed class MainWindow : Window
             }
         };
 
-        var actionRow = new WrapPanel
-        {
-            Orientation = Orientation.Horizontal,
-            Children =
-            {
-                _storageSelectAllChannelsButton,
-                _storageClearChannelsButton,
-                StorageField("\u91c7\u6837\u7387\u533a\u95f4", rangeControl)
-            }
-        };
-        foreach (Control child in actionRow.Children)
-        {
-            child.Margin = new Thickness(0, 0, 10, 10);
-        }
+        return StorageField("\u91c7\u6837\u7387\u533a\u95f4", rangeControl);
+    }
 
-        var panel = new StackPanel
+    private Control BuildStorageDeviceGrid()
+    {
+        var grid = new Grid
         {
-            Spacing = 12,
-            Children =
-            {
-                actionRow,
-                _storageChannelSummary,
-                _storageChannelHint
-            }
+            ColumnDefinitions = new ColumnDefinitions("*,*,*,*"),
+            ColumnSpacing = 12,
+            RowSpacing = 12
         };
 
-        RefreshStorageChannelPanel();
-        return panel;
-    }
-
-    private void LoadStorageChannelSelectionFromSettings()
-    {
-        _storageSelectedKeys.Clear();
-        foreach (MonitorChannelSettings channel in _settings.Storage.ChannelSelection.Channels)
+        int deviceIndex = 0;
+        foreach (DeviceDescriptor device in _acquisition.Devices)
         {
-            _storageSelectedKeys.Add(new ChannelKey(channel.DeviceIp, channel.DeviceId, channel.ChannelId));
-        }
-    }
+            if (deviceIndex % 4 == 0)
+            {
+                grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
+            }
 
-    private void RefreshStorageChannelPanel()
-    {
-        _updatingStorageChannelPanel = true;
-        try
-        {
-            NormalizeStorageSelectedKeys();
-            _storageAllChannelsRadio.IsChecked = _settings.Storage.ChannelSelection.Mode == StorageChannelSelectionMode.AllChannels;
-            _storageSelectedChannelsRadio.IsChecked = _settings.Storage.ChannelSelection.Mode == StorageChannelSelectionMode.SelectedChannels;
+            Control node = BuildStorageDeviceSelectionNode(device, deviceIndex + 1);
+            Grid.SetRow(node, deviceIndex / 4);
+            Grid.SetColumn(node, deviceIndex % 4);
+            grid.Children.Add(node);
+            deviceIndex++;
         }
-        finally
-        {
-            _updatingStorageChannelPanel = false;
-            UpdateStorageChannelSummary();
-            UpdateStorageChannelControlState();
-        }
-    }
 
-    private void RebuildStorageChannelTree()
-    {
-        RefreshStorageChannelPanel();
+        return grid;
     }
 
     private Control BuildStorageDeviceSelectionNode(DeviceDescriptor device, int displayIndex)
     {
         bool selectedMode = _settings.Storage.ChannelSelection.Mode == StorageChannelSelectionMode.SelectedChannels;
         ChannelDescriptor[] channels = device.Channels.ToArray();
-        int selectedCount = selectedMode
-            ? channels.Count(IsStorageChannelSelected)
-            : channels.Length;
+        int selectedCount = channels.Count(IsStorageChannelIncludedByCurrentMode);
         bool? checkedState = selectedCount == 0
             ? false
             : selectedCount == channels.Length ? true : null;
@@ -1081,7 +1113,7 @@ public sealed class MainWindow : Window
         {
             var channelCheck = new CheckBox
             {
-                IsChecked = !selectedMode || IsStorageChannelSelected(channel),
+                IsChecked = IsStorageChannelIncludedByCurrentMode(channel),
                 Content = FormatChannelSelectionName(channel),
                 Foreground = channel.Online ? TextPrimary : TextSecondary,
                 FontSize = 13,
@@ -1113,46 +1145,6 @@ public sealed class MainWindow : Window
         };
     }
 
-    private void SetAllStorageChannels()
-    {
-        SetStorageChannelMode(StorageChannelSelectionMode.AllChannels);
-        _storageSelectedKeys.Clear();
-        _updatingStorageChannelPanel = true;
-        try
-        {
-            _storageSampleRateMin.Text = string.Empty;
-            _storageSampleRateMax.Text = string.Empty;
-            _settings.Storage.ChannelSelection.SampleRateMinHz = null;
-            _settings.Storage.ChannelSelection.SampleRateMaxHz = null;
-        }
-        finally
-        {
-            _updatingStorageChannelPanel = false;
-        }
-
-        CommitStorageChannelSelectionChange();
-    }
-
-    private void ClearStorageChannels()
-    {
-        SetStorageChannelMode(StorageChannelSelectionMode.SelectedChannels);
-        _storageSelectedKeys.Clear();
-        _updatingStorageChannelPanel = true;
-        try
-        {
-            _storageSampleRateMin.Text = string.Empty;
-            _storageSampleRateMax.Text = string.Empty;
-            _settings.Storage.ChannelSelection.SampleRateMinHz = null;
-            _settings.Storage.ChannelSelection.SampleRateMaxHz = null;
-        }
-        finally
-        {
-            _updatingStorageChannelPanel = false;
-        }
-
-        CommitStorageChannelSelectionChange();
-    }
-
     private void ApplyStorageSampleRateRangeFromUi()
     {
         if (_updatingStorageChannelPanel)
@@ -1164,43 +1156,6 @@ public sealed class MainWindow : Window
         _settings.Storage.ChannelSelection.SampleRateMaxHz = TryParseDouble(_storageSampleRateMax.Text);
         SetStorageChannelMode(StorageChannelSelectionMode.SampleRateRange);
         _storageSelectedKeys.Clear();
-        CommitStorageChannelSelectionChange();
-    }
-
-    private void SetOnlineStorageChannels()
-    {
-        if (_acquisition.Devices.Count == 0)
-        {
-            return;
-        }
-
-        SetStorageChannelMode(StorageChannelSelectionMode.SelectedChannels);
-        _storageSelectedKeys.Clear();
-        foreach (ChannelDescriptor channel in _acquisition.Devices
-                     .Where(device => device.Online)
-                     .SelectMany(device => device.Channels)
-                     .Where(channel => channel.Online))
-        {
-            _storageSelectedKeys.Add(new ChannelKey(channel));
-        }
-
-        CommitStorageChannelSelectionChange();
-    }
-
-    private void UseActiveMonitorViewForStorage()
-    {
-        if (_monitorViews.Count == 0)
-        {
-            return;
-        }
-
-        SetStorageChannelMode(StorageChannelSelectionMode.SelectedChannels);
-        _storageSelectedKeys.Clear();
-        foreach (ChannelKey key in _monitorViews[_activeViewIndex].SelectedKeys)
-        {
-            _storageSelectedKeys.Add(key);
-        }
-
         CommitStorageChannelSelectionChange();
     }
 
@@ -1242,14 +1197,38 @@ public sealed class MainWindow : Window
                _storageSelectedKeys.Any(item => item.DeviceId == channel.DeviceId && item.ChannelId == channel.ChannelId);
     }
 
+    private bool IsStorageChannelIncludedByCurrentMode(ChannelDescriptor channel)
+    {
+        return _settings.Storage.ChannelSelection.Mode switch
+        {
+            StorageChannelSelectionMode.AllChannels => true,
+            StorageChannelSelectionMode.SampleRateRange => IsChannelInStorageSampleRateRange(channel),
+            _ => IsStorageChannelSelected(channel)
+        };
+    }
+
+    private void UpdateStorageModeButtons()
+    {
+        StorageChannelSelectionMode mode = _settings.Storage.ChannelSelection.Mode;
+        SetStorageModeButtonState(_storageAllChannelsButton, mode == StorageChannelSelectionMode.AllChannels);
+        SetStorageModeButtonState(_storageSampleRateRangeButton, mode == StorageChannelSelectionMode.SampleRateRange);
+        SetStorageModeButtonState(_storageSelectedChannelsButton, mode == StorageChannelSelectionMode.SelectedChannels);
+    }
+
+    private static void SetStorageModeButtonState(Button button, bool selected)
+    {
+        button.Background = selected ? AccentBlue : PanelBackground2;
+        button.Foreground = selected ? Brushes.White : TextPrimary;
+        button.BorderBrush = selected ? AccentBlue : BorderBrushSoft;
+    }
+
     private void SetStorageChannelMode(StorageChannelSelectionMode mode)
     {
         _settings.Storage.ChannelSelection.Mode = mode;
         _updatingStorageChannelPanel = true;
         try
         {
-            _storageAllChannelsRadio.IsChecked = mode == StorageChannelSelectionMode.AllChannels;
-            _storageSelectedChannelsRadio.IsChecked = mode == StorageChannelSelectionMode.SelectedChannels;
+            UpdateStorageModeButtons();
         }
         finally
         {
@@ -1262,6 +1241,7 @@ public sealed class MainWindow : Window
         NormalizeStorageSelectedKeys();
         PersistStorageChannelSelectionSettings();
         RebuildStorageChannelTree();
+        UpdateStorageChannelControlState();
         UpdateStoragePreview();
     }
 
@@ -1378,60 +1358,16 @@ public sealed class MainWindow : Window
                (!max.HasValue || sampleRate <= max.Value);
     }
 
-    private void UpdateStorageChannelSummary()
-    {
-        int totalChannels = _acquisition.Devices.Sum(device => device.Channels.Count);
-        int selectedChannels = ResolveStorageDevices(_acquisition.Devices).Sum(device => device.Channels.Count);
-        StorageChannelSelectionMode mode = _settings.Storage.ChannelSelection.Mode;
-
-        if (totalChannels == 0)
-        {
-            _storageChannelSummary.Text = mode == StorageChannelSelectionMode.SampleRateRange
-                ? $"\u672a\u8fde\u63a5\u8bbe\u5907\uff1b\u5df2\u8bbe\u7f6e\u91c7\u6837\u7387\u533a\u95f4 {StorageSampleRateRangeText()}"
-                : mode == StorageChannelSelectionMode.SelectedChannels
-                    ? "\u672a\u8fde\u63a5\u8bbe\u5907\uff1b\u5f53\u524d\u4e0d\u4fdd\u5b58\u4efb\u4f55\u901a\u9053"
-                    : "\u672a\u8fde\u63a5\u8bbe\u5907\uff1b\u8fde\u63a5\u540e\u9ed8\u8ba4\u4fdd\u5b58\u5168\u90e8\u901a\u9053";
-        }
-        else
-        {
-            _storageChannelSummary.Text = mode == StorageChannelSelectionMode.AllChannels
-                ? $"\u672c\u6b21\u5c06\u4fdd\u5b58\u5168\u90e8 {totalChannels} \u4e2a\u901a\u9053"
-                : mode == StorageChannelSelectionMode.SampleRateRange
-                    ? $"\u91c7\u6837\u7387 {StorageSampleRateRangeText()}\uff1a\u5c06\u4fdd\u5b58 {selectedChannels}/{totalChannels} \u4e2a\u901a\u9053"
-                    : "\u5f53\u524d\u5df2\u6e05\u7a7a\uff1b\u672c\u6b21\u4e0d\u4fdd\u5b58\u4efb\u4f55\u901a\u9053";
-        }
-
-        if (_captureUiRunning)
-        {
-            _storageChannelHint.Text = "\u91c7\u96c6\u8fd0\u884c\u4e2d\uff0c\u5b58\u50a8\u901a\u9053\u5df2\u9501\u5b9a\uff0c\u4fee\u6539\u5c06\u5728\u4e0b\u6b21\u91c7\u96c6\u524d\u751f\u6548";
-        }
-        else if (mode == StorageChannelSelectionMode.AllChannels)
-        {
-            _storageChannelHint.Text = "\u5168\u9009\u540e\u4f1a\u5199\u5165\u5f53\u524d\u8bbe\u5907\u7684\u6240\u6709\u901a\u9053";
-        }
-        else if (selectedChannels == 0)
-        {
-            _storageChannelHint.Text = "\u5f00\u59cb\u91c7\u96c6\u524d\u81f3\u5c11\u9700\u8981\u901a\u8fc7\u5168\u9009\u6216\u91c7\u6837\u7387\u533a\u95f4\u5339\u914d\u5230\u4e00\u4e2a\u901a\u9053";
-        }
-        else
-        {
-            _storageChannelHint.Text = "\u4fee\u6539\u91c7\u6837\u7387\u533a\u95f4\u540e\u4f1a\u81ea\u52a8\u7b5b\u9009\u5339\u914d\u901a\u9053\u5e76\u4fdd\u5b58\u914d\u7f6e";
-        }
-    }
-
     private void UpdateStorageChannelControlState()
     {
         bool canEdit = !_captureUiRunning && !_captureCleanupInProgress;
 
-        _storageAllChannelsRadio.IsEnabled = canEdit;
-        _storageSelectedChannelsRadio.IsEnabled = canEdit;
-        _storageChannelTreePanel.IsEnabled = canEdit;
-        _storageSelectAllChannelsButton.IsEnabled = canEdit;
-        _storageClearChannelsButton.IsEnabled = canEdit;
+        _storageAllChannelsButton.IsEnabled = canEdit;
+        _storageSampleRateRangeButton.IsEnabled = canEdit;
+        _storageSelectedChannelsButton.IsEnabled = canEdit;
+        _storageChannelDetailsPanel.IsEnabled = canEdit;
         _storageSampleRateMin.IsEnabled = canEdit;
         _storageSampleRateMax.IsEnabled = canEdit;
-        _storageOnlineChannelsButton.IsEnabled = false;
-            _storageUseMonitorChannelsButton.IsEnabled = false;
     }
 
     private string StorageSampleRateRangeText()
@@ -1626,18 +1562,6 @@ public sealed class MainWindow : Window
         return grid;
     }
 
-    private static Control StorageValue(string label, string value)
-    {
-        return StorageField(label, new TextBlock
-        {
-            Text = value,
-            Foreground = TextPrimary,
-            FontSize = 13,
-            TextWrapping = TextWrapping.Wrap,
-            VerticalAlignment = VerticalAlignment.Center
-        });
-    }
-
     private static Control CompressionField(string label, Control editor)
     {
         var block = FieldBlock(label, editor);
@@ -1743,6 +1667,7 @@ public sealed class MainWindow : Window
         ApplyMonitorSelectionsToStore();
         RebuildSelectionTree();
         RebuildStorageChannelTree();
+        UpdateStorageChannelControlState();
         RefreshDeviceInfoPanel();
     }
 
@@ -1855,7 +1780,6 @@ public sealed class MainWindow : Window
         _storageEnabledCheck.IsEnabled = false;
         _storageTabEnabledCheck.IsEnabled = false;
         UpdateStorageChannelControlState();
-        UpdateStorageChannelSummary();
         _status.Text = storageEnabled
             ? (_settings.Storage.Compression.Enabled && _settings.Storage.Compression.Algorithm != CompressionAlgorithm.None ? "\u91c7\u96c6\u4e2d\uff0c\u6b63\u5728\u5199\u5165\u538b\u7f29 .dhcap" : "\u91c7\u96c6\u4e2d\uff0c\u6b63\u5728\u5199\u5165 Codec=None \u539f\u59cb .dhcap")
             : "\u91c7\u96c6\u4e2d\uff0c\u4ec5\u663e\u793a\u4e0d\u4fdd\u5b58";
@@ -1920,7 +1844,6 @@ public sealed class MainWindow : Window
         {
             _captureCleanupInProgress = false;
             UpdateStorageChannelControlState();
-            UpdateStorageChannelSummary();
         }
     }
 
@@ -1991,27 +1914,35 @@ public sealed class MainWindow : Window
         {
             Foreground = TextSecondary,
             FontSize = 12,
-            Margin = new Thickness(8, 6, 8, 0),
+            Margin = new Thickness(8, 4, 8, 3),
             TextWrapping = TextWrapping.NoWrap
+        };
+
+        var titleStrip = new Border
+        {
+            Background = PanelBackground2,
+            BorderBrush = MonitorViewSeparatorBrush,
+            BorderThickness = new Thickness(0, 0, 0, 1),
+            Child = title
         };
 
         var host = new Border
         {
-            Margin = new Thickness(5),
+            Margin = new Thickness(0),
             Background = PanelBackground,
-            BorderBrush = BorderBrushSoft,
-            BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(PanelRadius),
+            BorderBrush = MonitorViewBorderBrush,
+            BorderThickness = new Thickness(2),
+            CornerRadius = new CornerRadius(2),
             Child = new DockPanel
             {
                 Children =
                 {
-                    title,
+                    titleStrip,
                     waveform
                 }
             }
         };
-        DockPanel.SetDock(title, Dock.Top);
+        DockPanel.SetDock(titleStrip, Dock.Top);
 
         MonitorViewState? view = null;
         var renderLoop = new MonitorViewRenderLoop(
@@ -2089,6 +2020,8 @@ public sealed class MainWindow : Window
         _monitorGrid.Children.Clear();
         _monitorGrid.RowDefinitions.Clear();
         _monitorGrid.ColumnDefinitions.Clear();
+        _monitorGrid.RowSpacing = 8;
+        _monitorGrid.ColumnSpacing = 8;
 
         var visibleViews = _monitorViews
             .Select((view, index) => new { View = view, Index = index })
@@ -2140,8 +2073,8 @@ public sealed class MainWindow : Window
     {
         for (int i = 0; i < _monitorViews.Count; i++)
         {
-            _monitorViews[i].Host.BorderBrush = i == _activeViewIndex ? AccentBlue : BorderBrushSoft;
-            _monitorViews[i].Host.BorderThickness = new Thickness(i == _activeViewIndex ? 2 : 1);
+            _monitorViews[i].Host.BorderBrush = i == _activeViewIndex ? AccentBlue : MonitorViewBorderBrush;
+            _monitorViews[i].Host.BorderThickness = new Thickness(2);
         }
     }
 
@@ -2699,8 +2632,12 @@ public sealed class MainWindow : Window
         }
 
         return totalChannels > 0
-            ? $"\u5df2\u6e05\u7a7a\uff0c\u4fdd\u5b58 0/{totalChannels} \u901a\u9053"
-            : "\u5df2\u6e05\u7a7a";
+            ? selectedChannels > 0
+                ? $"\u624b\u52a8\u9009\u62e9 {selectedChannels}/{totalChannels} \u901a\u9053"
+                : $"\u624b\u52a8\u9009\u62e9\uff0c\u4fdd\u5b58 0/{totalChannels} \u901a\u9053"
+            : _storageSelectedKeys.Count > 0
+                ? $"\u624b\u52a8\u9009\u62e9 {_storageSelectedKeys.Count} \u4e2a\u5386\u53f2\u901a\u9053"
+                : "\u624b\u52a8\u9009\u62e9\uff0c\u5df2\u6e05\u7a7a";
     }
 
     private string CompressionSummaryFromUi()
@@ -2891,6 +2828,16 @@ public sealed class MainWindow : Window
         comboBox.FontSize = 13;
         comboBox.Padding = new Thickness(8, 4);
         comboBox.MinHeight = FieldMinHeight;
+    }
+
+    private static void StyleStorageModeButton(Button button)
+    {
+        button.BorderThickness = new Thickness(1);
+        button.Padding = new Thickness(12, 7);
+        button.MinHeight = FieldMinHeight;
+        button.HorizontalAlignment = HorizontalAlignment.Stretch;
+        button.FontSize = 13;
+        button.FontWeight = FontWeight.SemiBold;
     }
 
     private static IBrush ChannelBrush(int channelId)

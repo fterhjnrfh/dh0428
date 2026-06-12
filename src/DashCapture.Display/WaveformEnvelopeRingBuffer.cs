@@ -17,17 +17,32 @@ public sealed class WaveformEnvelopeRingBuffer
 
     public void Append(ReadOnlySpan<EnvelopePoint> values)
     {
+        if (values.IsEmpty)
+        {
+            return;
+        }
+
         lock (_sync)
         {
-            foreach (EnvelopePoint value in values)
+            int capacity = _buffer.Length;
+            if (values.Length >= capacity)
             {
-                _buffer[_writeIndex % _buffer.Length] = value;
-                _writeIndex++;
-                if (_count < _buffer.Length)
-                {
-                    _count++;
-                }
+                values[^capacity..].CopyTo(_buffer);
+                _writeIndex += values.Length;
+                _count = capacity;
+                return;
             }
+
+            int position = (int)(_writeIndex % capacity);
+            int firstCopy = Math.Min(values.Length, capacity - position);
+            values[..firstCopy].CopyTo(_buffer.AsSpan(position, firstCopy));
+            if (firstCopy < values.Length)
+            {
+                values[firstCopy..].CopyTo(_buffer.AsSpan(0, values.Length - firstCopy));
+            }
+
+            _writeIndex += values.Length;
+            _count = Math.Min(capacity, _count + values.Length);
         }
     }
 
@@ -35,15 +50,15 @@ public sealed class WaveformEnvelopeRingBuffer
     {
         lock (_sync)
         {
-            int count = (int)Math.Min(_count, _buffer.Length);
-            var snapshot = new EnvelopePoint[count];
-            long start = _writeIndex - count;
-            for (int i = 0; i < count; i++)
-            {
-                snapshot[i] = _buffer[(start + i) % _buffer.Length];
-            }
+            return CopySnapshot();
+        }
+    }
 
-            return snapshot;
+    public WaveformEnvelopeSnapshot SnapshotWithPosition()
+    {
+        lock (_sync)
+        {
+            return new WaveformEnvelopeSnapshot(CopySnapshot(), _writeIndex);
         }
     }
 
@@ -71,4 +86,32 @@ public sealed class WaveformEnvelopeRingBuffer
             _count = 0;
         }
     }
+
+    private EnvelopePoint[] CopySnapshot()
+    {
+        int count = (int)Math.Min(_count, _buffer.Length);
+        if (count == 0)
+        {
+            return Array.Empty<EnvelopePoint>();
+        }
+
+        var snapshot = new EnvelopePoint[count];
+        long start = _writeIndex - count;
+        int position = (int)(start % _buffer.Length);
+        if (position < 0)
+        {
+            position += _buffer.Length;
+        }
+
+        int firstCopy = Math.Min(count, _buffer.Length - position);
+        Array.Copy(_buffer, position, snapshot, 0, firstCopy);
+        if (firstCopy < count)
+        {
+            Array.Copy(_buffer, 0, snapshot, firstCopy, count - firstCopy);
+        }
+
+        return snapshot;
+    }
 }
+
+public readonly record struct WaveformEnvelopeSnapshot(EnvelopePoint[] Points, long TotalPointCount);

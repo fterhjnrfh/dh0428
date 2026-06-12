@@ -7,12 +7,15 @@ namespace DashCapture.Storage;
 
 public sealed class TdmsStorageService : IAsyncDisposable
 {
+    private const long DeviceRateRefreshIntervalMs = 1000;
+
     private readonly AcquisitionService _acquisition;
     private readonly StorageSettings _settings;
     private CancellationTokenSource? _cts;
     private Task? _worker;
     private ICaptureStorageWriter? _writer;
     private CaptureStorageStatistics? _lastStatistics;
+    private long _lastDeviceRateRefreshTicks;
 
     public TdmsStorageService(AcquisitionService acquisition, StorageSettings settings)
     {
@@ -36,6 +39,8 @@ public sealed class TdmsStorageService : IAsyncDisposable
 
         _lastStatistics = null;
         _writer = new CompressedCaptureWriter(_settings, devices, sourceDevices);
+        _writer.UpdateDeviceRates(sourceDevices);
+        _lastDeviceRateRefreshTicks = Environment.TickCount64;
         _writer.Faulted += OnWriterFaulted;
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         _worker = Task.Run(() => ConsumeAsync(_cts.Token), CancellationToken.None);
@@ -109,7 +114,7 @@ public sealed class TdmsStorageService : IAsyncDisposable
         {
             try
             {
-                _writer.UpdateDeviceRates(_acquisition.Devices);
+                UpdateDeviceRatesIfDue();
                 _writer.AppendBlock(block);
             }
             catch (Exception ex)
@@ -130,5 +135,22 @@ public sealed class TdmsStorageService : IAsyncDisposable
             DateTimeOffset.UtcNow,
             "STORAGE_WRITE_FAILED",
             $"Storage writer failed for {path}: {exception.Message}"));
+    }
+
+    private void UpdateDeviceRatesIfDue()
+    {
+        if (_writer is null)
+        {
+            return;
+        }
+
+        long now = Environment.TickCount64;
+        if (now - Volatile.Read(ref _lastDeviceRateRefreshTicks) < DeviceRateRefreshIntervalMs)
+        {
+            return;
+        }
+
+        Volatile.Write(ref _lastDeviceRateRefreshTicks, now);
+        _writer.UpdateDeviceRates(_acquisition.Devices);
     }
 }

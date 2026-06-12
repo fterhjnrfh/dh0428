@@ -8,6 +8,7 @@ public sealed class WaveformStore
     private readonly Dictionary<ChannelKey, ChannelDescriptor> _channels = new();
     private readonly Dictionary<ChannelKey, float> _displaySampleRates = new();
     private readonly object _sync = new();
+    private ChannelDescriptor[] _visibleChannels = Array.Empty<ChannelDescriptor>();
     private int _capacityPerChannel;
 
     public WaveformStore(int capacityPerChannel)
@@ -21,7 +22,7 @@ public sealed class WaveformStore
         {
             lock (_sync)
             {
-                return _channels.Values.ToArray();
+                return _visibleChannels;
             }
         }
     }
@@ -66,6 +67,8 @@ public sealed class WaveformStore
                 _buffers.Remove(stale);
                 _displaySampleRates.Remove(stale);
             }
+
+            _visibleChannels = _channels.Values.ToArray();
         }
     }
 
@@ -130,16 +133,24 @@ public sealed class WaveformStore
     {
         lock (_sync)
         {
-            return ResolveChannels(channels)
-                .Select(channel =>
-                {
-                    var key = new ChannelKey(channel);
-                    float displaySampleRate = _displaySampleRates.TryGetValue(key, out float rate) && IsValidSampleRate(rate)
-                        ? rate
-                        : channel.SampleRate;
-                    return new WaveformSnapshot(channel, displaySampleRate, _buffers[key].Snapshot());
-                })
-                .ToArray();
+            IReadOnlyList<ChannelDescriptor> resolved = ResolveChannels(channels);
+            var snapshots = new WaveformSnapshot[resolved.Count];
+            for (int i = 0; i < resolved.Count; i++)
+            {
+                ChannelDescriptor channel = resolved[i];
+                var key = new ChannelKey(channel);
+                float displaySampleRate = _displaySampleRates.TryGetValue(key, out float rate) && IsValidSampleRate(rate)
+                    ? rate
+                    : channel.SampleRate;
+                WaveformEnvelopeSnapshot bufferSnapshot = _buffers[key].SnapshotWithPosition();
+                snapshots[i] = new WaveformSnapshot(
+                    channel,
+                    displaySampleRate,
+                    bufferSnapshot.Points,
+                    bufferSnapshot.TotalPointCount);
+            }
+
+            return snapshots;
         }
     }
 
@@ -159,18 +170,29 @@ public sealed class WaveformStore
         return sampleRate > 0 && !float.IsNaN(sampleRate) && !float.IsInfinity(sampleRate);
     }
 
-    private IEnumerable<ChannelDescriptor> ResolveChannels(IReadOnlyList<ChannelDescriptor>? channels)
+    private IReadOnlyList<ChannelDescriptor> ResolveChannels(IReadOnlyList<ChannelDescriptor>? channels)
     {
-        return channels is null
-            ? _channels.Values
-            : channels
-                .Select(channel => new ChannelKey(channel))
-                .Where(_channels.ContainsKey)
-                .Select(key => _channels[key]);
+        if (channels is null)
+        {
+            return _visibleChannels;
+        }
+
+        var resolved = new List<ChannelDescriptor>(channels.Count);
+        for (int i = 0; i < channels.Count; i++)
+        {
+            var key = new ChannelKey(channels[i]);
+            if (_channels.TryGetValue(key, out ChannelDescriptor? channel))
+            {
+                resolved.Add(channel);
+            }
+        }
+
+        return resolved;
     }
 }
 
 public sealed record WaveformSnapshot(
     ChannelDescriptor Channel,
     float DisplaySampleRate,
-    EnvelopePoint[] Points);
+    EnvelopePoint[] Points,
+    long TotalPointCount);

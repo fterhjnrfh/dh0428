@@ -3,14 +3,20 @@
     <LangVersion>10.0</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <DashCaptureTargetFrameworks>net10.0;net6.0</DashCaptureTargetFrameworks>
     <Platforms>AnyCPU;x64;arm64</Platforms>
     <PlatformTarget Condition="'$(PlatformTarget)' == '' and '$(RuntimeIdentifier)' != '' and $(RuntimeIdentifier.Contains('-arm64'))">arm64</PlatformTarget>
     <PlatformTarget Condition="'$(PlatformTarget)' == '' and '$(RuntimeIdentifier)' != '' and $(RuntimeIdentifier.Contains('-x64'))">x64</PlatformTarget>
     <PlatformTarget Condition="'$(PlatformTarget)' == ''">AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
+    <Optimize Condition="'$(Configuration)' == 'Release'">true</Optimize>
     <TieredCompilation>true</TieredCompilation>
     <TieredPGO>true</TieredPGO>
     <ServerGarbageCollection>true</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <PublishReadyToRun Condition="'$(RuntimeIdentifier)' != ''">true</PublishReadyToRun>
+    <PublishReadyToRunComposite Condition="'$(RuntimeIdentifier)' != '' and '$(TargetFramework)' == 'net10.0'">true</PublishReadyToRunComposite>
+    <ReadyToRunUseCrossgen2 Condition="'$(RuntimeIdentifier)' != ''">true</ReadyToRunUseCrossgen2>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>

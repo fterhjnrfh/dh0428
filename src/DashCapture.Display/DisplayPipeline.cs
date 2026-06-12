@@ -99,8 +99,7 @@ public sealed class DisplayPipeline : IAsyncDisposable
         bool globalBlock = IsGlobalMultiDeviceBlock(block, devices);
         DeviceDescriptor? device = globalBlock
             ? null
-            : devices.FirstOrDefault(d => d.DeviceId == block.Header.GroupId) ??
-              devices.FirstOrDefault(d => d.DeviceId == block.Header.MachineId);
+            : ResolveDevice(devices, block.Header.GroupId, block.Header.MachineId);
         bool singleChannelBlock = !globalBlock && IsExplicitSingleChannelBlock(block);
 
         if (!globalBlock && device is null)
@@ -164,13 +163,38 @@ public sealed class DisplayPipeline : IAsyncDisposable
 
     private static bool IsGlobalMultiDeviceBlock(AcquisitionBlock block, IReadOnlyList<DeviceDescriptor> devices)
     {
-        int totalChannelCount = devices.Sum(d => d.Channels.Count);
+        int totalChannelCount = 0;
+        for (int i = 0; i < devices.Count; i++)
+        {
+            totalChannelCount += devices[i].Channels.Count;
+        }
+
         return block.Header.MessageType == DashSampleMessageType.AnalogMultiChannelData ||
                block.Header.GroupId < 0 ||
                block.Header.MachineId < 0 ||
                (devices.Count > 1 &&
                 totalChannelCount > 0 &&
                 block.ChannelCount == totalChannelCount);
+    }
+
+    private static DeviceDescriptor? ResolveDevice(IReadOnlyList<DeviceDescriptor> devices, int groupId, int machineId)
+    {
+        DeviceDescriptor? machineMatch = null;
+        for (int i = 0; i < devices.Count; i++)
+        {
+            DeviceDescriptor device = devices[i];
+            if (device.DeviceId == groupId)
+            {
+                return device;
+            }
+
+            if (device.DeviceId == machineId)
+            {
+                machineMatch = device;
+            }
+        }
+
+        return machineMatch;
     }
 
     private static bool IsExplicitSingleChannelBlock(AcquisitionBlock block)

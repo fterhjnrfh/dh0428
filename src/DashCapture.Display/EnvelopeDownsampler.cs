@@ -11,6 +11,18 @@ public static class EnvelopeDownsampler
 
         int buckets = Math.Min(samples.Length, pixelWidth);
         var output = new EnvelopePoint[buckets];
+        Downsample(samples, pixelWidth, output);
+        return output;
+    }
+
+    public static int Downsample(ReadOnlySpan<float> samples, int pixelWidth, Span<EnvelopePoint> output)
+    {
+        if (samples.Length == 0 || pixelWidth <= 0 || output.IsEmpty)
+        {
+            return 0;
+        }
+
+        int buckets = Math.Min(Math.Min(samples.Length, pixelWidth), output.Length);
         for (int pixel = 0; pixel < buckets; pixel++)
         {
             int start = (int)((long)pixel * samples.Length / buckets);
@@ -49,7 +61,7 @@ public static class EnvelopeDownsampler
                 : new EnvelopePoint(pixel, float.NaN, float.NaN, float.NaN, float.NaN);
         }
 
-        return output;
+        return buckets;
     }
 
     public static EnvelopePoint[] Downsample(ReadOnlySpan<EnvelopePoint> points, int pixelWidth)
@@ -61,6 +73,18 @@ public static class EnvelopeDownsampler
 
         int buckets = Math.Min(points.Length, pixelWidth);
         var output = new EnvelopePoint[buckets];
+        Downsample(points, pixelWidth, output);
+        return output;
+    }
+
+    public static int Downsample(ReadOnlySpan<EnvelopePoint> points, int pixelWidth, Span<EnvelopePoint> output)
+    {
+        if (points.Length == 0 || pixelWidth <= 0 || output.IsEmpty)
+        {
+            return 0;
+        }
+
+        int buckets = Math.Min(Math.Min(points.Length, pixelWidth), output.Length);
         for (int pixel = 0; pixel < buckets; pixel++)
         {
             int start = (int)((long)pixel * points.Length / buckets);
@@ -100,6 +124,6 @@ public static class EnvelopeDownsampler
                 : new EnvelopePoint(pixel, float.NaN, float.NaN, float.NaN, float.NaN);
         }
 
-        return output;
+        return buckets;
     }
 }
