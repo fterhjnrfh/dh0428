@@ -22,10 +22,12 @@ public sealed class AcquisitionService : IAsyncDisposable
     private long _blocksReceived;
     private long _bytesReceived;
     private long _displayDrops;
+    private long _captureStartedTicks;
     private int _storageDepth;
     private int _displayDepth;
     private int _storageEnabled = 1;
     private BackpressureLevel _backpressureLevel;
+    private Func<SdkSampleData, int, bool>? _storageBlockFilter;
     private string _status = "Idle";
 
     public AcquisitionService(CaptureSettings settings)
@@ -73,6 +75,11 @@ public sealed class AcquisitionService : IAsyncDisposable
         }
     }
 
+    public void SetStorageBlockFilter(Func<SdkSampleData, int, bool>? filter)
+    {
+        Interlocked.Exchange(ref _storageBlockFilter, filter);
+    }
+
     public async Task ConnectAsync(CancellationToken cancellationToken)
     {
         if (_source is not null)
@@ -105,6 +112,7 @@ public sealed class AcquisitionService : IAsyncDisposable
         _blocksReceived = 0;
         _bytesReceived = 0;
         _displayDrops = 0;
+        _captureStartedTicks = Environment.TickCount64;
         _storageDepth = 0;
         _displayDepth = 0;
         _backpressureLevel = BackpressureLevel.Normal;
@@ -218,42 +226,52 @@ public sealed class AcquisitionService : IAsyncDisposable
             }
 
             int channelCount = ResolveChannelCount(sample);
+            bool storageEnabled = StorageEnabled;
+            bool queueForStorage = storageEnabled && ShouldQueueForStorage(sample, channelCount);
+            bool canQueueDisplay = _backpressureLevel < BackpressureLevel.PauseDisplay;
+
+            if (!queueForStorage && !canQueueDisplay)
+            {
+                Interlocked.Increment(ref _blocksReceived);
+                Interlocked.Add(ref _bytesReceived, sample.BufferCount);
+                Interlocked.Increment(ref _displayDrops);
+                UpdateBackpressure();
+                return;
+            }
+
             var rented = _pool.Rent(sample.BufferCount);
             NativeMemoryCopy.Copy(sample.DataPointer, rented.Pointer, sample.BufferCount);
             var block = new AcquisitionBlock(rented, sample, channelCount);
-            bool storageEnabled = StorageEnabled;
-
-            if (storageEnabled)
+            bool retainedForDisplay = queueForStorage && canQueueDisplay;
+            if (retainedForDisplay)
             {
-                if (!_storageQueue.Writer.TryWrite(block))
+                block.Retain();
+            }
+
+            if (queueForStorage)
+            {
+                if (!TryWriteStorageBlock(block))
                 {
+                    if (retainedForDisplay)
+                    {
+                        block.Release();
+                    }
+
                     block.Release();
                     _backpressureLevel = BackpressureLevel.StopRequired;
-                    PublishFault(new AcquisitionFault(
-                        DateTimeOffset.UtcNow,
-                        "STORAGE_QUEUE_FULL",
-                        "Storage queue is full. Sampling will stop to protect lossless storage.",
-                        sample.MachineId));
+                    PublishFault(CreateStorageQueueFullFault(sample, channelCount));
                     _ = StopAsync(CancellationToken.None);
                     return;
                 }
-
-                Interlocked.Increment(ref _storageDepth);
             }
 
             Interlocked.Increment(ref _blocksReceived);
             Interlocked.Add(ref _bytesReceived, sample.BufferCount);
 
-            if (_backpressureLevel < BackpressureLevel.PauseDisplay)
+            if (canQueueDisplay)
             {
-                if (storageEnabled)
+                if (TryWriteDisplayBlock(block))
                 {
-                    block.Retain();
-                }
-
-                if (_displayQueue.Writer.TryWrite(block))
-                {
-                    Interlocked.Increment(ref _displayDepth);
                 }
                 else
                 {
@@ -263,7 +281,7 @@ public sealed class AcquisitionService : IAsyncDisposable
             }
             else
             {
-                if (!storageEnabled)
+                if (!queueForStorage)
                 {
                     block.Release();
                 }
@@ -281,6 +299,100 @@ public sealed class AcquisitionService : IAsyncDisposable
         {
             PublishFault(new AcquisitionFault(DateTimeOffset.UtcNow, "CALLBACK_ERROR", ex.Message, sample.MachineId));
         }
+    }
+
+    private bool ShouldQueueForStorage(SdkSampleData sample, int channelCount)
+    {
+        Func<SdkSampleData, int, bool>? filter = Volatile.Read(ref _storageBlockFilter);
+        return filter is null || filter(sample, channelCount);
+    }
+
+    private bool TryWriteStorageBlock(AcquisitionBlock block)
+    {
+        if (TryWriteStorageBlockOnce(block))
+        {
+            return true;
+        }
+
+        int timeoutMs = Math.Clamp(_settings.Queues.StorageWriteTimeoutMs, 0, 30000);
+        if (timeoutMs <= 0)
+        {
+            return false;
+        }
+
+        long started = Environment.TickCount64;
+        var spin = new SpinWait();
+        while (IsRunning && ElapsedMilliseconds(started) < timeoutMs)
+        {
+            if (TryWriteStorageBlockOnce(block))
+            {
+                return true;
+            }
+
+            if (spin.Count < 10)
+            {
+                spin.SpinOnce();
+            }
+            else
+            {
+                Thread.Sleep(1);
+            }
+        }
+
+        return false;
+    }
+
+    private bool TryWriteDisplayBlock(AcquisitionBlock block)
+    {
+        Interlocked.Increment(ref _displayDepth);
+        if (_displayQueue.Writer.TryWrite(block))
+        {
+            return true;
+        }
+
+        Interlocked.Decrement(ref _displayDepth);
+        return false;
+    }
+
+    private bool TryWriteStorageBlockOnce(AcquisitionBlock block)
+    {
+        Interlocked.Increment(ref _storageDepth);
+        if (_storageQueue.Writer.TryWrite(block))
+        {
+            return true;
+        }
+
+        Interlocked.Decrement(ref _storageDepth);
+        return false;
+    }
+
+    private AcquisitionFault CreateStorageQueueFullFault(SdkSampleData sample, int channelCount)
+    {
+        int storageDepth = Volatile.Read(ref _storageDepth);
+        int displayDepth = Volatile.Read(ref _displayDepth);
+        int storageCapacity = Math.Max(1, _settings.Queues.StorageCapacityBlocks);
+        int displayCapacity = Math.Max(1, _settings.Queues.DisplayCapacityBlocks);
+        int timeoutMs = Math.Clamp(_settings.Queues.StorageWriteTimeoutMs, 0, 30000);
+        double blockMb = sample.BufferCount / 1024.0 / 1024.0;
+        double elapsedSeconds = Math.Max(0.001, ElapsedMilliseconds(Volatile.Read(ref _captureStartedTicks)) / 1000.0);
+        double ingressMbPerSecond = Interlocked.Read(ref _bytesReceived) / 1024.0 / 1024.0 / elapsedSeconds;
+
+        string message =
+            $"Storage queue is full after waiting {timeoutMs} ms. Sampling will stop to protect lossless storage. " +
+            $"StorageQ {storageDepth}/{storageCapacity}, DisplayQ {displayDepth}/{displayCapacity}, " +
+            $"Block {blockMb:0.0} MB, Channels {channelCount}, SamplesPerChannel {sample.DataCountPerChannel}, " +
+            $"Ingress {ingressMbPerSecond:0.0} MB/s.";
+
+        return new AcquisitionFault(
+            DateTimeOffset.UtcNow,
+            "STORAGE_QUEUE_FULL",
+            message,
+            sample.MachineId);
+    }
+
+    private static long ElapsedMilliseconds(long startedTicks)
+    {
+        return Math.Max(0, Environment.TickCount64 - startedTicks);
     }
 
     private int ResolveChannelCount(SdkSampleData sample)

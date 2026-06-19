@@ -1152,8 +1152,8 @@ public sealed class MainWindow : Window
             return;
         }
 
-        _settings.Storage.ChannelSelection.SampleRateMinHz = TryParseDouble(_storageSampleRateMin.Text);
-        _settings.Storage.ChannelSelection.SampleRateMaxHz = TryParseDouble(_storageSampleRateMax.Text);
+        _settings.Storage.ChannelSelection.SampleRateMinHz = TryParseSampleRateHz(_storageSampleRateMin.Text);
+        _settings.Storage.ChannelSelection.SampleRateMaxHz = TryParseSampleRateHz(_storageSampleRateMax.Text);
         SetStorageChannelMode(StorageChannelSelectionMode.SampleRateRange);
         _storageSelectedKeys.Clear();
         CommitStorageChannelSelectionChange();
@@ -1337,6 +1337,91 @@ public sealed class MainWindow : Window
         }
 
         return selectedDevices;
+    }
+
+    private Func<SdkSampleData, int, bool>? CreateStorageBlockFilter(
+        IReadOnlyList<DeviceDescriptor> storageDevices,
+        IReadOnlyList<DeviceDescriptor> sourceDevices)
+    {
+        if (_settings.Storage.ChannelSelection.Mode == StorageChannelSelectionMode.AllChannels)
+        {
+            return null;
+        }
+
+        if (storageDevices.Count == 0)
+        {
+            return static (_, _) => false;
+        }
+
+        var selectedByDevice = storageDevices.ToDictionary(device => device.DeviceId);
+        var selectedChannelIdsByDevice = storageDevices.ToDictionary(
+            device => device.DeviceId,
+            device => device.Channels.Select(channel => channel.ChannelId).ToHashSet());
+        int sourceTotalChannelCount = sourceDevices.Sum(device => device.Channels.Count);
+        bool hasMultipleSourceDevices = sourceDevices.Count > 1;
+
+        return (sample, channelCount) =>
+        {
+            if (channelCount <= 0 || sample.DataCountPerChannel <= 0 || sample.BufferCount <= 0)
+            {
+                return false;
+            }
+
+            if (IsGlobalStorageBlock(sample, channelCount, hasMultipleSourceDevices, sourceTotalChannelCount))
+            {
+                foreach (DeviceDescriptor device in storageDevices)
+                {
+                    foreach (ChannelDescriptor channel in device.Channels)
+                    {
+                        if (channel.DataIndex >= 0 && channel.DataIndex < channelCount)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            int deviceId = sample.GroupId >= 0 ? sample.GroupId : sample.MachineId;
+            if (!selectedByDevice.TryGetValue(deviceId, out DeviceDescriptor? selectedDevice))
+            {
+                return false;
+            }
+
+            if (channelCount == 1 && sample.ChannelId >= 0)
+            {
+                return selectedChannelIdsByDevice.TryGetValue(deviceId, out HashSet<int>? channelIds) &&
+                       channelIds.Contains(sample.ChannelId);
+            }
+
+            foreach (ChannelDescriptor channel in selectedDevice.Channels)
+            {
+                int dataIndex = sample.Layout == SampleDataLayout.ChannelContiguousFloat32
+                    ? channel.LocalDataIndex
+                    : channel.DataIndex;
+                if (dataIndex >= 0 && dataIndex < channelCount)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+    }
+
+    private static bool IsGlobalStorageBlock(
+        SdkSampleData sample,
+        int channelCount,
+        bool hasMultipleSourceDevices,
+        int sourceTotalChannelCount)
+    {
+        return sample.MessageType == DashSampleMessageType.AnalogMultiChannelData ||
+               sample.GroupId < 0 ||
+               sample.MachineId < 0 ||
+               (hasMultipleSourceDevices &&
+                sourceTotalChannelCount > 0 &&
+                channelCount == sourceTotalChannelCount);
     }
 
     private bool IsChannelInStorageSampleRateRange(ChannelDescriptor channel)
@@ -1754,6 +1839,9 @@ public sealed class MainWindow : Window
         }
 
         _acquisition.SetStorageEnabled(storageEnabled);
+        _acquisition.SetStorageBlockFilter(storageEnabled
+            ? CreateStorageBlockFilter(storageDevices, _acquisition.Devices)
+            : null);
         _waveformStore.Clear();
         _lastStorageStats = null;
         _lastFaultMessage = null;
@@ -1811,6 +1899,7 @@ public sealed class MainWindow : Window
             {
                 await _acquisition.StopAsync(CancellationToken.None);
             }
+            _acquisition.SetStorageBlockFilter(null);
 
             DateTimeOffset deadline = DateTimeOffset.UtcNow.AddSeconds(3);
             while ((_acquisition.GetTelemetry().StorageQueueDepth > 0 || _acquisition.GetTelemetry().DisplayQueueDepth > 0) && DateTimeOffset.UtcNow < deadline)
@@ -2455,7 +2544,7 @@ public sealed class MainWindow : Window
         }
 
         double ratio = stats.WrittenBytes > 0 ? (double)stats.RawBytes / stats.WrittenBytes : 0;
-        return $"\u7f16\u7801 {stats.Codec}/{stats.Preprocessor}    \u538b\u7f29 {ratio:0.00}x    \u5199\u5165 {stats.WriteThroughputMbPerSecond:0.0} MB/s";
+        return $"\u7f16\u7801 {stats.Codec}/{stats.Preprocessor}    \u538b\u7f29 {ratio:0.00}x    \u5199\u5165 {stats.WriteThroughputMbPerSecond:0.0} MB/s    CQ/WQ {stats.CompressionQueueDepth}/{stats.WriteQueueDepth}";
     }
 
     private void UpdateStorageStatsFields(CaptureStorageStatistics? stats)
@@ -2552,21 +2641,39 @@ public sealed class MainWindow : Window
             : "N/A";
     }
 
-    private static double? TryParseDouble(string? text)
+    private static double? TryParseSampleRateHz(string? text)
     {
         if (string.IsNullOrWhiteSpace(text))
         {
             return null;
         }
 
-        if (double.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out double current))
+        string valueText = text.Trim();
+        double multiplier = 1;
+        if (valueText.EndsWith("MHz", StringComparison.OrdinalIgnoreCase))
         {
-            return current;
+            valueText = valueText[..^3].Trim();
+            multiplier = 1_000_000;
+        }
+        else if (valueText.EndsWith("kHz", StringComparison.OrdinalIgnoreCase))
+        {
+            valueText = valueText[..^3].Trim();
+            multiplier = 1_000;
+        }
+        else if (valueText.EndsWith("Hz", StringComparison.OrdinalIgnoreCase))
+        {
+            valueText = valueText[..^2].Trim();
         }
 
-        if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out double invariant))
+        const NumberStyles styles = NumberStyles.Float | NumberStyles.AllowThousands;
+        if (double.TryParse(valueText, styles, CultureInfo.CurrentCulture, out double current))
         {
-            return invariant;
+            return current * multiplier;
+        }
+
+        if (double.TryParse(valueText, styles, CultureInfo.InvariantCulture, out double invariant))
+        {
+            return invariant * multiplier;
         }
 
         return null;
@@ -2585,8 +2692,8 @@ public sealed class MainWindow : Window
         _settings.Storage.Enabled = _storageEnabledCheck.IsChecked == true;
         _settings.Storage.NamingMode = _namingMode.SelectedIndex == 1 ? FileNamingMode.Custom : FileNamingMode.Time;
         _settings.Storage.CustomFileName = string.IsNullOrWhiteSpace(_customFileName.Text) ? "DashCapture" : _customFileName.Text.Trim();
-        _settings.Storage.ChannelSelection.SampleRateMinHz = TryParseDouble(_storageSampleRateMin.Text);
-        _settings.Storage.ChannelSelection.SampleRateMaxHz = TryParseDouble(_storageSampleRateMax.Text);
+        _settings.Storage.ChannelSelection.SampleRateMinHz = TryParseSampleRateHz(_storageSampleRateMin.Text);
+        _settings.Storage.ChannelSelection.SampleRateMaxHz = TryParseSampleRateHz(_storageSampleRateMax.Text);
         CompressionSettings compression = _settings.Storage.Compression;
         compression.Enabled = _compressionEnabledCheck.IsChecked == true;
         compression.Algorithm = SelectedValue(_compressionAlgorithmCombo, compression.Algorithm);

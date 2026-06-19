@@ -167,6 +167,7 @@ public sealed class MonitorChannelSettings
 public sealed class QueueSettings
 {
     public int StorageCapacityBlocks { get; set; } = 512;
+    public int StorageWriteTimeoutMs { get; set; } = 5000;
     public int DisplayCapacityBlocks { get; set; } = 32;
     public int SlabSizeMb { get; set; } = 8;
     public int SlabCount { get; set; } = 256;
