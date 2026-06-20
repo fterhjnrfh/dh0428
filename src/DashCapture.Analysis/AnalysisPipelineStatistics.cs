@@ -1,0 +1,26 @@
+namespace DashCapture.Analysis;
+
+public sealed record AnalysisPipelineStatistics(
+    long BlocksProcessed,
+    long BytesProcessed,
+    long ChannelSamplesProcessed,
+    long CompletedWindows,
+    int ActiveChannels,
+    double InputMbPerSecond,
+    double WindowsPerSecond,
+    long FftFramesProcessed,
+    long FftBytesWritten,
+    int FftChannelCount,
+    int FftRejectedChannelCount,
+    long FftWindowsSkippedByChannelLimit,
+    int FftQueueDepth,
+    int FftQueueCapacity,
+    long FftWindowsQueued,
+    long FftWindowsDropped,
+    long FftBatchesProcessed,
+    double FftCopyMillisecondsPerSecond,
+    double FftComputeMillisecondsPerSecond,
+    double FftWriteMillisecondsPerSecond,
+    string ResultPath,
+    string FftBackend,
+    string LastFftError);

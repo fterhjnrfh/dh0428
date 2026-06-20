@@ -6,6 +6,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using DashCapture.Analysis;
 using DashCapture.Core.Acquisition;
 using DashCapture.Core.Configuration;
 using DashCapture.Core.Models;
@@ -40,6 +41,7 @@ public sealed class MainWindow : Window
     private readonly AcquisitionService _acquisition;
     private readonly WaveformStore _waveformStore;
     private readonly DisplayPipeline _displayPipeline;
+    private readonly AnalysisPipeline _analysisPipeline;
     private TdmsStorageService? _storageService;
 
     private readonly WrapPanel _viewNavPanel = new() { Orientation = Orientation.Horizontal };
@@ -79,6 +81,26 @@ public sealed class MainWindow : Window
     private readonly TextBlock _storagePreprocessorValue = new();
     private readonly TextBlock _storageWriteThroughputValue = new();
     private readonly TextBlock _storageDurabilityValue = new();
+    private readonly TextBlock _analysisStateValue = new();
+    private readonly TextBlock _analysisWindowValue = new();
+    private readonly TextBlock _analysisBackendValue = new();
+    private readonly TextBlock _analysisQueueValue = new();
+    private readonly TextBlock _analysisDropsValue = new();
+    private readonly TextBlock _analysisBlocksValue = new();
+    private readonly TextBlock _analysisChannelsValue = new();
+    private readonly TextBlock _analysisSamplesValue = new();
+    private readonly TextBlock _analysisWindowsValue = new();
+    private readonly TextBlock _analysisFftFramesValue = new();
+    private readonly TextBlock _analysisFftWrittenValue = new();
+    private readonly TextBlock _analysisFftQueueValue = new();
+    private readonly TextBlock _analysisFftWindowDropsValue = new();
+    private readonly TextBlock _analysisFftBatchesValue = new();
+    private readonly TextBlock _analysisFftCopyCostValue = new();
+    private readonly TextBlock _analysisFftComputeCostValue = new();
+    private readonly TextBlock _analysisFftWriteCostValue = new();
+    private readonly TextBlock _analysisThroughputValue = new();
+    private readonly TextBlock _analysisWindowRateValue = new();
+    private readonly TextBlock _analysisResultPathValue = new();
     private readonly TextBlock _captureTimerText = new();
     private readonly Button _connectButton = new() { Content = "\u8fde\u63a5\u8bbe\u5907" };
     private readonly Button _startButton = new() { Content = "\u5f00\u59cb\u91c7\u96c6", IsEnabled = false };
@@ -87,6 +109,7 @@ public sealed class MainWindow : Window
     private readonly CheckBox _storageEnabledCheck = new() { Content = "\u4fdd\u5b58\u6570\u636e" };
     private readonly CheckBox _storageTabEnabledCheck = new() { Content = "\u4fdd\u5b58\u6570\u636e" };
     private readonly CheckBox _compressionEnabledCheck = new() { Content = "\u542f\u7528\u65e0\u635f\u538b\u7f29" };
+    private readonly CheckBox _analysisEnabledCheck = new() { Content = "\u542f\u7528\u5b9e\u65f6\u5206\u6790" };
     private readonly ComboBox _compressionAlgorithmCombo = new();
     private readonly ComboBox _compressionPreprocessorCombo = new();
     private readonly WrapPanel _compressionAlgorithmParams = new() { Orientation = Orientation.Horizontal };
@@ -110,6 +133,7 @@ public sealed class MainWindow : Window
     private Control? _compressionBZip2Field;
     private Control? _compressionLpcField;
     private readonly TdmsViewerControl _tdmsViewer;
+    private readonly FftResultViewerControl _fftResultViewer;
     private CaptureStorageStatistics? _lastStorageStats;
     private readonly DispatcherTimer _captureTimer;
     private readonly DispatcherTimer _runtimeStatsTimer;
@@ -140,7 +164,13 @@ public sealed class MainWindow : Window
             _waveformStore,
             () => _acquisition.Devices,
             _settings.Display.MaxDisplayPointsPerSecond);
+        _analysisPipeline = new AnalysisPipeline(
+            _acquisition,
+            _settings.Analysis,
+            () => _acquisition.Devices);
+        _analysisPipeline.Faulted += fault => Dispatcher.UIThread.Post(() => _status.Text = fault.Message);
         _tdmsViewer = new TdmsViewerControl(_settings.Storage.TdmRuntimeDir);
+        _fftResultViewer = new FftResultViewerControl(_settings.Analysis.ResultRootPath);
         LoadMonitorViewsFromSettings();
         LoadStorageChannelSelectionFromSettings();
         if (_monitorViews.Count == 0)
@@ -152,6 +182,7 @@ public sealed class MainWindow : Window
         _customFileName.Text = _settings.Storage.CustomFileName;
         _storageEnabledCheck.IsChecked = _settings.Storage.Enabled;
         _storageTabEnabledCheck.IsChecked = _settings.Storage.Enabled;
+        _analysisEnabledCheck.IsChecked = _settings.Analysis.Enabled;
         _storageSampleRateMin.Text = FormatNullableSampleRate(_settings.Storage.ChannelSelection.SampleRateMinHz);
         _storageSampleRateMax.Text = FormatNullableSampleRate(_settings.Storage.ChannelSelection.SampleRateMaxHz);
         _namingMode.ItemsSource = new[] { "\u6309\u65f6\u95f4\u547d\u540d", "\u81ea\u5b9a\u4e49\u547d\u540d" };
@@ -258,6 +289,17 @@ public sealed class MainWindow : Window
 
             UpdateStoragePreview();
         };
+        _analysisEnabledCheck.IsCheckedChanged += (_, _) =>
+        {
+            if (_captureUiRunning)
+            {
+                return;
+            }
+
+            _settings.Analysis.Enabled = _analysisEnabledCheck.IsChecked == true;
+            _acquisition.SetAnalysisEnabled(_settings.Analysis.Enabled);
+            UpdateAnalysisStatsFields(_acquisition.GetTelemetry(), _analysisPipeline.GetStatistics());
+        };
         _storageAllChannelsButton.Click += (_, _) =>
         {
             SetStorageChannelMode(StorageChannelSelectionMode.AllChannels);
@@ -333,6 +375,7 @@ public sealed class MainWindow : Window
         Closing += OnWindowClosing;
 
         UpdateStoragePreview();
+        UpdateAnalysisStatsFields(_acquisition.GetTelemetry(), _analysisPipeline.GetStatistics());
     }
 
     private async void OnWindowClosing(object? sender, WindowClosingEventArgs e)
@@ -369,6 +412,7 @@ public sealed class MainWindow : Window
     {
         await StopAsync();
         await _displayPipeline.DisposeAsync();
+        await _analysisPipeline.DisposeAsync();
         if (_storageService is not null)
         {
             await _storageService.DisposeAsync();
@@ -376,6 +420,7 @@ public sealed class MainWindow : Window
         }
 
         _tdmsViewer.Dispose();
+        _fftResultViewer.Dispose();
         await DisposeMonitorViewsAsync();
         _captureTimer.Stop();
         _runtimeStatsTimer.Stop();
@@ -519,6 +564,8 @@ public sealed class MainWindow : Window
                 new TabItem { Header = "\u4e3b\u76d1\u63a7", Content = BuildMonitorTab() },
                 new TabItem { Header = "\u8bbe\u5907\u901a\u9053", Content = BuildDeviceTab() },
                 new TabItem { Header = "\u6570\u636e\u67e5\u770b", Content = _tdmsViewer },
+                new TabItem { Header = "FFT \u5206\u6790", Content = BuildAnalysisTab() },
+                new TabItem { Header = "FFT \u7ed3\u679c", Content = _fftResultViewer },
                 new TabItem { Header = "\u5b58\u50a8", Content = BuildStorageTab() }
             }
         };
@@ -826,6 +873,92 @@ public sealed class MainWindow : Window
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             Content = _deviceInfoPanel
         };
+    }
+
+    private Control BuildAnalysisTab()
+    {
+        _analysisEnabledCheck.Foreground = TextPrimary;
+        _analysisEnabledCheck.FontSize = 14;
+
+        var root = new Grid
+        {
+            Margin = new Thickness(16),
+            ColumnDefinitions = new ColumnDefinitions("0.9*,1.1*"),
+            RowDefinitions = new RowDefinitions("Auto,Auto"),
+            ColumnSpacing = 16,
+            RowSpacing = 16,
+            HorizontalAlignment = HorizontalAlignment.Stretch
+        };
+
+        var configContent = new StackPanel
+        {
+            Spacing = 12,
+            Children =
+            {
+                _analysisEnabledCheck,
+                RuntimeParameter("\u5206\u6790\u72b6\u6001", _analysisStateValue),
+                RuntimeParameter("\u8ba1\u7b97\u8def\u5f84", _analysisBackendValue),
+                RuntimeParameter("\u7a97\u53e3\u53c2\u6570", _analysisWindowValue),
+                RuntimeParameter("\u7ed3\u679c\u4fdd\u5b58", _analysisResultPathValue)
+            }
+        };
+
+        Control configModule = StorageModule("FFT \u5206\u6790", configContent);
+        Grid.SetColumn(configModule, 0);
+        Grid.SetRow(configModule, 0);
+        root.Children.Add(configModule);
+
+        Control realtimeModule = StorageModule("\u5b9e\u65f6\u72b6\u6001", BuildAnalysisRealtimePanel());
+        Grid.SetColumn(realtimeModule, 1);
+        Grid.SetRow(realtimeModule, 0);
+        root.Children.Add(realtimeModule);
+
+        Control countersModule = StorageModule("\u5904\u7406\u7edf\u8ba1", BuildAnalysisCountersPanel());
+        Grid.SetColumn(countersModule, 0);
+        Grid.SetRow(countersModule, 1);
+        Grid.SetColumnSpan(countersModule, 2);
+        root.Children.Add(countersModule);
+
+        return new ScrollViewer
+        {
+            Content = root,
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+        };
+    }
+
+    private Control BuildAnalysisRealtimePanel()
+    {
+        Control[] parameters =
+        {
+            RuntimeParameter("\u5206\u6790\u961f\u5217", _analysisQueueValue),
+            RuntimeParameter("FFT \u961f\u5217", _analysisFftQueueValue),
+            RuntimeParameter("\u5206\u6790\u4e22\u5f03", _analysisDropsValue),
+            RuntimeParameter("FFT \u4e22\u5f03", _analysisFftWindowDropsValue),
+            RuntimeParameter("\u6d3b\u52a8\u901a\u9053", _analysisChannelsValue),
+            RuntimeParameter("\u8f93\u5165\u541e\u5410", _analysisThroughputValue)
+        };
+
+        return BuildRuntimeGrid(parameters, columns: 1);
+    }
+
+    private Control BuildAnalysisCountersPanel()
+    {
+        Control[] parameters =
+        {
+            RuntimeParameter("\u5df2\u5904\u7406\u5757", _analysisBlocksValue),
+            RuntimeParameter("\u901a\u9053\u6837\u672c", _analysisSamplesValue),
+            RuntimeParameter("\u5b8c\u6210\u7a97\u53e3", _analysisWindowsValue),
+            RuntimeParameter("FFT \u5e27", _analysisFftFramesValue),
+            RuntimeParameter("FFT \u5199\u5165", _analysisFftWrittenValue),
+            RuntimeParameter("FFT \u6279\u6b21", _analysisFftBatchesValue),
+            RuntimeParameter("\u590d\u5236\u8017\u65f6", _analysisFftCopyCostValue),
+            RuntimeParameter("\u8ba1\u7b97\u8017\u65f6", _analysisFftComputeCostValue),
+            RuntimeParameter("\u5199\u5165\u8017\u65f6", _analysisFftWriteCostValue),
+            RuntimeParameter("\u7a97\u53e3\u901f\u7387", _analysisWindowRateValue)
+        };
+
+        return BuildRuntimeGrid(parameters, columns: 2);
     }
 
     private Control BuildStorageTab()
@@ -1563,6 +1696,34 @@ public sealed class MainWindow : Window
         return grid;
     }
 
+    private static Control BuildRuntimeGrid(IReadOnlyList<Control> parameters, int columns)
+    {
+        columns = Math.Max(1, columns);
+        var columnBuilder = new string[columns];
+        Array.Fill(columnBuilder, "*");
+        var grid = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitions(string.Join(",", columnBuilder)),
+            ColumnSpacing = 16,
+            RowSpacing = 10
+        };
+
+        for (int index = 0; index < parameters.Count; index++)
+        {
+            if (index % columns == 0)
+            {
+                grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
+            }
+
+            Control parameter = parameters[index];
+            Grid.SetRow(parameter, index / columns);
+            Grid.SetColumn(parameter, index % columns);
+            grid.Children.Add(parameter);
+        }
+
+        return grid;
+    }
+
     private static Control RuntimeParameter(string label, string value)
     {
         return RuntimeParameter(label, new TextBlock { Text = value });
@@ -1838,10 +1999,12 @@ public sealed class MainWindow : Window
             return;
         }
 
+        _settings.Analysis.Enabled = _analysisEnabledCheck.IsChecked == true;
         _acquisition.SetStorageEnabled(storageEnabled);
         _acquisition.SetStorageBlockFilter(storageEnabled
             ? CreateStorageBlockFilter(storageDevices, _acquisition.Devices)
             : null);
+        _acquisition.SetAnalysisEnabled(_settings.Analysis.Enabled);
         _waveformStore.Clear();
         _lastStorageStats = null;
         _lastFaultMessage = null;
@@ -1860,6 +2023,7 @@ public sealed class MainWindow : Window
             await _storageService.StartAsync(storageDevices, _acquisition.Devices, CancellationToken.None);
         }
 
+        await _analysisPipeline.StartAsync(CancellationToken.None);
         await _displayPipeline.StartAsync(CancellationToken.None);
         await _acquisition.StartAsync(CancellationToken.None);
         StartCaptureTimer();
@@ -1867,7 +2031,9 @@ public sealed class MainWindow : Window
         SetButtons(connect: false, start: false, stop: true);
         _storageEnabledCheck.IsEnabled = false;
         _storageTabEnabledCheck.IsEnabled = false;
+        _analysisEnabledCheck.IsEnabled = false;
         UpdateStorageChannelControlState();
+        UpdateAnalysisStatsFields(_acquisition.GetTelemetry(), _analysisPipeline.GetStatistics());
         _status.Text = storageEnabled
             ? (_settings.Storage.Compression.Enabled && _settings.Storage.Compression.Algorithm != CompressionAlgorithm.None ? "\u91c7\u96c6\u4e2d\uff0c\u6b63\u5728\u5199\u5165\u538b\u7f29 .dhcap" : "\u91c7\u96c6\u4e2d\uff0c\u6b63\u5728\u5199\u5165 Codec=None \u539f\u59cb .dhcap")
             : "\u91c7\u96c6\u4e2d\uff0c\u4ec5\u663e\u793a\u4e0d\u4fdd\u5b58";
@@ -1902,12 +2068,13 @@ public sealed class MainWindow : Window
             _acquisition.SetStorageBlockFilter(null);
 
             DateTimeOffset deadline = DateTimeOffset.UtcNow.AddSeconds(3);
-            while ((_acquisition.GetTelemetry().StorageQueueDepth > 0 || _acquisition.GetTelemetry().DisplayQueueDepth > 0) && DateTimeOffset.UtcNow < deadline)
+            while (HasPendingCaptureQueues() && DateTimeOffset.UtcNow < deadline)
             {
                 await Task.Delay(50);
             }
 
             await _displayPipeline.StopAsync();
+            await _analysisPipeline.StopAsync();
             if (_storageService is not null)
             {
                 await _storageService.StopAsync();
@@ -1920,7 +2087,9 @@ public sealed class MainWindow : Window
             SetButtons(connect: true, start: _acquisition.Devices.Count > 0, stop: false);
             _storageEnabledCheck.IsEnabled = true;
             _storageTabEnabledCheck.IsEnabled = true;
+            _analysisEnabledCheck.IsEnabled = true;
             _captureUiRunning = false;
+            UpdateAnalysisStatsFields(_acquisition.GetTelemetry(), _analysisPipeline.GetStatistics());
             if (_acquisition.Devices.Count > 0)
             {
                 string? reason = string.IsNullOrWhiteSpace(stopReason) ? _lastFaultMessage : stopReason;
@@ -1934,6 +2103,14 @@ public sealed class MainWindow : Window
             _captureCleanupInProgress = false;
             UpdateStorageChannelControlState();
         }
+    }
+
+    private bool HasPendingCaptureQueues()
+    {
+        CaptureTelemetry telemetry = _acquisition.GetTelemetry();
+        return telemetry.StorageQueueDepth > 0 ||
+               telemetry.DisplayQueueDepth > 0 ||
+               telemetry.AnalysisQueueDepth > 0;
     }
 
     private void StartCaptureTimer()
@@ -2501,7 +2678,9 @@ public sealed class MainWindow : Window
             _lastStorageStats = storageStats;
         }
 
-        _metrics.Text = $"Blocks {telemetry.BlocksReceived}    Data {mb:0.0} MB    StorageQ {telemetry.StorageQueueDepth}    DisplayQ {telemetry.DisplayQueueDepth}    Drops {telemetry.DisplayDrops}    {telemetry.BackpressureLevel}    {FormatStorageStatsShort(storageStats)}";
+        AnalysisPipelineStatistics analysisStats = _analysisPipeline.GetStatistics();
+        UpdateAnalysisStatsFields(telemetry, analysisStats);
+        _metrics.Text = $"数据块 {telemetry.BlocksReceived}    数据 {mb:0.0} MB    存储队列 {telemetry.StorageQueueDepth}    显示队列 {telemetry.DisplayQueueDepth}    分析队列 {telemetry.AnalysisQueueDepth}    FFT队列 {analysisStats.FftQueueDepth}    丢弃 显/析/FFT {telemetry.DisplayDrops}/{telemetry.AnalysisDrops}/{analysisStats.FftWindowsDropped}    窗口 {analysisStats.CompletedWindows}    分析吞吐 {analysisStats.InputMbPerSecond:0.0} MB/s    {FormatBackpressureLevel(telemetry.BackpressureLevel)}    {FormatStorageStatsShort(storageStats)}";
         UpdateStorageStatsFields(storageStats);
         if (!string.IsNullOrWhiteSpace(telemetry.Status))
         {
@@ -2517,6 +2696,90 @@ public sealed class MainWindow : Window
         }
     }
 
+    private void UpdateAnalysisStatsFields(CaptureTelemetry telemetry, AnalysisPipelineStatistics stats)
+    {
+        string state;
+        if (!_settings.Analysis.Enabled)
+        {
+            state = "\u5df2\u5173\u95ed";
+        }
+        else if (_analysisPipeline.IsRunning)
+        {
+            state = "\u8fd0\u884c\u4e2d";
+        }
+        else
+        {
+            state = _captureUiRunning ? "\u542f\u52a8\u4e2d" : "\u5f85\u91c7\u96c6";
+        }
+
+        _analysisStateValue.Text = state;
+        string backendText = !string.IsNullOrWhiteSpace(stats.FftBackend) ? stats.FftBackend : FormatConfiguredFftBackend(_settings.Analysis.FftBackend);
+        if (!string.IsNullOrWhiteSpace(stats.LastFftError))
+        {
+            backendText = $"{backendText} | {stats.LastFftError}";
+        }
+
+        _analysisBackendValue.Text = _settings.Analysis.ComputeFft
+            ? FormatFftRuntimeBackend(backendText, stats)
+            : "CPU \u7a97\u53e3\u7d2f\u79ef";
+        _analysisWindowValue.Text = FormatAnalysisWindowParameters();
+        _analysisQueueValue.Text = $"{telemetry.AnalysisQueueDepth}/{Math.Max(1, _settings.Queues.AnalysisCapacityBlocks)}";
+        _analysisFftQueueValue.Text = $"{stats.FftQueueDepth:N0}/{stats.FftQueueCapacity:N0}";
+        _analysisDropsValue.Text = telemetry.AnalysisDrops.ToString("N0", CultureInfo.CurrentCulture);
+        _analysisFftWindowDropsValue.Text = stats.FftWindowsDropped.ToString("N0", CultureInfo.CurrentCulture);
+        _analysisBlocksValue.Text = stats.BlocksProcessed.ToString("N0", CultureInfo.CurrentCulture);
+        _analysisChannelsValue.Text = $"{stats.ActiveChannels:N0}/{Math.Max(1, _settings.Analysis.MaxChannels):N0}  FFT {stats.FftChannelCount:N0}/{FormatFftChannelLimit(_settings.Analysis.MaxFftChannels)}";
+        _analysisSamplesValue.Text = stats.ChannelSamplesProcessed.ToString("N0", CultureInfo.CurrentCulture);
+        _analysisWindowsValue.Text = stats.CompletedWindows.ToString("N0", CultureInfo.CurrentCulture);
+        _analysisFftFramesValue.Text = stats.FftFramesProcessed.ToString("N0", CultureInfo.CurrentCulture);
+        _analysisFftWrittenValue.Text = FormatStorageBytes(stats.FftBytesWritten);
+        _analysisFftBatchesValue.Text = stats.FftBatchesProcessed.ToString("N0", CultureInfo.CurrentCulture);
+        _analysisFftCopyCostValue.Text = $"{stats.FftCopyMillisecondsPerSecond:0.0} ms/s";
+        _analysisFftComputeCostValue.Text = $"{stats.FftComputeMillisecondsPerSecond:0.0} ms/s";
+        _analysisFftWriteCostValue.Text = $"{stats.FftWriteMillisecondsPerSecond:0.0} ms/s";
+        _analysisThroughputValue.Text = $"{stats.InputMbPerSecond:0.0} MB/s";
+        _analysisWindowRateValue.Text = $"{stats.WindowsPerSecond:0.0} windows/s";
+        _analysisResultPathValue.Text = _settings.Analysis.PersistResults
+            ? string.IsNullOrWhiteSpace(stats.ResultPath) ? _settings.Analysis.ResultRootPath : stats.ResultPath
+            : "\u672a\u542f\u7528";
+    }
+
+    private static string FormatFftChannelLimit(int maxFftChannels)
+    {
+        return maxFftChannels > 0 ? $"{maxFftChannels} \u901a\u9053" : "\u5168\u90e8\u901a\u9053";
+    }
+
+    private string FormatAnalysisWindowParameters()
+    {
+        if (!_settings.Analysis.UseSampleRateWindowing)
+        {
+            return $"{_settings.Analysis.WindowSampleCount:N0} / {_settings.Analysis.HopSampleCount:N0} 点";
+        }
+
+        return $"{_settings.Analysis.FftResolutionHz:0.###} Hz / {_settings.Analysis.FftOverlapRatio:P0} 重叠";
+    }
+
+    private string FormatFftRuntimeBackend(string backendText, AnalysisPipelineStatistics stats)
+    {
+        string text = $"{backendText}\uff0cFFT {stats.FftChannelCount:N0}/{FormatFftChannelLimit(_settings.Analysis.MaxFftChannels)}";
+        if (stats.FftRejectedChannelCount <= 0)
+        {
+            return text;
+        }
+
+        return $"{text}\uff0c\u4e0a\u9650\u8df3\u8fc7 {stats.FftRejectedChannelCount:N0} \u901a\u9053/{stats.FftWindowsSkippedByChannelLimit:N0} \u7a97\u53e3";
+    }
+
+    private static string FormatConfiguredFftBackend(FftComputeBackend backend)
+    {
+        return backend switch
+        {
+            FftComputeBackend.Gpu => "CUDA/cuFFT",
+            FftComputeBackend.Cpu => "CPU FFT",
+            _ => "自动 GPU/CPU"
+        };
+    }
+
     private void UpdateRuntimeTitle()
     {
         DateTimeOffset now = DateTimeOffset.UtcNow;
@@ -2526,7 +2789,7 @@ public sealed class MainWindow : Window
         _lastRuntimeStatsAt = now;
 
         RuntimeUsageSnapshot usage = _runtimeUsageSampler.Sample();
-        Title = $"DASH Capture | FPS {displayFps:0.0} | CPU App {FormatPercent(usage.ProcessCpuPercent)} Sys {FormatPercent(usage.SystemCpuPercent)} | {FormatGpuUsage(usage)}";
+        Title = $"DASH Capture | 帧率 {displayFps:0.0} | CPU 程序 {FormatPercent(usage.ProcessCpuPercent)} 系统 {FormatPercent(usage.SystemCpuPercent)} | {FormatGpuUsage(usage)}";
         CaptureStorageStatistics? storageStats = _storageService?.GetStatistics() ?? _lastStorageStats;
         if (_storageService is not null && storageStats is not null)
         {
@@ -2544,7 +2807,7 @@ public sealed class MainWindow : Window
         }
 
         double ratio = stats.WrittenBytes > 0 ? (double)stats.RawBytes / stats.WrittenBytes : 0;
-        return $"\u7f16\u7801 {stats.Codec}/{stats.Preprocessor}    \u538b\u7f29 {ratio:0.00}x    \u5199\u5165 {stats.WriteThroughputMbPerSecond:0.0} MB/s    CQ/WQ {stats.CompressionQueueDepth}/{stats.WriteQueueDepth}";
+        return $"\u7f16\u7801 {stats.Codec}/{stats.Preprocessor}    \u538b\u7f29 {ratio:0.00}x    \u5199\u5165 {stats.WriteThroughputMbPerSecond:0.0} MB/s    \u538b\u961f/\u5199\u961f {stats.CompressionQueueDepth}/{stats.WriteQueueDepth}";
     }
 
     private void UpdateStorageStatsFields(CaptureStorageStatistics? stats)
@@ -2586,12 +2849,12 @@ public sealed class MainWindow : Window
     {
         if (!usage.GpuTotalPercent.HasValue)
         {
-            return "GPU N/A";
+            return "GPU 不可用";
         }
 
         string engines = FormatGpuEngines(usage.GpuEngines);
         string suffix = string.IsNullOrWhiteSpace(engines) ? string.Empty : $" ({engines})";
-        return $"GPU App {FormatPercent(usage.GpuProcessPercent)} Sys {FormatPercent(usage.GpuTotalPercent)}{suffix}";
+        return $"GPU 程序 {FormatPercent(usage.GpuProcessPercent)} 系统 {FormatPercent(usage.GpuTotalPercent)}{suffix}";
     }
 
     private static string FormatGpuEngines(IReadOnlyList<GpuEngineUsage> engines)
@@ -2627,9 +2890,11 @@ public sealed class MainWindow : Window
     {
         return engine switch
         {
-            "VideoDecode" => "VDec",
-            "VideoEncode" => "VEnc",
-            "VideoProcessing" => "VProc",
+            "Compute" => "\u8ba1\u7b97",
+            "Copy" => "\u590d\u5236",
+            "VideoDecode" => "\u89e3\u7801",
+            "VideoEncode" => "\u7f16\u7801",
+            "VideoProcessing" => "\u89c6\u9891",
             _ => engine
         };
     }
@@ -2638,7 +2903,7 @@ public sealed class MainWindow : Window
     {
         return value.HasValue
             ? value.Value.ToString("0.#", CultureInfo.InvariantCulture) + "%"
-            : "N/A";
+            : "\u4e0d\u53ef\u7528";
     }
 
     private static double? TryParseSampleRateHz(string? text)
@@ -2970,6 +3235,18 @@ public sealed class MainWindow : Window
             "Stopped" => "\u5df2\u505c\u6b62",
             var text when text.StartsWith("Connected", StringComparison.OrdinalIgnoreCase) => "\u5df2\u8fde\u63a5",
             _ => status
+        };
+    }
+
+    private static string FormatBackpressureLevel(BackpressureLevel level)
+    {
+        return level switch
+        {
+            BackpressureLevel.Normal => "\u6b63\u5e38",
+            BackpressureLevel.ReduceDisplay => "\u964d\u4f4e\u663e\u793a",
+            BackpressureLevel.PauseDisplay => "\u6682\u505c\u663e\u793a",
+            BackpressureLevel.StopRequired => "\u9700\u505c\u6b62",
+            _ => level.ToString()
         };
     }
 

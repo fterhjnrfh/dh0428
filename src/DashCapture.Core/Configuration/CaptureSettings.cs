@@ -8,6 +8,7 @@ public sealed class CaptureSettings
     public DataSourceClientSettings DataSource { get; set; } = new();
     public StorageSettings Storage { get; set; } = new();
     public DisplaySettings Display { get; set; } = new();
+    public AnalysisSettings Analysis { get; set; } = new();
     public QueueSettings Queues { get; set; } = new();
 }
 
@@ -150,6 +151,33 @@ public sealed class DisplaySettings
     public List<MonitorViewSettings> Views { get; set; } = new();
 }
 
+public sealed class AnalysisSettings
+{
+    public bool Enabled { get; set; } = false;
+    public int WindowSampleCount { get; set; } = 1_000_000;
+    public int HopSampleCount { get; set; } = 100_000;
+    public int MaxChannels { get; set; } = 256;
+    public bool ComputeFft { get; set; } = true;
+    public FftComputeBackend FftBackend { get; set; } = FftComputeBackend.Auto;
+    public int MaxFftChannels { get; set; } = 256;
+    public bool UseSampleRateWindowing { get; set; } = true;
+    public double FftResolutionHz { get; set; } = 1.0;
+    public double FftOverlapRatio { get; set; } = 0.9;
+    public int FftWindowQueueCapacity { get; set; } = 8192;
+    public int FftBatchSize { get; set; } = 64;
+    public int FftDrainTimeoutMs { get; set; } = 300000;
+    public bool KeepWindowSamples { get; set; } = false;
+    public bool PersistResults { get; set; } = false;
+    public string ResultRootPath { get; set; } = @".\Analysis";
+}
+
+public enum FftComputeBackend
+{
+    Auto,
+    Gpu,
+    Cpu
+}
+
 public sealed class MonitorViewSettings
 {
     public string Name { get; set; } = string.Empty;
@@ -169,6 +197,7 @@ public sealed class QueueSettings
     public int StorageCapacityBlocks { get; set; } = 512;
     public int StorageWriteTimeoutMs { get; set; } = 5000;
     public int DisplayCapacityBlocks { get; set; } = 32;
+    public int AnalysisCapacityBlocks { get; set; } = 64;
     public int SlabSizeMb { get; set; } = 8;
     public int SlabCount { get; set; } = 256;
 }

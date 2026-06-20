@@ -13,6 +13,7 @@ public sealed class AcquisitionService : IAsyncDisposable
     private readonly NativeSlabPool _pool;
     private readonly Channel<AcquisitionBlock> _storageQueue;
     private readonly Channel<AcquisitionBlock> _displayQueue;
+    private readonly Channel<AcquisitionBlock> _analysisQueue;
     private readonly ContinuityTracker _continuity = new();
     private readonly object _sync = new();
     private DeviceDescriptor[] _devices = Array.Empty<DeviceDescriptor>();
@@ -22,10 +23,13 @@ public sealed class AcquisitionService : IAsyncDisposable
     private long _blocksReceived;
     private long _bytesReceived;
     private long _displayDrops;
+    private long _analysisDrops;
     private long _captureStartedTicks;
     private int _storageDepth;
     private int _displayDepth;
+    private int _analysisDepth;
     private int _storageEnabled = 1;
+    private int _analysisEnabled;
     private BackpressureLevel _backpressureLevel;
     private Func<SdkSampleData, int, bool>? _storageBlockFilter;
     private string _status = "Idle";
@@ -47,6 +51,13 @@ public sealed class AcquisitionService : IAsyncDisposable
             SingleWriter = false,
             FullMode = BoundedChannelFullMode.Wait
         });
+        _analysisQueue = Channel.CreateBounded<AcquisitionBlock>(new BoundedChannelOptions(Math.Max(1, settings.Queues.AnalysisCapacityBlocks))
+        {
+            SingleReader = true,
+            SingleWriter = false,
+            FullMode = BoundedChannelFullMode.Wait
+        });
+        _analysisEnabled = settings.Analysis.Enabled ? 1 : 0;
     }
 
     public event Action<AcquisitionFault>? Faulted;
@@ -60,9 +71,11 @@ public sealed class AcquisitionService : IAsyncDisposable
     }
     public ChannelReader<AcquisitionBlock> StorageReader => _storageQueue.Reader;
     public ChannelReader<AcquisitionBlock> DisplayReader => _displayQueue.Reader;
+    public ChannelReader<AcquisitionBlock> AnalysisReader => _analysisQueue.Reader;
     public bool IsRunning { get; private set; }
     public bool IsConnected => _source?.IsConnected == true;
     public bool StorageEnabled => Volatile.Read(ref _storageEnabled) != 0;
+    public bool AnalysisEnabled => Volatile.Read(ref _analysisEnabled) != 0;
 
     public void SetStorageEnabled(bool enabled)
     {
@@ -78,6 +91,16 @@ public sealed class AcquisitionService : IAsyncDisposable
     public void SetStorageBlockFilter(Func<SdkSampleData, int, bool>? filter)
     {
         Interlocked.Exchange(ref _storageBlockFilter, filter);
+    }
+
+    public void SetAnalysisEnabled(bool enabled)
+    {
+        Volatile.Write(ref _analysisEnabled, enabled ? 1 : 0);
+        if (!enabled)
+        {
+            ReleaseQueuedBlocks(_analysisQueue.Reader, ref _analysisDepth);
+            PublishTelemetry();
+        }
     }
 
     public async Task ConnectAsync(CancellationToken cancellationToken)
@@ -112,9 +135,11 @@ public sealed class AcquisitionService : IAsyncDisposable
         _blocksReceived = 0;
         _bytesReceived = 0;
         _displayDrops = 0;
+        _analysisDrops = 0;
         _captureStartedTicks = Environment.TickCount64;
         _storageDepth = 0;
         _displayDepth = 0;
+        _analysisDepth = 0;
         _backpressureLevel = BackpressureLevel.Normal;
         IsRunning = true;
         _status = "Sampling";
@@ -145,8 +170,10 @@ public sealed class AcquisitionService : IAsyncDisposable
         Interlocked.Read(ref _blocksReceived),
         Interlocked.Read(ref _bytesReceived),
         Interlocked.Read(ref _displayDrops),
+        Interlocked.Read(ref _analysisDrops),
         Volatile.Read(ref _storageDepth),
         Volatile.Read(ref _displayDepth),
+        Volatile.Read(ref _analysisDepth),
         _backpressureLevel,
         _status);
 
@@ -162,6 +189,7 @@ public sealed class AcquisitionService : IAsyncDisposable
         ReleaseQueuedBlocks();
         _storageQueue.Writer.TryComplete();
         _displayQueue.Writer.TryComplete();
+        _analysisQueue.Writer.TryComplete();
         _pool.Dispose();
     }
 
@@ -169,7 +197,8 @@ public sealed class AcquisitionService : IAsyncDisposable
     {
         int releasedStorage = ReleaseQueuedBlocks(_storageQueue.Reader, ref _storageDepth);
         int releasedDisplay = ReleaseQueuedBlocks(_displayQueue.Reader, ref _displayDepth);
-        if (releasedStorage > 0 || releasedDisplay > 0)
+        int releasedAnalysis = ReleaseQueuedBlocks(_analysisQueue.Reader, ref _analysisDepth);
+        if (releasedStorage > 0 || releasedDisplay > 0 || releasedAnalysis > 0)
         {
             PublishTelemetry();
         }
@@ -185,6 +214,11 @@ public sealed class AcquisitionService : IAsyncDisposable
     {
         Interlocked.Decrement(ref _displayDepth);
         UpdateBackpressure();
+    }
+
+    public void MarkAnalysisBlockConsumed()
+    {
+        Interlocked.Decrement(ref _analysisDepth);
     }
 
     private static int ReleaseQueuedBlocks(ChannelReader<AcquisitionBlock> reader, ref int depth)
@@ -228,9 +262,10 @@ public sealed class AcquisitionService : IAsyncDisposable
             int channelCount = ResolveChannelCount(sample);
             bool storageEnabled = StorageEnabled;
             bool queueForStorage = storageEnabled && ShouldQueueForStorage(sample, channelCount);
+            bool queueForAnalysis = AnalysisEnabled;
             bool canQueueDisplay = _backpressureLevel < BackpressureLevel.PauseDisplay;
 
-            if (!queueForStorage && !canQueueDisplay)
+            if (!queueForStorage && !canQueueDisplay && !queueForAnalysis)
             {
                 Interlocked.Increment(ref _blocksReceived);
                 Interlocked.Add(ref _bytesReceived, sample.BufferCount);
@@ -243,7 +278,13 @@ public sealed class AcquisitionService : IAsyncDisposable
             NativeMemoryCopy.Copy(sample.DataPointer, rented.Pointer, sample.BufferCount);
             var block = new AcquisitionBlock(rented, sample, channelCount);
             bool retainedForDisplay = queueForStorage && canQueueDisplay;
+            bool retainedForAnalysis = queueForAnalysis && (queueForStorage || canQueueDisplay);
             if (retainedForDisplay)
+            {
+                block.Retain();
+            }
+
+            if (retainedForAnalysis)
             {
                 block.Retain();
             }
@@ -253,6 +294,11 @@ public sealed class AcquisitionService : IAsyncDisposable
                 if (!TryWriteStorageBlock(block))
                 {
                     if (retainedForDisplay)
+                    {
+                        block.Release();
+                    }
+
+                    if (retainedForAnalysis)
                     {
                         block.Release();
                     }
@@ -281,12 +327,16 @@ public sealed class AcquisitionService : IAsyncDisposable
             }
             else
             {
-                if (!queueForStorage)
+                Interlocked.Increment(ref _displayDrops);
+            }
+
+            if (queueForAnalysis)
+            {
+                if (!TryWriteAnalysisBlock(block))
                 {
                     block.Release();
+                    Interlocked.Increment(ref _analysisDrops);
                 }
-
-                Interlocked.Increment(ref _displayDrops);
             }
 
             UpdateBackpressure();
@@ -354,6 +404,18 @@ public sealed class AcquisitionService : IAsyncDisposable
         return false;
     }
 
+    private bool TryWriteAnalysisBlock(AcquisitionBlock block)
+    {
+        Interlocked.Increment(ref _analysisDepth);
+        if (_analysisQueue.Writer.TryWrite(block))
+        {
+            return true;
+        }
+
+        Interlocked.Decrement(ref _analysisDepth);
+        return false;
+    }
+
     private bool TryWriteStorageBlockOnce(AcquisitionBlock block)
     {
         Interlocked.Increment(ref _storageDepth);
@@ -370,8 +432,10 @@ public sealed class AcquisitionService : IAsyncDisposable
     {
         int storageDepth = Volatile.Read(ref _storageDepth);
         int displayDepth = Volatile.Read(ref _displayDepth);
+        int analysisDepth = Volatile.Read(ref _analysisDepth);
         int storageCapacity = Math.Max(1, _settings.Queues.StorageCapacityBlocks);
         int displayCapacity = Math.Max(1, _settings.Queues.DisplayCapacityBlocks);
+        int analysisCapacity = Math.Max(1, _settings.Queues.AnalysisCapacityBlocks);
         int timeoutMs = Math.Clamp(_settings.Queues.StorageWriteTimeoutMs, 0, 30000);
         double blockMb = sample.BufferCount / 1024.0 / 1024.0;
         double elapsedSeconds = Math.Max(0.001, ElapsedMilliseconds(Volatile.Read(ref _captureStartedTicks)) / 1000.0);
@@ -379,7 +443,7 @@ public sealed class AcquisitionService : IAsyncDisposable
 
         string message =
             $"Storage queue is full after waiting {timeoutMs} ms. Sampling will stop to protect lossless storage. " +
-            $"StorageQ {storageDepth}/{storageCapacity}, DisplayQ {displayDepth}/{displayCapacity}, " +
+            $"StorageQ {storageDepth}/{storageCapacity}, DisplayQ {displayDepth}/{displayCapacity}, AnalysisQ {analysisDepth}/{analysisCapacity}, " +
             $"Block {blockMb:0.0} MB, Channels {channelCount}, SamplesPerChannel {sample.DataCountPerChannel}, " +
             $"Ingress {ingressMbPerSecond:0.0} MB/s.";
 

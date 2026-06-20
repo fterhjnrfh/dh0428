@@ -6,6 +6,7 @@
     <SelfContained>false</SelfContained>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\DashCapture.Analysis\DashCapture.Analysis.csproj" />
     <ProjectReference Include="..\..\src\DashCapture.Storage\DashCapture.Storage.csproj" />
   </ItemGroup>
 </Project>

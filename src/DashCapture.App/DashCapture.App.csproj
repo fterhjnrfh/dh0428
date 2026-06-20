@@ -15,6 +15,7 @@
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.7" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DashCapture.Analysis\DashCapture.Analysis.csproj" />
     <ProjectReference Include="..\DashCapture.Core\DashCapture.Core.csproj" />
     <ProjectReference Include="..\DashCapture.Display\DashCapture.Display.csproj" />
     <ProjectReference Include="..\DashCapture.Native\DashCapture.Native.csproj" />

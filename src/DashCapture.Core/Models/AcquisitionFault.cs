@@ -21,7 +21,9 @@ public sealed record CaptureTelemetry(
     long BlocksReceived,
     long BytesReceived,
     long DisplayDrops,
+    long AnalysisDrops,
     int StorageQueueDepth,
     int DisplayQueueDepth,
+    int AnalysisQueueDepth,
     BackpressureLevel BackpressureLevel,
     string Status);
