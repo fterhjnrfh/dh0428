@@ -13,9 +13,11 @@ namespace DashCapture.App;
 public sealed class TdmsViewerControl : UserControl, IDisposable
 {
     private const int MaxEnvelopeCacheEntries = 1536;
+    private const int ExactOverviewChannelLimit = 8;
     private const double ButtonMinHeight = 32;
     private const double FieldMinHeight = 34;
     private const double PanelRadius = 4;
+    private static readonly int[] OverviewPyramidBuckets = { 256, 1024, 4096, 8192 };
 
     private static readonly IBrush PageBackground = new SolidColorBrush(Color.FromRgb(232, 236, 241));
     private static readonly IBrush PanelBackground = Brushes.White;
@@ -748,13 +750,14 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
             List<TdmsChannelEnvelope> envelopes;
             try
             {
+                bool preferSummaries = selected.Count > ExactOverviewChannelLimit;
                 envelopes = await Task.Run(() =>
                 {
                     var output = new List<TdmsChannelEnvelope>(selected.Count);
                     foreach (TdmsChannelInfo channel in selected)
                     {
                         token.ThrowIfCancellationRequested();
-                        output.Add(ReadEnvelopeCached(reader, channel, 0, channel.SampleCount, buckets, token));
+                        output.Add(ReadEnvelopeCached(reader, channel, 0, channel.SampleCount, buckets, token, preferSummaries));
                     }
 
                     return output;
@@ -891,22 +894,44 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         ulong startSample,
         ulong sampleCount,
         int buckets,
-        CancellationToken token)
+        CancellationToken token,
+        bool preferSummaries = false)
     {
-        if (TryGetCachedEnvelope(channel, startSample, sampleCount, buckets, out TdmsChannelEnvelope? cached))
+        if (TryGetCachedEnvelope(channel, startSample, sampleCount, buckets, out TdmsChannelEnvelope? cached, preferSummaries))
         {
             return cached;
         }
 
-        TdmsChannelEnvelope envelope = reader.ReadEnvelope(channel, startSample, sampleCount, buckets, token);
-        var key = new EnvelopeCacheKey(channel.Key, startSample, sampleCount, buckets);
+        if (TryGetCompatibleCachedEnvelope(channel, startSample, sampleCount, buckets, out TdmsChannelEnvelope? compatible, preferSummaries))
+        {
+            CacheEnvelope(channel, startSample, sampleCount, buckets, compatible, preferSummaries);
+            return compatible;
+        }
+
+        TdmsChannelEnvelope envelope = reader.ReadEnvelope(channel, startSample, sampleCount, buckets, token, preferSummaries);
+        CacheEnvelope(channel, startSample, sampleCount, buckets, envelope, preferSummaries);
+        if (preferSummaries)
+        {
+            CacheOverviewPyramidLevels(channel, startSample, sampleCount, envelope, buckets);
+        }
+
+        return envelope;
+    }
+
+    private void CacheEnvelope(
+        TdmsChannelInfo channel,
+        ulong startSample,
+        ulong sampleCount,
+        int buckets,
+        TdmsChannelEnvelope envelope,
+        bool preferSummaries)
+    {
+        var key = new EnvelopeCacheKey(channel.Key, startSample, sampleCount, buckets, preferSummaries);
         lock (_envelopeCache)
         {
             _envelopeCache[key] = new EnvelopeCacheEntry(envelope, NextCacheClock());
             TrimEnvelopeCache();
         }
-
-        return envelope;
     }
 
     private bool TryGetCachedEnvelope(
@@ -914,9 +939,10 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         ulong startSample,
         ulong sampleCount,
         int buckets,
-        [NotNullWhen(true)] out TdmsChannelEnvelope? envelope)
+        [NotNullWhen(true)] out TdmsChannelEnvelope? envelope,
+        bool preferSummaries = false)
     {
-        var key = new EnvelopeCacheKey(channel.Key, startSample, sampleCount, buckets);
+        var key = new EnvelopeCacheKey(channel.Key, startSample, sampleCount, buckets, preferSummaries);
         lock (_envelopeCache)
         {
             if (_envelopeCache.TryGetValue(key, out EnvelopeCacheEntry? cached))
@@ -929,6 +955,135 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
 
         envelope = null;
         return false;
+    }
+
+    private bool TryGetCompatibleCachedEnvelope(
+        TdmsChannelInfo channel,
+        ulong startSample,
+        ulong sampleCount,
+        int buckets,
+        [NotNullWhen(true)] out TdmsChannelEnvelope? envelope,
+        bool preferSummaries = false)
+    {
+        EnvelopeCacheEntry? bestEntry = null;
+        EnvelopeCacheKey bestKey = default;
+        lock (_envelopeCache)
+        {
+            foreach ((EnvelopeCacheKey key, EnvelopeCacheEntry entry) in _envelopeCache)
+            {
+                if (!key.Channel.Equals(channel.Key) ||
+                    key.StartSample != startSample ||
+                    key.SampleCount != sampleCount ||
+                    key.PreferSummaries != preferSummaries ||
+                    key.Buckets < buckets ||
+                    entry.Envelope.Points.Count < buckets)
+                {
+                    continue;
+                }
+
+                if (bestEntry is null || key.Buckets < bestKey.Buckets)
+                {
+                    bestEntry = entry;
+                    bestKey = key;
+                }
+            }
+
+            if (bestEntry is not null)
+            {
+                bestEntry.LastAccess = NextCacheClock();
+            }
+        }
+
+        if (bestEntry is null)
+        {
+            envelope = null;
+            return false;
+        }
+
+        envelope = DownsampleEnvelope(bestEntry.Envelope, buckets);
+        return true;
+    }
+
+    private void CacheOverviewPyramidLevels(
+        TdmsChannelInfo channel,
+        ulong startSample,
+        ulong sampleCount,
+        TdmsChannelEnvelope source,
+        int sourceBuckets)
+    {
+        foreach (int levelBuckets in OverviewPyramidBuckets)
+        {
+            if (levelBuckets >= sourceBuckets || levelBuckets <= 0)
+            {
+                continue;
+            }
+
+            TdmsChannelEnvelope level = DownsampleEnvelope(source, levelBuckets);
+            var key = new EnvelopeCacheKey(channel.Key, startSample, sampleCount, levelBuckets, PreferSummaries: true);
+            lock (_envelopeCache)
+            {
+                if (!_envelopeCache.ContainsKey(key))
+                {
+                    _envelopeCache[key] = new EnvelopeCacheEntry(level, NextCacheClock());
+                }
+            }
+        }
+
+        lock (_envelopeCache)
+        {
+            TrimEnvelopeCache();
+        }
+    }
+
+    private static TdmsChannelEnvelope DownsampleEnvelope(TdmsChannelEnvelope source, int buckets)
+    {
+        IReadOnlyList<TdmsEnvelopePoint> input = source.Points;
+        if (input.Count == 0 || buckets <= 0 || input.Count <= buckets)
+        {
+            return source;
+        }
+
+        buckets = Math.Min(buckets, input.Count);
+        var output = new TdmsEnvelopePoint[buckets];
+        for (int pixel = 0; pixel < buckets; pixel++)
+        {
+            int start = (int)((long)pixel * input.Count / buckets);
+            int end = (int)((long)(pixel + 1) * input.Count / buckets);
+            if (end <= start)
+            {
+                end = start + 1;
+            }
+
+            TdmsEnvelopePoint firstPoint = input[start];
+            TdmsEnvelopePoint lastPoint = firstPoint;
+            float minimum = float.PositiveInfinity;
+            float maximum = float.NegativeInfinity;
+            bool hasValue = false;
+            for (int i = start; i < end; i++)
+            {
+                TdmsEnvelopePoint point = input[i];
+                if (!float.IsFinite(point.Minimum) || !float.IsFinite(point.Maximum))
+                {
+                    continue;
+                }
+
+                if (!hasValue)
+                {
+                    firstPoint = point;
+                    hasValue = true;
+                }
+
+                lastPoint = point;
+                if (point.Minimum < minimum) minimum = point.Minimum;
+                if (point.Maximum > maximum) maximum = point.Maximum;
+            }
+
+            output[pixel] = hasValue
+                ? new TdmsEnvelopePoint(pixel, firstPoint.First, lastPoint.Last, minimum, maximum)
+                : new TdmsEnvelopePoint(pixel, 0, 0, 0, 0);
+        }
+
+        return new TdmsChannelEnvelope(source.Channel, source.StartSample, source.SampleCount, output);
     }
 
     private long NextCacheClock()
@@ -983,14 +1138,16 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
 
     private static int QuantizeOverviewBuckets(double width)
     {
-        int target = (int)Math.Clamp(width * 1.2, 512, 4096);
-        int power = 512;
-        while (power < target && power < 4096)
+        int target = (int)Math.Clamp(width * 1.25, OverviewPyramidBuckets[0], OverviewPyramidBuckets[^1]);
+        foreach (int level in OverviewPyramidBuckets)
         {
-            power <<= 1;
+            if (level >= target)
+            {
+                return level;
+            }
         }
 
-        return power;
+        return OverviewPyramidBuckets[^1];
     }
 
     private void SetDefaultRange(TdmsFileInfo fileInfo)
@@ -1044,7 +1201,17 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         _suppressAutoLoad = false;
         UpdateSelectedChannelsText();
         UpdateLoadButtonState();
-        _ = LoadSelectedAndOverviewAsync();
+        if (selected)
+        {
+            SetStatusNow($"已选择 {_selectedChannelKeys.Count} 个通道。点击“Load”加载详细波形，或选择单个通道后点“Only”。");
+            QueueOverviewLoad();
+        }
+        else
+        {
+            _waveform.SetSeries(Array.Empty<TdmsChannelEnvelope>(), 0, 1);
+            _overviewSlider.SetOverview(Array.Empty<TdmsChannelEnvelope>(), _fullDurationSeconds);
+            SetStatusNow("已清空通道选择。");
+        }
     }
 
     private void UpdateLoadButtonState()
@@ -1385,5 +1552,5 @@ public sealed class TdmsViewerControl : UserControl, IDisposable
         public long LastAccess { get; set; }
     }
 
-    private readonly record struct EnvelopeCacheKey(TdmsChannelKey Channel, ulong StartSample, ulong SampleCount, int Buckets);
+    private readonly record struct EnvelopeCacheKey(TdmsChannelKey Channel, ulong StartSample, ulong SampleCount, int Buckets, bool PreferSummaries);
 }

@@ -216,6 +216,12 @@ public sealed class AcquisitionService : IAsyncDisposable
         UpdateBackpressure();
     }
 
+    public void MarkDisplayBlockSkipped()
+    {
+        Interlocked.Increment(ref _displayDrops);
+        MarkDisplayBlockConsumed();
+    }
+
     public void MarkAnalysisBlockConsumed()
     {
         Interlocked.Decrement(ref _analysisDepth);

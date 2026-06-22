@@ -62,6 +62,63 @@ public sealed class WaveformEnvelopeRingBuffer
         }
     }
 
+    public WaveformEnvelopeSnapshot SnapshotCurrentSweepDownsampled(int pointsPerSweep, int targetBuckets)
+    {
+        lock (_sync)
+        {
+            int sourceCount = CurrentSweepCount(pointsPerSweep);
+            if (sourceCount <= 0)
+            {
+                return new WaveformEnvelopeSnapshot(Array.Empty<EnvelopePoint>(), _writeIndex, 0);
+            }
+
+            int buckets = Math.Min(sourceCount, Math.Max(1, targetBuckets));
+            var output = new EnvelopePoint[buckets];
+            long start = _writeIndex - sourceCount;
+            int capacity = _buffer.Length;
+            for (int pixel = 0; pixel < buckets; pixel++)
+            {
+                int offsetStart = (int)((long)pixel * sourceCount / buckets);
+                int offsetEnd = (int)((long)(pixel + 1) * sourceCount / buckets);
+                if (offsetEnd <= offsetStart)
+                {
+                    offsetEnd = offsetStart + 1;
+                }
+
+                bool hasValue = false;
+                float first = float.NaN;
+                float last = float.NaN;
+                float min = float.MaxValue;
+                float max = float.MinValue;
+                for (int offset = offsetStart; offset < offsetEnd; offset++)
+                {
+                    EnvelopePoint point = _buffer[PositiveModulo(start + offset, capacity)];
+                    if (float.IsNaN(point.Minimum) || float.IsInfinity(point.Minimum) ||
+                        float.IsNaN(point.Maximum) || float.IsInfinity(point.Maximum))
+                    {
+                        continue;
+                    }
+
+                    if (!hasValue)
+                    {
+                        first = point.First;
+                        hasValue = true;
+                    }
+
+                    last = point.Last;
+                    if (point.Minimum < min) min = point.Minimum;
+                    if (point.Maximum > max) max = point.Maximum;
+                }
+
+                output[pixel] = hasValue
+                    ? new EnvelopePoint(pixel, first, last, min, max)
+                    : new EnvelopePoint(pixel, float.NaN, float.NaN, float.NaN, float.NaN);
+            }
+
+            return new WaveformEnvelopeSnapshot(output, _writeIndex, sourceCount);
+        }
+    }
+
     public WaveformEnvelopeRingBuffer Resize(int capacity)
     {
         if (capacity <= 0) throw new ArgumentOutOfRangeException(nameof(capacity));
@@ -112,6 +169,36 @@ public sealed class WaveformEnvelopeRingBuffer
 
         return snapshot;
     }
+
+    private int CurrentSweepCount(int pointsPerSweep)
+    {
+        int count = (int)Math.Min(_count, _buffer.Length);
+        if (count <= 0)
+        {
+            return 0;
+        }
+
+        pointsPerSweep = Math.Max(1, pointsPerSweep);
+        int sweepCount;
+        if (_writeIndex < pointsPerSweep)
+        {
+            sweepCount = (int)Math.Min(_writeIndex, count);
+        }
+        else
+        {
+            int phase = (int)(_writeIndex % pointsPerSweep);
+            sweepCount = phase == 0 ? pointsPerSweep : phase;
+            sweepCount = Math.Min(sweepCount, count);
+        }
+
+        return Math.Max(0, sweepCount);
+    }
+
+    private static int PositiveModulo(long value, int divisor)
+    {
+        int result = (int)(value % divisor);
+        return result < 0 ? result + divisor : result;
+    }
 }
 
-public readonly record struct WaveformEnvelopeSnapshot(EnvelopePoint[] Points, long TotalPointCount);
+public readonly record struct WaveformEnvelopeSnapshot(EnvelopePoint[] Points, long TotalPointCount, int SourcePointCount = 0);

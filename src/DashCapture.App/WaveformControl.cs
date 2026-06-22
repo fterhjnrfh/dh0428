@@ -44,6 +44,8 @@ public sealed class WaveformControl : Control
     public IReadOnlyList<Core.Models.ChannelDescriptor>? Channels { get; set; }
     public double WindowSeconds { get; set; } = 5;
     public double DefaultYAxisAmplitude { get; set; }
+    public WaveformRenderQuality RenderQuality { get; set; } = WaveformRenderQuality.Balanced;
+    public double RenderBucketScale { get; set; } = 1.0;
 
     public override void Render(DrawingContext context)
     {
@@ -56,7 +58,10 @@ public sealed class WaveformControl : Control
 
         context.FillRectangle(BackgroundBrush, bounds);
 
-        IReadOnlyList<WaveformSnapshot>? snapshot = Store?.SnapshotSeries(Channels);
+        double visibleSeconds = Math.Max(0.001, WindowSeconds);
+        int requestedSeriesCount = Math.Max(1, Channels?.Count ?? 16);
+        int initialBuckets = ResolveRenderBucketCount(Math.Max(1, bounds.Width), requestedSeriesCount, RenderQuality, RenderBucketScale);
+        IReadOnlyList<WaveformSnapshot>? snapshot = Store?.SnapshotSeries(Channels, visibleSeconds, initialBuckets);
         if (snapshot is null || snapshot.Count == 0 || snapshot.All(series => series.Points.Length == 0))
         {
             double amplitude = GetDefaultYAxisAmplitude();
@@ -71,13 +76,17 @@ public sealed class WaveformControl : Control
                 0,
                 Math.Max(0.001, WindowSeconds),
                 emptyMin,
-                emptyMax);
+                emptyMax,
+                drawMinorGrid: true);
             DrawText(context, "\u6682\u65e0\u6ce2\u5f62\u6570\u636e", new Point(emptyPlot.Left + 14, emptyPlot.Top + 12), 14, MutedBrush);
             return;
         }
 
-        double visibleSeconds = Math.Max(0.001, WindowSeconds);
-        double xAxisStart = ResolveSweepAxisStart(snapshot, visibleSeconds);
+        int visibleSeriesCount = snapshot.Count(series => series.Points.Length > 0);
+        bool lightweight = RenderQuality == WaveformRenderQuality.Lightweight || visibleSeriesCount >= 32;
+        bool drawSignalHalo = RenderQuality == WaveformRenderQuality.Detailed && visibleSeriesCount <= 16;
+        bool connectLastValues = RenderQuality != WaveformRenderQuality.Lightweight && visibleSeriesCount <= 24;
+        (double xAxisStart, double sweepElapsedSeconds) = ResolveSweepAxis(snapshot, visibleSeconds);
         (double rawMin, double rawMax) = FindVisibleRange(snapshot, visibleSeconds);
         if (!IsFinite(rawMin) || !IsFinite(rawMax))
         {
@@ -88,7 +97,7 @@ public sealed class WaveformControl : Control
         (double yMin, double yMax) = NiceBoundsWithPadding(rawMin, rawMax, GetDefaultYAxisAmplitude());
         Rect plot = CreatePlotRect(bounds, yMin, yMax);
         DrawPlotSurface(context, plot);
-        DrawAxes(context, bounds, plot, xAxisStart, xAxisStart + visibleSeconds, yMin, yMax);
+        DrawAxes(context, bounds, plot, xAxisStart, xAxisStart + visibleSeconds, yMin, yMax, drawMinorGrid: !lightweight);
 
         double width = Math.Max(1, plot.Width);
         int channelIndex = 0;
@@ -105,38 +114,57 @@ public sealed class WaveformControl : Control
 
                 double sampleRate = GetSampleRate(series.DisplaySampleRate);
                 int pointsPerSweep = PointsPerSweep(visibleSeconds, sampleRate);
-                ReadOnlySpan<EnvelopePoint> sweepSamples = CurrentSweepSpan(
-                    samples,
-                    series.TotalPointCount,
-                    pointsPerSweep);
-                if (sweepSamples.Length == 0)
+                ReadOnlySpan<EnvelopePoint> renderSamples = series.SourcePointCount > 0
+                    ? samples
+                    : CurrentSweepSpan(samples, series.TotalPointCount, pointsPerSweep);
+                if (renderSamples.Length == 0)
                 {
                     continue;
                 }
 
-                int targetBuckets = Math.Min(sweepSamples.Length, (int)Math.Max(1, width));
-                EnsureDownsampleCapacity(targetBuckets);
-                int envelopeCount = EnvelopeDownsampler.Downsample(
-                    sweepSamples,
-                    targetBuckets,
-                    _downsampleBuffer.AsSpan(0, targetBuckets));
-                double seriesSeconds = Math.Min(
+                int targetBuckets = Math.Min(
+                    renderSamples.Length,
+                    ResolveRenderBucketCount(width, visibleSeriesCount, RenderQuality, RenderBucketScale));
+                ReadOnlySpan<EnvelopePoint> envelope = renderSamples;
+                int envelopeCount = renderSamples.Length;
+                if (renderSamples.Length > targetBuckets)
+                {
+                    EnsureDownsampleCapacity(targetBuckets);
+                    envelopeCount = EnvelopeDownsampler.Downsample(
+                        renderSamples,
+                        targetBuckets,
+                        _downsampleBuffer.AsSpan(0, targetBuckets));
+                    envelope = _downsampleBuffer.AsSpan(0, envelopeCount);
+                }
+
+                int sourcePointCount = series.SourcePointCount > 0
+                    ? series.SourcePointCount
+                    : renderSamples.Length;
+                double channelSeconds = Math.Min(
                     visibleSeconds,
-                    Math.Max(0, sweepSamples.Length - 1) / sampleRate);
+                    Math.Max(0, sourcePointCount - 1) / sampleRate);
+                double seriesSeconds = sweepElapsedSeconds > 0.000001
+                    ? sweepElapsedSeconds
+                    : channelSeconds;
                 DrawEnvelope(
                     context,
-                    _downsampleBuffer.AsSpan(0, envelopeCount),
+                    envelope,
                     GetSeriesPen(series, channelIndex),
                     plot,
                     visibleSeconds,
                     seriesSeconds,
                     yMin,
-                    yMax);
+                    yMax,
+                    connectLastValues,
+                    drawSignalHalo);
                 channelIndex++;
             }
         }
 
-        DrawLegend(context, bounds, plot, snapshot);
+        if (!lightweight)
+        {
+            DrawLegend(context, bounds, plot, snapshot);
+        }
     }
 
     private static Rect CreatePlotRect(Rect bounds, double yMin, double yMax)
@@ -160,10 +188,10 @@ public sealed class WaveformControl : Control
         context.DrawRectangle(null, PlotInnerBorderPen, new Rect(plot.X + 1, plot.Y + 1, Math.Max(1, plot.Width - 2), Math.Max(1, plot.Height - 2)), 2, 2);
     }
 
-    private void DrawAxes(DrawingContext context, Rect bounds, Rect plot, double xMin, double xMax, double yMin, double yMax)
+    private void DrawAxes(DrawingContext context, Rect bounds, Rect plot, double xMin, double xMax, double yMin, double yMax, bool drawMinorGrid)
     {
-        DrawAxisGrid(context, plot, yMin, yMax, vertical: false);
-        DrawAxisGrid(context, plot, xMin, xMax, vertical: true);
+        DrawAxisGrid(context, plot, yMin, yMax, vertical: false, drawMinorGrid: drawMinorGrid);
+        DrawAxisGrid(context, plot, xMin, xMax, vertical: true, drawMinorGrid: drawMinorGrid);
 
         if (yMin < 0 && yMax > 0)
         {
@@ -177,7 +205,7 @@ public sealed class WaveformControl : Control
         DrawAxisTitles(context, bounds, plot);
     }
 
-    private static void DrawAxisGrid(DrawingContext context, Rect plot, double min, double max, bool vertical)
+    private static void DrawAxisGrid(DrawingContext context, Rect plot, double min, double max, bool vertical, bool drawMinorGrid)
     {
         double range = Math.Max(0.000001, max - min);
         double targetPixels = vertical ? 96 : 52;
@@ -185,24 +213,27 @@ public sealed class WaveformControl : Control
         double majorStep = NiceNumber(range / targetTicks, round: true);
         double minorStep = majorStep / 2;
 
-        double minorStart = Math.Ceiling(min / minorStep) * minorStep;
-        for (double value = minorStart; value <= max + minorStep * 0.5; value += minorStep)
+        if (drawMinorGrid)
         {
-            double ratio = (value - min) / range;
-            if (ratio < -0.0001 || ratio > 1.0001)
+            double minorStart = Math.Ceiling(min / minorStep) * minorStep;
+            for (double value = minorStart; value <= max + minorStep * 0.5; value += minorStep)
             {
-                continue;
-            }
+                double ratio = (value - min) / range;
+                if (ratio < -0.0001 || ratio > 1.0001)
+                {
+                    continue;
+                }
 
-            if (vertical)
-            {
-                double x = plot.Left + ratio * plot.Width;
-                context.DrawLine(MinorGridPen, new Point(x, plot.Top), new Point(x, plot.Bottom));
-            }
-            else
-            {
-                double y = plot.Bottom - ratio * plot.Height;
-                context.DrawLine(MinorGridPen, new Point(plot.Left, y), new Point(plot.Right, y));
+                if (vertical)
+                {
+                    double x = plot.Left + ratio * plot.Width;
+                    context.DrawLine(MinorGridPen, new Point(x, plot.Top), new Point(x, plot.Bottom));
+                }
+                else
+                {
+                    double y = plot.Bottom - ratio * plot.Height;
+                    context.DrawLine(MinorGridPen, new Point(plot.Left, y), new Point(plot.Right, y));
+                }
             }
         }
 
@@ -255,7 +286,9 @@ public sealed class WaveformControl : Control
         double visibleSeconds,
         double seriesSeconds,
         double min,
-        double max)
+        double max,
+        bool connectLastValues,
+        bool drawSignalHalo)
     {
         if (envelope.Length == 0)
         {
@@ -290,15 +323,15 @@ public sealed class WaveformControl : Control
             yMin = Clamp(yMin, plot.Top, plot.Bottom);
             yMax = Clamp(yMax, plot.Top, plot.Bottom);
             yLast = Clamp(yLast, plot.Top, plot.Bottom);
-            DrawSignalLine(context, pens, new Point(x, yMin), new Point(x, yMax));
+            DrawSignalLine(context, pens, new Point(x, yMin), new Point(x, yMax), drawSignalHalo);
 
             var current = new Point(x, yLast);
-            if (previous is not null && current.X >= previous.Value.X)
+            if (connectLastValues && previous is not null && current.X >= previous.Value.X)
             {
-                DrawSignalLine(context, pens, previous.Value, current);
+                DrawSignalLine(context, pens, previous.Value, current, drawSignalHalo);
             }
 
-            previous = current;
+            previous = connectLastValues ? current : null;
         }
     }
 
@@ -310,7 +343,9 @@ public sealed class WaveformControl : Control
         {
             EnvelopePoint[] data = series.Points;
             int pointsPerSweep = PointsPerSweep(visibleSeconds, GetSampleRate(series.DisplaySampleRate));
-            ReadOnlySpan<EnvelopePoint> visibleData = CurrentSweepSpan(data, series.TotalPointCount, pointsPerSweep);
+            ReadOnlySpan<EnvelopePoint> visibleData = series.SourcePointCount > 0
+                ? data
+                : CurrentSweepSpan(data, series.TotalPointCount, pointsPerSweep);
             for (int i = 0; i < visibleData.Length; i++)
             {
                 EnvelopePoint point = visibleData[i];
@@ -327,7 +362,9 @@ public sealed class WaveformControl : Control
         return (globalMin, globalMax);
     }
 
-    private static double ResolveSweepAxisStart(IReadOnlyList<WaveformSnapshot> snapshot, double visibleSeconds)
+    private static (double StartSeconds, double ElapsedSeconds) ResolveSweepAxis(
+        IReadOnlyList<WaveformSnapshot> snapshot,
+        double visibleSeconds)
     {
         double latestElapsedSeconds = 0;
         foreach (WaveformSnapshot series in snapshot)
@@ -342,8 +379,16 @@ public sealed class WaveformControl : Control
             latestElapsedSeconds = Math.Max(latestElapsedSeconds, Math.Max(0, total - 1) / sampleRate);
         }
 
-        double sweepIndex = Math.Floor(latestElapsedSeconds / Math.Max(0.001, visibleSeconds));
-        return sweepIndex * Math.Max(0.001, visibleSeconds);
+        double window = Math.Max(0.001, visibleSeconds);
+        double sweepIndex = Math.Floor(latestElapsedSeconds / window);
+        double start = sweepIndex * window;
+        double elapsed = Math.Clamp(latestElapsedSeconds - start, 0, window);
+        if (elapsed <= 0.000001 && latestElapsedSeconds > 0)
+        {
+            elapsed = window;
+        }
+
+        return (start, elapsed);
     }
 
     private static (double Min, double Max) NiceBoundsWithPadding(double min, double max, double defaultAmplitude)
@@ -413,6 +458,43 @@ public sealed class WaveformControl : Control
     private static int PointsPerSweep(double visibleSeconds, double sampleRate)
     {
         return Math.Max(1, (int)Math.Ceiling(Math.Max(0.001, visibleSeconds) * Math.Max(1, sampleRate)));
+    }
+
+    private static int ResolveRenderBucketCount(
+        double width,
+        int visibleSeriesCount,
+        WaveformRenderQuality quality,
+        double bucketScale)
+    {
+        int pixelBuckets = (int)Math.Clamp(Math.Ceiling(width), 64, 1800);
+        double scale = IsFinite(bucketScale) ? Math.Clamp(bucketScale, 0.25, 2.0) : 1.0;
+        int baseBuckets;
+        if (quality == WaveformRenderQuality.Detailed && visibleSeriesCount <= 8)
+        {
+            baseBuckets = pixelBuckets;
+            return ScaleBucketCount(baseBuckets, pixelBuckets, scale);
+        }
+
+        if (quality == WaveformRenderQuality.Balanced)
+        {
+            int cap = visibleSeriesCount >= 24 ? 480 : visibleSeriesCount >= 12 ? 720 : 1200;
+            baseBuckets = Math.Min(pixelBuckets, cap);
+            return ScaleBucketCount(baseBuckets, pixelBuckets, scale);
+        }
+
+        int lightweightCap = visibleSeriesCount >= 56 ? 220 :
+            visibleSeriesCount >= 40 ? 280 :
+            visibleSeriesCount >= 24 ? 360 :
+            visibleSeriesCount >= 12 ? 520 :
+            760;
+        baseBuckets = Math.Min(pixelBuckets, lightweightCap);
+        return ScaleBucketCount(baseBuckets, pixelBuckets, scale);
+    }
+
+    private static int ScaleBucketCount(int baseBuckets, int pixelBuckets, double scale)
+    {
+        int scaled = (int)Math.Round(baseBuckets * scale);
+        return Math.Clamp(scaled, 48, pixelBuckets);
     }
 
     private static ReadOnlySpan<EnvelopePoint> CurrentSweepSpan(
@@ -648,9 +730,13 @@ public sealed class WaveformControl : Control
         }
     }
 
-    private static void DrawSignalLine(DrawingContext context, SeriesPens pens, Point start, Point end)
+    private static void DrawSignalLine(DrawingContext context, SeriesPens pens, Point start, Point end, bool drawHalo)
     {
-        context.DrawLine(pens.Halo, start, end);
+        if (drawHalo)
+        {
+            context.DrawLine(pens.Halo, start, end);
+        }
+
         context.DrawLine(pens.Stroke, start, end);
     }
 
@@ -670,4 +756,11 @@ public sealed class WaveformControl : Control
     private readonly record struct SeriesPens(Pen Halo, Pen Stroke);
 
     private readonly record struct AxisLabel(string Text, double X, double Y, double Height);
+}
+
+public enum WaveformRenderQuality
+{
+    Detailed,
+    Balanced,
+    Lightweight
 }

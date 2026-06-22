@@ -131,7 +131,7 @@ public sealed class TdmsFileReader : IDisposable
             : path[..^".tdms".Length];
     }
 
-    public TdmsChannelEnvelope ReadEnvelope(TdmsChannelInfo channel, ulong startSample, ulong sampleCount, int bucketCount, CancellationToken cancellationToken)
+    public TdmsChannelEnvelope ReadEnvelope(TdmsChannelInfo channel, ulong startSample, ulong sampleCount, int bucketCount, CancellationToken cancellationToken, bool preferSummaries = false)
     {
         ThrowIfDisposed();
         if (startSample >= channel.SampleCount)
@@ -175,7 +175,8 @@ public sealed class TdmsFileReader : IDisposable
                 sampleCount,
                 accumulators,
                 buffer,
-                cancellationToken);
+                cancellationToken,
+                preferSummaries);
 
             remainingCount -= segmentCount;
             outputOffset += segmentCount;
@@ -190,6 +191,77 @@ public sealed class TdmsFileReader : IDisposable
             .Select((accumulator, index) => accumulator.ToPoint(index))
             .ToArray();
         return new TdmsChannelEnvelope(channel, startSample, sampleCount, points);
+    }
+
+    public int ReadSamples(TdmsChannelInfo channel, ulong startSample, int sampleCount, float[] buffer, CancellationToken cancellationToken)
+    {
+        ThrowIfDisposed();
+        if (sampleCount <= 0 || buffer.Length == 0 || startSample >= channel.SampleCount)
+        {
+            return 0;
+        }
+
+        int requested = (int)Math.Min((ulong)Math.Min(sampleCount, buffer.Length), channel.SampleCount - startSample);
+        if (requested <= 0)
+        {
+            return 0;
+        }
+
+        ulong remainingStart = startSample;
+        ulong remainingCount = (ulong)requested;
+        int copied = 0;
+        float[]? scratch = null;
+        foreach (IReadableSegment segment in _segments)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!segment.Channels.TryGetValue(channel.Key, out TdmsChannelInfo? segmentChannel))
+            {
+                continue;
+            }
+
+            if (remainingStart >= segmentChannel.SampleCount)
+            {
+                remainingStart -= segmentChannel.SampleCount;
+                continue;
+            }
+
+            ulong segmentStart = remainingStart;
+            int count = (int)Math.Min(remainingCount, segmentChannel.SampleCount - segmentStart);
+            if (count <= 0)
+            {
+                break;
+            }
+
+            if (copied == 0)
+            {
+                int read = segment.ReadSamples(channel.Key, segmentStart, count, buffer, cancellationToken);
+                if (read <= 0)
+                {
+                    break;
+                }
+            }
+            else
+            {
+                scratch ??= new float[requested];
+                int read = segment.ReadSamples(channel.Key, segmentStart, count, scratch, cancellationToken);
+                if (read <= 0)
+                {
+                    break;
+                }
+
+                Array.Copy(scratch, 0, buffer, copied, count);
+            }
+
+            copied += count;
+            remainingCount -= (ulong)count;
+            remainingStart = 0;
+            if (remainingCount == 0)
+            {
+                break;
+            }
+        }
+
+        return copied;
     }
 
     public void ExportToTdms(string targetPath, CancellationToken cancellationToken, IProgress<TdmsExportProgress>? progress = null)
@@ -605,7 +677,8 @@ public sealed class TdmsFileReader : IDisposable
             ulong totalSampleCount,
             TdmsEnvelopeAccumulator[] accumulators,
             float[] buffer,
-            CancellationToken cancellationToken);
+            CancellationToken cancellationToken,
+            bool preferSummaries);
 
         int ReadSamples(
             TdmsChannelKey key,
@@ -692,7 +765,8 @@ public sealed class TdmsFileReader : IDisposable
             ulong totalSampleCount,
             TdmsEnvelopeAccumulator[] accumulators,
             float[] buffer,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            bool preferSummaries)
         {
             if (!ChannelHandles.TryGetValue(key, out IntPtr handle))
             {
@@ -847,7 +921,8 @@ public sealed class TdmsFileReader : IDisposable
             ulong totalSampleCount,
             TdmsEnvelopeAccumulator[] accumulators,
             float[] buffer,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            bool preferSummaries)
         {
             if (!_recordsByChannel.TryGetValue(key, out List<CompressedCaptureRecordIndex>? records))
             {
@@ -864,7 +939,7 @@ public sealed class TdmsFileReader : IDisposable
                     continue;
                 }
 
-                if (TryAccumulateRecordSummary(record, segmentStart, requestEnd, outputOffset, totalSampleCount, accumulators))
+                if (TryAccumulateRecordSummary(record, segmentStart, requestEnd, outputOffset, totalSampleCount, accumulators, preferSummaries))
                 {
                     continue;
                 }
@@ -1293,7 +1368,8 @@ public sealed class TdmsFileReader : IDisposable
             ulong requestEnd,
             ulong outputOffset,
             ulong totalSampleCount,
-            TdmsEnvelopeAccumulator[] accumulators)
+            TdmsEnvelopeAccumulator[] accumulators,
+            bool allowSpanningBuckets)
         {
             if (!HasSummary(record) || record.SampleStart < segmentStart || record.SampleStart + (ulong)record.SampleCount > requestEnd)
             {
@@ -1309,13 +1385,47 @@ public sealed class TdmsFileReader : IDisposable
 
             int firstBucket = BucketIndex(relativeStart, totalSampleCount, accumulators.Length);
             int lastBucket = BucketIndex(relativeEnd - 1, totalSampleCount, accumulators.Length);
-            if (firstBucket != lastBucket)
+            if (firstBucket == lastBucket)
+            {
+                accumulators[firstBucket].AddSummary(record.First, record.Last, record.Minimum, record.Maximum);
+                return true;
+            }
+
+            if (!allowSpanningBuckets)
             {
                 return false;
             }
 
-            accumulators[firstBucket].AddSummary(record.First, record.Last, record.Minimum, record.Maximum);
+            for (int bucket = firstBucket; bucket <= lastBucket; bucket++)
+            {
+                ulong bucketStart = Scale(bucket, totalSampleCount, accumulators.Length);
+                ulong bucketEnd = Scale(bucket + 1, totalSampleCount, accumulators.Length);
+                if (bucketEnd <= bucketStart)
+                {
+                    bucketEnd = bucketStart + 1;
+                }
+
+                ulong overlapStart = Math.Max(bucketStart, relativeStart);
+                ulong overlapEnd = Math.Min(bucketEnd, relativeEnd);
+                if (overlapEnd <= overlapStart)
+                {
+                    continue;
+                }
+
+                double denominator = Math.Max(1, record.SampleCount - 1);
+                double startRatio = Math.Clamp((overlapStart - relativeStart) / denominator, 0, 1);
+                double endRatio = Math.Clamp((overlapEnd - 1 - relativeStart) / denominator, 0, 1);
+                float estimatedFirst = Lerp(record.First, record.Last, startRatio);
+                float estimatedLast = Lerp(record.First, record.Last, endRatio);
+                accumulators[bucket].AddSummary(estimatedFirst, estimatedLast, record.Minimum, record.Maximum);
+            }
+
             return true;
+        }
+
+        private static float Lerp(float start, float end, double ratio)
+        {
+            return (float)(start + (end - start) * Math.Clamp(ratio, 0, 1));
         }
 
         private static bool HasSummary(CompressedCaptureRecordIndex record)

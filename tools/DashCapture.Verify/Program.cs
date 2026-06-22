@@ -9,7 +9,53 @@ static int Fail(string message)
 
 if (args.Length == 0)
 {
-    return Fail("Usage: DashCapture.Verify <file.tdms> [audit.raw.csv] [tdm-runtime-dir]\n       DashCapture.Verify stats <file-or-folder> [tdm-runtime-dir]\n       DashCapture.Verify fft <file-or-folder> [expectedHz] [toleranceHz] [maxFrames]");
+    return Fail("Usage: DashCapture.Verify <file.tdms> [audit.raw.csv] [tdm-runtime-dir]\n       DashCapture.Verify stats <file-or-folder> [tdm-runtime-dir]\n       DashCapture.Verify analysis <file-or-folder> [maxChannels] [tdm-runtime-dir]\n       DashCapture.Verify fft <file-or-folder> [expectedHz] [toleranceHz] [maxFrames]");
+}
+
+if (string.Equals(args[0], "analysis", StringComparison.OrdinalIgnoreCase))
+{
+    if (args.Length < 2)
+    {
+        return Fail("Usage: DashCapture.Verify analysis <file-or-folder> [maxChannels] [tdm-runtime-dir]");
+    }
+
+    string inputPath = args[1];
+    int maxChannels = args.Length >= 3 && int.TryParse(args[2], out int parsedChannels)
+        ? Math.Max(1, parsedChannels)
+        : 8;
+    string runtimeDir = args.Length >= 4
+        ? args[3]
+        : Path.GetFullPath(@".\TDM C DLL[官方源文件]\dev\bin\64-bit");
+
+    try
+    {
+        using TdmsFileReader reader = TdmsFileReader.Open(inputPath, runtimeDir);
+        TdmsChannelInfo[] channels = reader.FileInfo.Groups
+            .SelectMany(group => group.Channels)
+            .Take(maxChannels)
+            .ToArray();
+        HistoricalSignalProcessingResult result = HistoricalSignalProcessor.Process(
+            reader,
+            SignalProcessingModuleDefinition.BuiltInAmplitudeAnalysis,
+            channels,
+            new HistoricalSignalProcessingOptions(),
+            CancellationToken.None);
+
+        Console.WriteLine($"Analysis source: {result.SourcePath}");
+        Console.WriteLine($"Module: {result.ModuleName}, Channels: {result.Channels.Count}, Elapsed: {result.Elapsed.TotalSeconds:0.000}s");
+        Console.WriteLine("Device\tChannel\tSampleRate\tSamples\tMin\tMax\tPeakToPeak\tRMS\tMean\tStdDev");
+        foreach (SignalProcessingChannelResult channel in result.Channels)
+        {
+            Console.WriteLine(
+                $"{channel.DeviceId + 1}\t{channel.ChannelName}\t{channel.SampleRate:0.###}\t{channel.SampleCount}\t{Metric(channel, SignalProcessingAlgorithmType.Minimum):0.######}\t{Metric(channel, SignalProcessingAlgorithmType.Maximum):0.######}\t{Metric(channel, SignalProcessingAlgorithmType.PeakToPeak):0.######}\t{Metric(channel, SignalProcessingAlgorithmType.Rms):0.######}\t{Metric(channel, SignalProcessingAlgorithmType.Mean):0.######}\t{Metric(channel, SignalProcessingAlgorithmType.StandardDeviation):0.######}");
+        }
+
+        return 0;
+    }
+    catch (Exception ex)
+    {
+        return Fail(ex.Message);
+    }
 }
 
 if (string.Equals(args[0], "fft", StringComparison.OrdinalIgnoreCase))
@@ -247,6 +293,11 @@ static bool IsSampleRateWindowing(FftResultFileInfo fileInfo)
 {
     return fileInfo.FormatVersion >= 3 &&
         string.Equals(fileInfo.WindowMode, "sample_rate_resolution", StringComparison.OrdinalIgnoreCase);
+}
+
+static double Metric(SignalProcessingChannelResult channel, SignalProcessingAlgorithmType type)
+{
+    return channel.MetricValue(type) ?? double.NaN;
 }
 
 sealed record FftFileVerificationSummary(

@@ -154,6 +154,52 @@ public sealed class WaveformStore
         }
     }
 
+    public IReadOnlyList<WaveformSnapshot> SnapshotSeries(
+        IReadOnlyList<ChannelDescriptor>? channels,
+        double visibleSeconds,
+        int targetBuckets)
+    {
+        (ChannelDescriptor Channel, WaveformEnvelopeRingBuffer Buffer, float DisplaySampleRate)[] items;
+        lock (_sync)
+        {
+            IReadOnlyList<ChannelDescriptor> resolved = ResolveChannels(channels);
+            var list = new List<(ChannelDescriptor Channel, WaveformEnvelopeRingBuffer Buffer, float DisplaySampleRate)>(resolved.Count);
+            foreach (ChannelDescriptor channel in resolved)
+            {
+                var key = new ChannelKey(channel);
+                if (!_buffers.TryGetValue(key, out WaveformEnvelopeRingBuffer? buffer))
+                {
+                    continue;
+                }
+
+                float displaySampleRate = _displaySampleRates.TryGetValue(key, out float rate) && IsValidSampleRate(rate)
+                    ? rate
+                    : channel.SampleRate;
+                list.Add((channel, buffer, displaySampleRate));
+            }
+
+            items = list.ToArray();
+        }
+
+        var snapshots = new WaveformSnapshot[items.Length];
+        for (int i = 0; i < items.Length; i++)
+        {
+            (ChannelDescriptor channel, WaveformEnvelopeRingBuffer buffer, float displaySampleRate) = items[i];
+            int pointsPerSweep = PointsPerSweep(visibleSeconds, displaySampleRate);
+            WaveformEnvelopeSnapshot bufferSnapshot = buffer.SnapshotCurrentSweepDownsampled(
+                pointsPerSweep,
+                targetBuckets);
+            snapshots[i] = new WaveformSnapshot(
+                channel,
+                displaySampleRate,
+                bufferSnapshot.Points,
+                bufferSnapshot.TotalPointCount,
+                bufferSnapshot.SourcePointCount);
+        }
+
+        return snapshots;
+    }
+
     public void Clear()
     {
         lock (_sync)
@@ -168,6 +214,12 @@ public sealed class WaveformStore
     private static bool IsValidSampleRate(float sampleRate)
     {
         return sampleRate > 0 && !float.IsNaN(sampleRate) && !float.IsInfinity(sampleRate);
+    }
+
+    private static int PointsPerSweep(double visibleSeconds, float sampleRate)
+    {
+        double rate = IsValidSampleRate(sampleRate) ? sampleRate : 1;
+        return Math.Max(1, (int)Math.Ceiling(Math.Max(0.001, visibleSeconds) * Math.Max(1, rate)));
     }
 
     private IReadOnlyList<ChannelDescriptor> ResolveChannels(IReadOnlyList<ChannelDescriptor>? channels)
@@ -195,4 +247,5 @@ public sealed record WaveformSnapshot(
     ChannelDescriptor Channel,
     float DisplaySampleRate,
     EnvelopePoint[] Points,
-    long TotalPointCount);
+    long TotalPointCount,
+    int SourcePointCount = 0);

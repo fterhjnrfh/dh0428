@@ -107,7 +107,7 @@ public sealed class CompressionSettings
 {
     public bool Enabled { get; set; } = true;
     public CompressionAlgorithm Algorithm { get; set; } = CompressionAlgorithm.Lz4;
-    public CompressionPreprocessor Preprocessor { get; set; } = CompressionPreprocessor.ByteShuffle;
+    public CompressionPreprocessor Preprocessor { get; set; } = CompressionPreprocessor.Delta1;
     public int ChunkSizeMb { get; set; } = 4;
     public int ZstdLevel { get; set; } = 3;
     public int ZstdWindowLog { get; set; } = 0;
@@ -143,10 +143,11 @@ public enum CompressionPreprocessor
 
 public sealed class DisplaySettings
 {
-    public int TargetFps { get; set; } = 30;
+    public int TargetFps { get; set; } = 60;
     public int WindowSeconds { get; set; } = 5;
     public int MaxVisibleChannels { get; set; } = 16;
     public int MaxDisplayPointsPerSecond { get; set; } = 4000;
+    public double RenderBucketScale { get; set; } = 1.0;
     public float DefaultYAxisAmplitude { get; set; }
     public List<MonitorViewSettings> Views { get; set; } = new();
 }

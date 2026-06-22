@@ -8,15 +8,23 @@ namespace DashCapture.App;
 
 public sealed class TdmsOverviewSlider : Control
 {
-    private static readonly IBrush TrackBrush = new SolidColorBrush(Color.FromRgb(244, 246, 248));
+    private const double HeatStripHeight = 9;
+    private const double EnvelopeBottomGap = 4;
+    private const double MinimumSeriesRange = 0.000001;
+
+    private static readonly IBrush TrackBrush = new SolidColorBrush(Color.FromRgb(248, 250, 252));
     private static readonly IBrush EmptyBrush = new SolidColorBrush(Color.FromRgb(174, 184, 197));
-    private static readonly IBrush DimBrush = new SolidColorBrush(Color.FromArgb(42, 20, 29, 39));
-    private static readonly IBrush WindowBrush = new SolidColorBrush(Color.FromArgb(78, 31, 91, 140));
+    private static readonly IBrush DimBrush = new SolidColorBrush(Color.FromArgb(28, 20, 29, 39));
+    private static readonly IBrush WindowBrush = new SolidColorBrush(Color.FromArgb(30, 31, 91, 140));
     private static readonly IBrush HandleBrush = new SolidColorBrush(Color.FromArgb(190, 31, 91, 140));
     private static readonly Pen BorderPen = new(new SolidColorBrush(Color.FromRgb(190, 198, 208)), 1);
-    private static readonly Pen OverviewPen = new(new SolidColorBrush(Color.FromArgb(185, 31, 91, 140)), 1);
+    private static readonly Pen OverviewPen = new(new SolidColorBrush(Color.FromArgb(95, 31, 91, 140)), 1);
+    private static readonly Pen OverviewOutlinePen = new(new SolidColorBrush(Color.FromArgb(230, 31, 91, 140)), 1.2);
+    private static readonly Pen CenterTrendPen = new(new SolidColorBrush(Color.FromArgb(210, 35, 117, 80)), 1);
     private static readonly Pen WindowPen = new(new SolidColorBrush(Color.FromRgb(31, 91, 140)), 1.2);
-    private static readonly Pen CenterPen = new(new SolidColorBrush(Color.FromArgb(90, 82, 92, 106)), 1);
+    private static readonly Pen CenterPen = new(new SolidColorBrush(Color.FromArgb(80, 82, 92, 106)), 1);
+    private static readonly IBrush HeatEmptyBrush = new SolidColorBrush(Color.FromArgb(60, 174, 184, 197));
+    private static readonly IBrush[] HeatBrushes = CreateHeatBrushes();
 
     private IReadOnlyList<TdmsChannelEnvelope> _overview = Array.Empty<TdmsChannelEnvelope>();
     private OverviewBin[] _overviewBins = Array.Empty<OverviewBin>();
@@ -32,8 +40,8 @@ public sealed class TdmsOverviewSlider : Control
     public TdmsOverviewSlider()
     {
         Focusable = true;
-        Height = 54;
-        MinHeight = 48;
+        Height = 76;
+        MinHeight = 66;
     }
 
     public event Action<double, double>? RangeRequested;
@@ -181,23 +189,71 @@ public sealed class TdmsOverviewSlider : Control
         double min = _overviewMin;
         double max = _overviewMax;
         double range = Math.Max(0.000001, max - min);
+        Rect envelopeTrack = new(
+            track.Left,
+            track.Top,
+            track.Width,
+            Math.Max(1, track.Height - HeatStripHeight - EnvelopeBottomGap));
+        Rect heatTrack = new(
+            track.Left,
+            envelopeTrack.Bottom + EnvelopeBottomGap,
+            track.Width,
+            HeatStripHeight);
 
         double zeroRatio = Math.Clamp((0 - min) / range, 0, 1);
-        double zeroY = track.Bottom - zeroRatio * track.Height;
-        context.DrawLine(CenterPen, new Point(track.Left, zeroY), new Point(track.Right, zeroY));
+        double zeroY = envelopeTrack.Bottom - zeroRatio * envelopeTrack.Height;
+        context.DrawLine(CenterPen, new Point(envelopeTrack.Left, zeroY), new Point(envelopeTrack.Right, zeroY));
 
+        Point? previousMin = null;
+        Point? previousMax = null;
+        Point? previousCenter = null;
+        double columnWidth = Math.Max(1, track.Width / _overviewBins.Length);
         for (int i = 0; i < _overviewBins.Length; i++)
         {
             OverviewBin bin = _overviewBins[i];
             if (bin.Count == 0)
             {
+                previousMin = null;
+                previousMax = null;
+                previousCenter = null;
+                double emptyLeft = heatTrack.Left + i * heatTrack.Width / _overviewBins.Length;
+                context.FillRectangle(HeatEmptyBrush, new Rect(emptyLeft, heatTrack.Top, columnWidth + 0.5, heatTrack.Height));
                 continue;
             }
 
-            double x = track.Left + (i + 0.5) * track.Width / _overviewBins.Length;
-            double yMin = track.Bottom - ((bin.Minimum - min) / range) * track.Height;
-            double yMax = track.Bottom - ((bin.Maximum - min) / range) * track.Height;
-            context.DrawLine(OverviewPen, new Point(x, yMin), new Point(x, yMax));
+            double x = envelopeTrack.Left + (i + 0.5) * envelopeTrack.Width / _overviewBins.Length;
+            double left = heatTrack.Left + i * heatTrack.Width / _overviewBins.Length;
+            double yMin = envelopeTrack.Bottom - ((bin.NormalizedMinimum - min) / range) * envelopeTrack.Height;
+            double yMax = envelopeTrack.Bottom - ((bin.NormalizedMaximum - min) / range) * envelopeTrack.Height;
+            var minPoint = new Point(x, yMin);
+            var maxPoint = new Point(x, yMax);
+            context.DrawLine(OverviewPen, minPoint, maxPoint);
+            if (previousMin.HasValue && previousMax.HasValue)
+            {
+                context.DrawLine(OverviewOutlinePen, previousMin.Value, minPoint);
+                context.DrawLine(OverviewOutlinePen, previousMax.Value, maxPoint);
+            }
+
+            previousMin = minPoint;
+            previousMax = maxPoint;
+            if (bin.CenterCount > 0)
+            {
+                double center = bin.CenterSum / bin.CenterCount;
+                double yCenter = envelopeTrack.Bottom - ((center - min) / range) * envelopeTrack.Height;
+                var centerPoint = new Point(x, yCenter);
+                if (previousCenter.HasValue)
+                {
+                    context.DrawLine(CenterTrendPen, previousCenter.Value, centerPoint);
+                }
+
+                previousCenter = centerPoint;
+            }
+            else
+            {
+                previousCenter = null;
+            }
+
+            context.FillRectangle(HeatBrush(bin.AnomalyScore), new Rect(left, heatTrack.Top, columnWidth + 0.5, heatTrack.Height));
         }
     }
 
@@ -221,6 +277,13 @@ public sealed class TdmsOverviewSlider : Control
                 continue;
             }
 
+            (double seriesCenter, double seriesHalfRange) = FindSeriesScale(series);
+
+            double sampleRate = series.Channel.SampleRate > 0 && !double.IsNaN(series.Channel.SampleRate) && !double.IsInfinity(series.Channel.SampleRate)
+                ? series.Channel.SampleRate
+                : 1;
+            double startSample = series.StartSample;
+            double sampleCount = Math.Max(1, series.SampleCount);
             for (int i = 0; i < count; i++)
             {
                 TdmsEnvelopePoint point = series.Points[i];
@@ -231,19 +294,34 @@ public sealed class TdmsOverviewSlider : Control
 
                 if (point.Minimum < min) min = point.Minimum;
                 if (point.Maximum > max) max = point.Maximum;
-                int binIndex = Math.Clamp((int)((i + 0.5) / count * binCount), 0, binCount - 1);
+                double normalizedMinimum = Normalize(point.Minimum, seriesCenter, seriesHalfRange);
+                double normalizedMaximum = Normalize(point.Maximum, seriesCenter, seriesHalfRange);
+                if (normalizedMinimum > normalizedMaximum)
+                {
+                    (normalizedMinimum, normalizedMaximum) = (normalizedMaximum, normalizedMinimum);
+                }
+
+                double centerSample = startSample + (i + 0.5) * sampleCount / count;
+                double centerSeconds = centerSample / sampleRate;
+                int binIndex = Math.Clamp((int)(centerSeconds / DurationSeconds * binCount), 0, binCount - 1);
                 ref OverviewBin bin = ref bins[binIndex];
                 if (bin.Count == 0)
                 {
                     bin.Minimum = point.Minimum;
                     bin.Maximum = point.Maximum;
+                    bin.NormalizedMinimum = normalizedMinimum;
+                    bin.NormalizedMaximum = normalizedMaximum;
                 }
                 else
                 {
                     if (point.Minimum < bin.Minimum) bin.Minimum = point.Minimum;
                     if (point.Maximum > bin.Maximum) bin.Maximum = point.Maximum;
+                    if (normalizedMinimum < bin.NormalizedMinimum) bin.NormalizedMinimum = normalizedMinimum;
+                    if (normalizedMaximum > bin.NormalizedMaximum) bin.NormalizedMaximum = normalizedMaximum;
                 }
 
+                bin.CenterSum += Normalize((point.First + point.Last) * 0.5, seriesCenter, seriesHalfRange);
+                bin.CenterCount++;
                 bin.Count++;
             }
         }
@@ -256,15 +334,193 @@ public sealed class TdmsOverviewSlider : Control
             return;
         }
 
+        ScoreAnomalies(bins);
+        (min, max) = FindNormalizedRange(bins);
         if (Math.Abs(max - min) < 0.000001)
         {
             min -= 1;
             max += 1;
         }
+        else
+        {
+            double padding = Math.Max(0.08, (max - min) * 0.08);
+            min -= padding;
+            max += padding;
+        }
 
         _overviewMin = min;
         _overviewMax = max;
         _overviewBins = bins;
+    }
+
+    private static (double Center, double HalfRange) FindSeriesScale(TdmsChannelEnvelope series)
+    {
+        double min = double.PositiveInfinity;
+        double max = double.NegativeInfinity;
+        foreach (TdmsEnvelopePoint point in series.Points)
+        {
+            if (!float.IsFinite(point.Minimum) || !float.IsFinite(point.Maximum))
+            {
+                continue;
+            }
+
+            if (point.Minimum < min) min = point.Minimum;
+            if (point.Maximum > max) max = point.Maximum;
+        }
+
+        if (double.IsInfinity(min) || double.IsInfinity(max))
+        {
+            return (0, 1);
+        }
+
+        double halfRange = Math.Max(MinimumSeriesRange, (max - min) * 0.5);
+        return ((max + min) * 0.5, halfRange);
+    }
+
+    private static double Normalize(double value, double center, double halfRange)
+    {
+        return Math.Clamp((value - center) / Math.Max(MinimumSeriesRange, halfRange), -1.5, 1.5);
+    }
+
+    private static (double Min, double Max) FindNormalizedRange(IReadOnlyList<OverviewBin> bins)
+    {
+        double min = double.PositiveInfinity;
+        double max = double.NegativeInfinity;
+        foreach (OverviewBin bin in bins)
+        {
+            if (bin.Count == 0)
+            {
+                continue;
+            }
+
+            if (bin.NormalizedMinimum < min) min = bin.NormalizedMinimum;
+            if (bin.NormalizedMaximum > max) max = bin.NormalizedMaximum;
+        }
+
+        if (double.IsInfinity(min) || double.IsInfinity(max))
+        {
+            return (-1, 1);
+        }
+
+        return (min, max);
+    }
+
+    private static void ScoreAnomalies(OverviewBin[] bins)
+    {
+        double[] amplitudes = bins
+            .Where(bin => bin.Count > 0)
+            .Select(bin => Math.Max(0, bin.NormalizedMaximum - bin.NormalizedMinimum))
+            .ToArray();
+        if (amplitudes.Length == 0)
+        {
+            return;
+        }
+
+        double amplitudeMedian = Median(amplitudes);
+        double amplitudeMad = Median(amplitudes.Select(value => Math.Abs(value - amplitudeMedian)).ToArray());
+
+        double previousCenter = 0;
+        bool hasPreviousCenter = false;
+        var deltas = new List<double>(bins.Length);
+        for (int i = 0; i < bins.Length; i++)
+        {
+            if (bins[i].Count == 0 || bins[i].CenterCount == 0)
+            {
+                continue;
+            }
+
+            double center = bins[i].CenterSum / bins[i].CenterCount;
+            if (hasPreviousCenter)
+            {
+                deltas.Add(Math.Abs(center - previousCenter));
+            }
+
+            previousCenter = center;
+            hasPreviousCenter = true;
+        }
+
+        double deltaMedian = deltas.Count > 0 ? Median(deltas.ToArray()) : 0;
+        double deltaMad = deltas.Count > 0 ? Median(deltas.Select(value => Math.Abs(value - deltaMedian)).ToArray()) : 0;
+        previousCenter = 0;
+        hasPreviousCenter = false;
+        for (int i = 0; i < bins.Length; i++)
+        {
+            if (bins[i].Count == 0)
+            {
+                continue;
+            }
+
+            double amplitude = Math.Max(0, bins[i].NormalizedMaximum - bins[i].NormalizedMinimum);
+            double amplitudeScore = RobustScore(amplitude, amplitudeMedian, amplitudeMad);
+            double deltaScore = 0;
+            if (bins[i].CenterCount > 0)
+            {
+                double center = bins[i].CenterSum / bins[i].CenterCount;
+                if (hasPreviousCenter)
+                {
+                    deltaScore = RobustScore(Math.Abs(center - previousCenter), deltaMedian, deltaMad);
+                }
+
+                previousCenter = center;
+                hasPreviousCenter = true;
+            }
+
+            bins[i].AnomalyScore = Math.Clamp(Math.Max(amplitudeScore, deltaScore), 0, 1);
+        }
+    }
+
+    private static double RobustScore(double value, double median, double mad)
+    {
+        double scale = Math.Max(0.025, mad * 1.4826);
+        return Math.Clamp((value - median - scale * 2.0) / (scale * 6.0), 0, 1);
+    }
+
+    private static double Median(double[] values)
+    {
+        if (values.Length == 0)
+        {
+            return 0;
+        }
+
+        Array.Sort(values);
+        int middle = values.Length / 2;
+        return values.Length % 2 == 0
+            ? (values[middle - 1] + values[middle]) * 0.5
+            : values[middle];
+    }
+
+    private static IBrush HeatBrush(double score)
+    {
+        int index = (int)Math.Round(Math.Clamp(score, 0, 1) * (HeatBrushes.Length - 1));
+        return HeatBrushes[index];
+    }
+
+    private static IBrush[] CreateHeatBrushes()
+    {
+        var brushes = new IBrush[32];
+        Color calm = Color.FromArgb(125, 47, 124, 104);
+        Color warning = Color.FromArgb(190, 203, 143, 49);
+        Color hot = Color.FromArgb(225, 176, 62, 62);
+        for (int i = 0; i < brushes.Length; i++)
+        {
+            double ratio = (double)i / (brushes.Length - 1);
+            Color color = ratio < 0.55
+                ? Lerp(calm, warning, ratio / 0.55)
+                : Lerp(warning, hot, (ratio - 0.55) / 0.45);
+            brushes[i] = new SolidColorBrush(color);
+        }
+
+        return brushes;
+    }
+
+    private static Color Lerp(Color start, Color end, double ratio)
+    {
+        ratio = Math.Clamp(ratio, 0, 1);
+        return Color.FromArgb(
+            (byte)Math.Round(start.A + (end.A - start.A) * ratio),
+            (byte)Math.Round(start.R + (end.R - start.R) * ratio),
+            (byte)Math.Round(start.G + (end.G - start.G) * ratio),
+            (byte)Math.Round(start.B + (end.B - start.B) * ratio));
     }
 
     private void DrawWindow(DrawingContext context, Rect track)
@@ -365,6 +621,11 @@ public sealed class TdmsOverviewSlider : Control
     {
         public double Minimum;
         public double Maximum;
+        public double NormalizedMinimum;
+        public double NormalizedMaximum;
+        public double CenterSum;
+        public int CenterCount;
+        public double AnomalyScore;
         public int Count;
     }
 }

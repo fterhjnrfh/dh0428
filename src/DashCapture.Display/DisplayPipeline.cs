@@ -68,13 +68,21 @@ public sealed class DisplayPipeline : IAsyncDisposable
     {
         await foreach (AcquisitionBlock block in _acquisition.DisplayReader.ReadAllAsync(cancellationToken).ConfigureAwait(false))
         {
+            AcquisitionBlock current = block;
             try
             {
-                Process(block);
+                while (_acquisition.DisplayReader.TryRead(out AcquisitionBlock? newer))
+                {
+                    current.Release();
+                    _acquisition.MarkDisplayBlockSkipped();
+                    current = newer;
+                }
+
+                Process(current);
             }
             finally
             {
-                block.Release();
+                current.Release();
                 _acquisition.MarkDisplayBlockConsumed();
             }
         }
@@ -147,7 +155,7 @@ public sealed class DisplayPipeline : IAsyncDisposable
     {
         var key = new ChannelKey(channel);
         float rawSampleRate = IsValidSampleRate(channel.SampleRate) ? channel.SampleRate : _maxDisplayPointsPerSecond;
-        int bucketSize = Math.Max(1, (int)Math.Round(rawSampleRate / Math.Min(rawSampleRate, _maxDisplayPointsPerSecond)));
+        int bucketSize = Math.Max(1, (int)Math.Ceiling(rawSampleRate / Math.Min(rawSampleRate, _maxDisplayPointsPerSecond)));
         float outputSampleRate = rawSampleRate / bucketSize;
 
         if (_decimators.TryGetValue(key, out ChannelEnvelopeDecimator? decimator))

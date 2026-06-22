@@ -54,6 +54,15 @@ public sealed class MainWindow : Window
     private readonly Button _closeSelectionButton = new() { Content = "\u6536\u8d77" };
     private readonly Button _selectAllChannelsButton = new() { Content = "\u5168\u9009" };
     private readonly Button _clearChannelsButton = new() { Content = "\u6e05\u7a7a" };
+    private readonly Slider _monitorRenderScaleSlider = new()
+    {
+        Minimum = 0.25,
+        Maximum = 2.0,
+        Width = 76,
+        TickFrequency = 0.25,
+        IsSnapToTickEnabled = true
+    };
+    private readonly TextBlock _monitorRenderScaleValue = new();
     private readonly CheckBox _activeViewVisibleCheck = new() { Content = "\u663e\u793a\u8be5\u89c6\u56fe" };
     private readonly TextBlock _activeViewText = new();
     private readonly TextBlock _selectionTitle = new();
@@ -134,6 +143,7 @@ public sealed class MainWindow : Window
     private Control? _compressionLpcField;
     private readonly TdmsViewerControl _tdmsViewer;
     private readonly FftResultViewerControl _fftResultViewer;
+    private readonly SignalProcessingControl _signalProcessingViewer;
     private CaptureStorageStatistics? _lastStorageStats;
     private readonly DispatcherTimer _captureTimer;
     private readonly DispatcherTimer _runtimeStatsTimer;
@@ -144,6 +154,7 @@ public sealed class MainWindow : Window
     private DateTimeOffset _lastRuntimeStatsAt = DateTimeOffset.UtcNow;
     private int _activeViewIndex;
     private int _displayFrameCounter;
+    private BackpressureLevel _lastBackpressureLevel;
     private bool _captureUiRunning;
     private bool _captureCleanupInProgress;
     private bool _closeConfirmed;
@@ -156,6 +167,7 @@ public sealed class MainWindow : Window
     public MainWindow()
     {
         _settings = AppSettingsLoader.Load();
+        _settings.Display.RenderBucketScale = ClampRenderBucketScale(_settings.Display.RenderBucketScale);
         _storageSampleRateRangePanel = BuildStorageSampleRateRangePanel();
         _acquisition = new AcquisitionService(_settings);
         _waveformStore = new WaveformStore(DisplayCapacity());
@@ -171,6 +183,7 @@ public sealed class MainWindow : Window
         _analysisPipeline.Faulted += fault => Dispatcher.UIThread.Post(() => _status.Text = fault.Message);
         _tdmsViewer = new TdmsViewerControl(_settings.Storage.TdmRuntimeDir);
         _fftResultViewer = new FftResultViewerControl(_settings.Analysis.ResultRootPath);
+        _signalProcessingViewer = new SignalProcessingControl(_settings.Storage.TdmRuntimeDir, _settings.Analysis.ResultRootPath);
         LoadMonitorViewsFromSettings();
         LoadStorageChannelSelectionFromSettings();
         if (_monitorViews.Count == 0)
@@ -187,6 +200,8 @@ public sealed class MainWindow : Window
         _storageSampleRateMax.Text = FormatNullableSampleRate(_settings.Storage.ChannelSelection.SampleRateMaxHz);
         _namingMode.ItemsSource = new[] { "\u6309\u65f6\u95f4\u547d\u540d", "\u81ea\u5b9a\u4e49\u547d\u540d" };
         _namingMode.SelectedIndex = _settings.Storage.NamingMode == FileNamingMode.Time ? 0 : 1;
+        _monitorRenderScaleSlider.Value = _settings.Display.RenderBucketScale;
+        UpdateMonitorRenderScaleText();
         InitializeCompressionControls();
         StyleInput(_storagePath);
         StyleInput(_customFileName);
@@ -241,6 +256,24 @@ public sealed class MainWindow : Window
         _closeSelectionButton.Click += (_, _) => HideSelectionDrawer();
         _selectAllChannelsButton.Click += (_, _) => SetAllChannelsForActiveView(true);
         _clearChannelsButton.Click += (_, _) => SetAllChannelsForActiveView(false);
+        _monitorRenderScaleSlider.PropertyChanged += (_, e) =>
+        {
+            if (e.Property != RangeBase.ValueProperty)
+            {
+                return;
+            }
+
+            double scale = ClampRenderBucketScale(_monitorRenderScaleSlider.Value);
+            if (Math.Abs(_settings.Display.RenderBucketScale - scale) < 0.001)
+            {
+                return;
+            }
+
+            _settings.Display.RenderBucketScale = scale;
+            UpdateMonitorRenderScaleText();
+            ApplyMonitorRenderScale();
+            AppSettingsLoader.SaveDisplayRenderScale(scale);
+        };
         _activeViewVisibleCheck.IsCheckedChanged += (_, _) =>
         {
             if (_updatingSelectionPanel || _monitorViews.Count == 0)
@@ -421,6 +454,7 @@ public sealed class MainWindow : Window
 
         _tdmsViewer.Dispose();
         _fftResultViewer.Dispose();
+        _signalProcessingViewer.Dispose();
         await DisposeMonitorViewsAsync();
         _captureTimer.Stop();
         _runtimeStatsTimer.Stop();
@@ -451,14 +485,12 @@ public sealed class MainWindow : Window
             new(CompressionPreprocessor.None, "\u65e0"),
             new(CompressionPreprocessor.Delta1, "\u4e00\u9636\u5dee\u5206"),
             new(CompressionPreprocessor.Delta2, "\u4e8c\u9636\u5dee\u5206"),
-            new(CompressionPreprocessor.Lpc, "LPC"),
-            new(CompressionPreprocessor.ByteShuffle, "\u5b57\u8282\u91cd\u6392"),
-            new(CompressionPreprocessor.FloatXorDelta, "\u6d6e\u70b9 XOR \u5dee\u5206"),
-            new(CompressionPreprocessor.DeltaFloatPredictor, "\u6d6e\u70b9\u7ebf\u6027\u9884\u6d4b"),
-            new(CompressionPreprocessor.IntDeltaZigZag, "\u6574\u6570\u5dee\u5206 ZigZag")
+            new(CompressionPreprocessor.Lpc, "LPC")
         };
         _compressionPreprocessorCombo.ItemsSource = preprocessors;
-        _compressionPreprocessorCombo.SelectedItem = preprocessors.FirstOrDefault(item => item.Value == compression.Preprocessor) ?? preprocessors[0];
+        _compressionPreprocessorCombo.SelectedItem =
+            preprocessors.FirstOrDefault(item => item.Value == compression.Preprocessor) ??
+            preprocessors.First(item => item.Value == CompressionPreprocessor.Delta1);
 
         _compressionAlgorithmCombo.Width = 150;
         _compressionPreprocessorCombo.Width = 150;
@@ -566,6 +598,7 @@ public sealed class MainWindow : Window
                 new TabItem { Header = "\u6570\u636e\u67e5\u770b", Content = _tdmsViewer },
                 new TabItem { Header = "FFT \u5206\u6790", Content = BuildAnalysisTab() },
                 new TabItem { Header = "FFT \u7ed3\u679c", Content = _fftResultViewer },
+                new TabItem { Header = "\u4fe1\u53f7\u5904\u7406", Content = _signalProcessingViewer },
                 new TabItem { Header = "\u5b58\u50a8", Content = BuildStorageTab() }
             }
         };
@@ -605,7 +638,7 @@ public sealed class MainWindow : Window
         _activeViewText.Foreground = TextSecondary;
         _activeViewText.FontSize = 13;
         _activeViewText.TextWrapping = TextWrapping.Wrap;
-        _activeViewText.Width = 104;
+        _activeViewText.Width = 120;
 
         _addViewButton.MinWidth = 82;
         _removeViewButton.MinWidth = 82;
@@ -622,7 +655,7 @@ public sealed class MainWindow : Window
         {
             Margin = new Thickness(0, 10, 0, 10),
             Padding = new Thickness(10),
-            Width = 120,
+            Width = 138,
             Background = PanelBackground,
             BorderBrush = BorderBrushSoft,
             BorderThickness = new Thickness(1),
@@ -635,6 +668,7 @@ public sealed class MainWindow : Window
                     _addViewButton,
                     _removeViewButton,
                     _showSelectionButton,
+                    BuildMonitorRenderScalePanel(),
                     _activeViewText
                 }
             }
@@ -644,6 +678,51 @@ public sealed class MainWindow : Window
         {
             Orientation = Orientation.Horizontal,
             Children = { rail, _selectionDrawerHost }
+        };
+    }
+
+    private Control BuildMonitorRenderScalePanel()
+    {
+        _monitorRenderScaleValue.Foreground = TextPrimary;
+        _monitorRenderScaleValue.FontSize = 12;
+        _monitorRenderScaleValue.Width = 34;
+        _monitorRenderScaleValue.TextAlignment = TextAlignment.Right;
+        _monitorRenderScaleValue.VerticalAlignment = VerticalAlignment.Center;
+
+        var row = new Grid
+        {
+            ColumnDefinitions = new ColumnDefinitions("*,Auto"),
+            ColumnSpacing = 6,
+            Children =
+            {
+                _monitorRenderScaleSlider,
+                _monitorRenderScaleValue
+            }
+        };
+        Grid.SetColumn(_monitorRenderScaleValue, 1);
+
+        return new StackPanel
+        {
+            Spacing = 4,
+            Margin = new Thickness(0, 4, 0, 4),
+            Children =
+            {
+                new TextBlock
+                {
+                    Text = "\u663e\u793a\u7ec6\u8282",
+                    Foreground = TextPrimary,
+                    FontSize = 12,
+                    FontWeight = FontWeight.SemiBold
+                },
+                row,
+                new TextBlock
+                {
+                    Text = "\u4f4e\u66f4\u6d41\u7545\uff0c\u9ad8\u66f4\u7ec6\u81f4",
+                    Foreground = TextSecondary,
+                    FontSize = 11,
+                    TextWrapping = TextWrapping.Wrap
+                }
+            }
         };
     }
 
@@ -844,7 +923,7 @@ public sealed class MainWindow : Window
                     return;
                 }
 
-                CommitMonitorSelectionChange(_monitorViews[_activeViewIndex]);
+                CommitMonitorSelectionChange(_monitorViews[_activeViewIndex], rebuildSelectionTree: false);
             };
             channelPanel.Children.Add(channelCheck);
         }
@@ -2173,7 +2252,8 @@ public sealed class MainWindow : Window
         {
             Store = _waveformStore,
             WindowSeconds = _settings.Display.WindowSeconds,
-            DefaultYAxisAmplitude = _settings.Display.DefaultYAxisAmplitude
+            DefaultYAxisAmplitude = _settings.Display.DefaultYAxisAmplitude,
+            RenderBucketScale = _settings.Display.RenderBucketScale
         };
 
         var title = new TextBlock
@@ -2213,9 +2293,9 @@ public sealed class MainWindow : Window
         MonitorViewState? view = null;
         var renderLoop = new MonitorViewRenderLoop(
             waveform,
-            MonitorFrameInterval(),
+            () => MonitorFrameInterval(view),
             () => view?.Visible == true,
-            TrackDisplayFrame);
+            () => TrackDisplayFrame(view));
 
         string name = string.IsNullOrWhiteSpace(settings?.Name)
             ? DefaultMonitorViewName(_monitorViews.Count)
@@ -2431,12 +2511,34 @@ public sealed class MainWindow : Window
         return true;
     }
 
-    private void CommitMonitorSelectionChange(MonitorViewState view)
+    private void CommitMonitorSelectionChange(MonitorViewState view, bool rebuildSelectionTree = true)
     {
         RefreshViewChannels(view);
         ApplyMonitorSelectionsToStore();
-        RebuildSelectionTree();
+        if (rebuildSelectionTree && _selectionDrawerHost.IsVisible)
+        {
+            RebuildSelectionTree();
+        }
+        else
+        {
+            UpdateActiveViewText();
+            UpdateSelectionSummary(view);
+        }
+
         PersistMonitorViewSettings();
+    }
+
+    private void UpdateSelectionSummary(MonitorViewState view)
+    {
+        if (_monitorViews.Count == 0)
+        {
+            return;
+        }
+
+        _selectionTitle.Text = $"{view.Name} \u901a\u9053\u9009\u62e9";
+        _selectionHint.Text = _acquisition.Devices.Count == 0
+            ? "\u672a\u8fde\u63a5\u8bbe\u5907\uff0c\u8fde\u63a5\u540e\u5c06\u663e\u793a\u8bbe\u5907\u6811"
+            : $"\u5df2\u9009 {view.SelectedKeys.Count}/{MaxChannelsPerMonitorView} \u901a\u9053\uff0c\u53ef\u8de8\u8bbe\u5907\u53e0\u52a0";
     }
 
     private async Task RemoveActiveMonitorViewAsync()
@@ -2491,15 +2593,94 @@ public sealed class MainWindow : Window
         return Math.Max(1000, pointsPerSecond * seconds);
     }
 
-    private TimeSpan MonitorFrameInterval()
+    private void ApplyMonitorRenderScale()
     {
-        double milliseconds = Math.Max(1.0, 1000.0 / Math.Max(1, _settings.Display.TargetFps));
+        double scale = ClampRenderBucketScale(_settings.Display.RenderBucketScale);
+        foreach (MonitorViewState view in _monitorViews)
+        {
+            view.Waveform.RenderBucketScale = scale;
+            view.Waveform.InvalidateVisual();
+        }
+    }
+
+    private void UpdateMonitorRenderScaleText()
+    {
+        double scale = ClampRenderBucketScale(_settings.Display.RenderBucketScale);
+        _monitorRenderScaleValue.Text = $"{scale * 100:0}%";
+    }
+
+    private static double ClampRenderBucketScale(double value)
+    {
+        return double.IsFinite(value) ? Math.Clamp(value, 0.25, 2.0) : 1.0;
+    }
+
+    private TimeSpan MonitorFrameInterval(MonitorViewState? view)
+    {
+        int targetFps = Math.Clamp(_settings.Display.TargetFps, 1, 120);
+        int visibleViews = Math.Max(1, _monitorViews.Count(item => item.Visible));
+        int channelCount = view?.Channels.Count ?? 0;
+        int visibleChannelCount = _monitorViews.Where(item => item.Visible).Sum(item => item.Channels.Count);
+        bool active = view is not null && _monitorViews.IndexOf(view) == _activeViewIndex;
+
+        if (!active)
+        {
+            targetFps = Math.Min(targetFps, visibleViews >= 32 ? 8 : visibleViews >= 16 ? 12 : visibleViews >= 8 ? 20 : 30);
+        }
+
+        if (!active && channelCount >= 48)
+        {
+            targetFps = Math.Min(targetFps, 10);
+        }
+
+        if (visibleChannelCount >= 2048)
+        {
+            targetFps = Math.Min(targetFps, active ? 40 : 8);
+        }
+        else if (visibleChannelCount >= 512)
+        {
+            targetFps = Math.Min(targetFps, active ? 50 : 12);
+        }
+
+        targetFps = _lastBackpressureLevel switch
+        {
+            BackpressureLevel.PauseDisplay => Math.Min(targetFps, active ? 8 : 1),
+            BackpressureLevel.ReduceDisplay => Math.Min(targetFps, active ? 30 : 6),
+            BackpressureLevel.StopRequired => 1,
+            _ => targetFps
+        };
+
+        double milliseconds = Math.Max(1.0, 1000.0 / Math.Max(1, targetFps));
         return TimeSpan.FromMilliseconds(milliseconds);
     }
 
-    private void TrackDisplayFrame()
+    private void TrackDisplayFrame(MonitorViewState? view)
     {
+        if (view is not null)
+        {
+            view.Waveform.RenderQuality = ResolveRenderQuality(view);
+            view.Waveform.RenderBucketScale = _settings.Display.RenderBucketScale;
+        }
+
         Interlocked.Increment(ref _displayFrameCounter);
+    }
+
+    private WaveformRenderQuality ResolveRenderQuality(MonitorViewState view)
+    {
+        int visibleViews = Math.Max(1, _monitorViews.Count(item => item.Visible));
+        int visibleChannelCount = _monitorViews.Where(item => item.Visible).Sum(item => item.Channels.Count);
+        bool active = _monitorViews.IndexOf(view) == _activeViewIndex;
+        if (!active ||
+            _lastBackpressureLevel >= BackpressureLevel.ReduceDisplay ||
+            visibleViews >= 8 ||
+            visibleChannelCount >= 256 ||
+            view.Channels.Count >= 32)
+        {
+            return WaveformRenderQuality.Lightweight;
+        }
+
+        return active && view.Channels.Count <= 8
+            ? WaveformRenderQuality.Detailed
+            : WaveformRenderQuality.Balanced;
     }
 
     private void RefreshViewChannels(MonitorViewState view)
@@ -2671,6 +2852,7 @@ public sealed class MainWindow : Window
 
     private void UpdateTelemetry(CaptureTelemetry telemetry)
     {
+        _lastBackpressureLevel = telemetry.BackpressureLevel;
         double mb = telemetry.BytesReceived / 1024.0 / 1024.0;
         CaptureStorageStatistics? storageStats = _storageService?.GetStatistics() ?? _lastStorageStats;
         if (_storageService is not null && storageStats is not null)
@@ -3276,16 +3458,16 @@ public sealed class MainWindow : Window
     private sealed class MonitorViewRenderLoop : IAsyncDisposable
     {
         private readonly WaveformControl _waveform;
-        private readonly TimeSpan _interval;
+        private readonly Func<TimeSpan> _intervalProvider;
         private readonly Func<bool> _shouldRender;
         private readonly Action _frameTick;
         private readonly CancellationTokenSource _cts = new();
         private readonly Task _worker;
 
-        public MonitorViewRenderLoop(WaveformControl waveform, TimeSpan interval, Func<bool> shouldRender, Action frameTick)
+        public MonitorViewRenderLoop(WaveformControl waveform, Func<TimeSpan> intervalProvider, Func<bool> shouldRender, Action frameTick)
         {
             _waveform = waveform;
-            _interval = interval;
+            _intervalProvider = intervalProvider;
             _shouldRender = shouldRender;
             _frameTick = frameTick;
             _worker = Task.Factory.StartNew(
@@ -3297,11 +3479,17 @@ public sealed class MainWindow : Window
 
         private async Task RunAsync(CancellationToken cancellationToken)
         {
-            using var timer = new PeriodicTimer(_interval);
             try
             {
-                while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false))
+                while (!cancellationToken.IsCancellationRequested)
                 {
+                    TimeSpan interval = _intervalProvider();
+                    if (interval <= TimeSpan.Zero)
+                    {
+                        interval = TimeSpan.FromMilliseconds(16);
+                    }
+
+                    await Task.Delay(interval, cancellationToken).ConfigureAwait(false);
                     Dispatcher.UIThread.Post(() =>
                     {
                         if (cancellationToken.IsCancellationRequested || !_shouldRender())

@@ -6,5 +6,6 @@
   <ItemGroup>
     <ProjectReference Include="..\DashCapture.Core\DashCapture.Core.csproj" />
     <ProjectReference Include="..\DashCapture.Native\DashCapture.Native.csproj" />
+    <ProjectReference Include="..\DashCapture.Storage\DashCapture.Storage.csproj" />
   </ItemGroup>
 </Project>

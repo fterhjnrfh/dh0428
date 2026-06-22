@@ -42,6 +42,21 @@ public static class AppSettingsLoader
         WriteSettingsRoot(path, root);
     }
 
+    public static void SaveDisplayRenderScale(double renderBucketScale)
+    {
+        string path = FindSettingsPath();
+        JsonObject root = ReadSettingsRoot(path);
+        var display = root["Display"] as JsonObject;
+        if (display is null)
+        {
+            display = new JsonObject();
+            root["Display"] = display;
+        }
+
+        display["RenderBucketScale"] = Math.Clamp(renderBucketScale, 0.25, 2.0);
+        WriteSettingsRoot(path, root);
+    }
+
     public static void SaveStorageChannelSelection(StorageChannelSelectionSettings channelSelection)
     {
         string path = FindSettingsPath();
