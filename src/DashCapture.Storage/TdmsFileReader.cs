@@ -1443,8 +1443,11 @@ public sealed class TdmsFileReader : IDisposable
                 return 0;
             }
 
-            int bucket = (int)((double)relative / totalSampleCount * bucketCount);
-            return Math.Clamp(bucket, 0, bucketCount - 1);
+            ulong buckets = (ulong)bucketCount;
+            ulong bucket = relative <= ulong.MaxValue / buckets
+                ? relative * buckets / totalSampleCount
+                : (ulong)Math.Floor((decimal)relative * bucketCount / totalSampleCount);
+            return bucket >= buckets ? bucketCount - 1 : (int)bucket;
         }
 
     }
